@@ -1,0 +1,74 @@
+{
+  "description": "Tudo o que as pessoas fizeram com seus comentários, avaliações e atividade.",
+  "markAllAsRead": "Marcar tudo como lido.",
+  "markAllAsUnread": "Marcar tudo como não lido",
+  "markAsRead": "Marcar como lido",
+  "markAsUnread": "Marcar como não lida",
+  "deleteAll": "Apagar tudo",
+  "deleteAllTitle": "Excluir todas as notificações?",
+  "deleteAllDescription": "Isto exclui permanentemente cada notificação que você tem. Isto não pode ser desfeito.",
+  "system": "TrackGeek",
+  "learnMore": "Saiba mais",
+  "welcome": {
+    "title": "Bem-vindo ao TrackGeek",
+    "description": "Comece a seguir animes, mangás, séries, filmes, jogos e livros que você ama."
+  },
+  "unreadCount_one": "{{count}} notificação não lida",
+  "unreadCount_other": "{{count}} notificações não lidas",
+  "preferences": {
+    "title": "Preferências de notificação",
+    "description": "Escolha quais notificações você deseja receber. Notificações do sistema são sempre entregues.",
+    "comment": "Comentários",
+    "commentDescription": "Quando alguém comenta no seu perfil.",
+    "reaction": "Reações",
+    "reactionDescription": "Quando alguém reage aos seus comentários, comentários ou atividade.",
+    "newEpisode": "Novos episódios",
+    "newEpisodeDescription": "Quando um anime ou uma série de TV que você está assistindo lança um novo episódio.",
+    "newChapter": "Novos capítulos",
+    "newChapterDescription": "Quando um mangá que você lê lança um novo capítulo.",
+    "gameRelease": "Lançamentos de jogos",
+    "gameReleaseDescription": "Quando um jogo que você está rastreando ou favoritando é lançado.",
+    "sequelAdded": "Sequências de anime",
+    "sequelAddedDescription": "Quando uma sequência de um anime que você concluiu é anunciada.",
+    "reopenedCompleted": "Títulos reabertos",
+    "reopenedCompletedDescription": "Quando um título que você completou volta para assistir porque um novo conteúdo chegou.",
+    "levelUp": "Níveis alcançados",
+    "levelUpDescription": "Quando você atinge um novo nível.",
+    "mission": "Missões",
+    "missionDescription": "Quando você completar uma missão."
+  },
+  "release": {
+    "episode": "Episódio {{number}} do {{title}} foi lançado",
+    "seasonEpisode": "A Temporada {{season}}, episódio {{number}} do {{title}} lançado",
+    "episodeUnknown": "Um novo episódio de {{title}} foi lançado",
+    "chapter": "Capítulo {{number}} do {{title}} foi lançado",
+    "chapterUnknown": "Um novo capítulo de {{title}} foi lançado",
+    "game": "{{title}} foi lançado",
+    "sequel": "{{title}} foi adicionado como sequência",
+    "reopened": "Voltou ao Assistindo",
+    "viewTitle": "Ver título"
+  },
+  "empty": {
+    "title": "Nenhuma notificação ainda",
+    "description": "Quando alguém comenta seu perfil ou reage ao seu conteúdo, ele aparece aqui."
+  },
+  "types": {
+    "CommentOnProfile": "comentou no seu perfil",
+    "ReactionOnComment": "reagiu ao seu comentário",
+    "ReactionOnActivity": "reagiu à sua atividade",
+    "ReactionOnAnimeReview": "reagiu à sua avaliação de anime",
+    "ReactionOnMangaReview": "reagiu à sua avaliação de mangá",
+    "ReactionOnTvShowReview": "reagiu à sua avaliação de série",
+    "ReactionOnMovieReview": "reagiu à sua avaliação do filme",
+    "ReactionOnGameReview": "reagiu à sua avaliação do jogo",
+    "ReactionOnBookReview": "reagiu à sua avaliação de livro"
+  },
+  "levelUp": {
+    "title": "Subiste de nível!",
+    "description": "Você atingiu o nível {{level}}."
+  },
+  "missionCompleted": {
+    "title": "Missão concluída!",
+    "description": "Você completou “{{missionName}}” e a recompensa foi entregue."
+  }
+}

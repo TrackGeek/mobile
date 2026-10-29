@@ -1,0 +1,407 @@
+{
+  "accountDeleted": {
+    "title": "Sua conta foi excluída",
+    "description": "Tudo correu bem. Obrigado pelo tempo que você passou conosco — seja bem-vindo de volta a qualquer hora."
+  },
+  "landing": {
+    "demoTitle": "Experiência de rastreamento perfeita e ampla",
+    "demoDescription": "Tente você mesmo. Nosso sistema de rastreamento é rápido e responsivo. Clique no botão do lado direito para simular o progresso de um episódio.",
+    "crossDevice": "Sincronização entre Dispositivos",
+    "notifications": "Notificações de lançamento",
+    "progress": "Sistema de progresso avançado",
+    "lists": "Listas Personalizadas",
+    "favorites": "Exiba seus favoritos no seu perfil",
+    "feed": "Feed com múltiplas vistas",
+    "upload": "Envie suas capturas de tela e mostre aos seus amigos",
+    "related": "Ver animes, sequências, prequelas e franquias relacionadas",
+    "hideContent": "Ocultar tipos de conteúdo específicos",
+    "cleanLayout": "Layout limpo",
+    "settings": "Configurações personalizadas para notificações e exibição.",
+    "watchingNow": "Assistindo agora",
+    "seasonProgress": "Progresso da Temporada",
+    "markEpisode": "Marcar Episódio {{number}} como Assistido",
+    "toastCongrats": "Parabéns! Você terminou esta série.",
+    "toastMark": "Episódio {{number}} marcado como assistido!",
+    "CTATitle": "Pronto para assumir o controle?",
+    "CTADescription": "Junte-se a outros geeks organizando a sua mídia favorita hoje!",
+    "CTAButton": "Comece gratuitamente",
+    "alive": "Estamos vivos!",
+    "heroTitle": "Organize sua <1>Jornada Geek</1>",
+    "heroDescription": "O rastreador definitivo para anime, jogos, filmes, séries, mangá e livros. Descubra estatísticas, conecte-se com amigos e nunca perca a trilha do seu progresso. Código aberto, auto-hospedável, e grátis.",
+    "heroButton": "Ver no GitHub",
+    "featuresTitle": "Todas as suas necessidades em um só lugar",
+    "featuresDescription": "Pare de malabarismos com vários aplicativos e planilhas.",
+    "import": {
+      "title": "Sua biblioteca.",
+      "titleAccent": "Não há necessidade de começar de novo.",
+      "description": "Traga seus animes, mangás e jogos para o TrackGeek. Importe automaticamente suas listas ao invés de adicionar cada título à mão.",
+      "hint": "Escolha uma plataforma para começar. Importar de um perfil público ou de um arquivo de exportação.",
+      "exportFile": "Exportar arquivo",
+      "backloggdExport": "Exportação do Backloggd Plus",
+      "providerAction": "Importar do {{provider}}",
+      "destination": "Uma casa para a sua biblioteca."
+    },
+    "animeManga": "Anime & Mangá",
+    "animeMangaDescription": "Um dos maiores catálogos de anime e mangá, com acesso a relações, personagens e informações detalhadas.",
+    "moviesTVShows": "Filmes & Séries",
+    "moviesTVShowsDescription": "Obtenha acesso a um rico catálogo de filmes e séries, com visualizações de franquias e notificações para novas versões ou próximos episódios.",
+    "advancedProgress": "Progresso Avançado",
+    "advancedProgressDescription": "Destaque detalhes importantes do seu conteúdo, adicione notas e escreva uma análise completa no final.",
+    "socialFeed": "Feed Social",
+    "socialFeedDescription": "Veja o que seus amigos estão fazendo e compartilhe seus pensamentos com eles.",
+    "gamesDescription": "Um fã de jogos que precisa organizar melhor a sua biblioteca? Acompanhe o tempo de jogo, o progresso geral do jogo e vários status de conclusões.",
+    "booksDescription": "Para o mais literário, oferecemos uma opção também. Acompanhe as páginas que leu e quantas vezes você releu um livro.",
+    "proofOpenSource": "Código aberto",
+    "proofSelfHost": "Auto-hospedável",
+    "proofFree": "Grátis para sempre",
+    "proofNoAds": "Sem anúncios, sem rastreamento",
+    "githubStars_one": "{{count}} estrela no GitHub",
+    "githubStars_other": "{{count}} estrelas no GitHub",
+    "heroScroll": "Veja como funciona",
+    "catalogLead": "Cada mídia com o qual você se preocupa já está indexado e pronto para rastrear.",
+    "demoHint": "Esta é a interacção real, não uma gravação.",
+    "demoReplay": "Redefinir a demonstração",
+    "trustTitle": "Construído para ser confiável, não apenas usado",
+    "trustDescription": "Sem padrões escuros, sem assinaturas, sem anúncios. O código é público e os dados são seus.",
+    "trustOpenSourceTitle": "Código aberto",
+    "trustOpenSourceDescription": "Cada linha do TrackGeek é pública. Leia-o, audite-o ou envie um pull request.",
+    "trustSelfHostTitle": "Auto-hospedável",
+    "trustSelfHostDescription": "Execute sua própria instância em seu próprio hardware. Ninguém pode manter sua biblioteca refém.",
+    "trustPrivacyTitle": "Sem anúncios, sem rastreamento",
+    "trustPrivacyDescription": "Nós não vendemos seus dados e não vendemos a sua atenção. Não há aqui nenhum negócio publicitário.",
+    "trustExportTitle": "Seus dados permanecem portáteis",
+    "trustExportDescription": "Exporte tudo como um ZIP de arquivos CSV quando quiser e exclua sua conta para sempre.",
+    "trustAction": "Ler a fonte",
+    "faqTitle": "Perguntas antes de iniciar",
+    "faqDescription": "Respostas diretas, sem encheção de saco.",
+    "faqFreeQuestion": "TrackGeek é realmente gratuito?",
+    "faqFreeAnswer": "Sim. O rastreador é gratuito e nenhuma parte da sua biblioteca fica atrás de uma assinatura paga. Doações são opcionais e vão para hospedagem.",
+    "faqScopeQuestion": "O que posso realmente rastrear?",
+    "faqScopeAnswer": "Anime, mangá, filmes, séries, jogos e livros, tudo em um perfil, com progresso, classificações, notas e avaliações completas.",
+    "faqImportQuestion": "Posso trazer dados de outro rastreador?",
+    "faqImportAnswer": "Sim. Você pode importar diretamente de MyAnimeList, AniList, Backloggd e qualquer outra instância do TrackGeek diretamente das suas configurações.",
+    "faqLeaveQuestion": "O que acontece aos meus dados se eu sair?",
+    "faqLeaveAnswer": "Exporte-o como um ZIP de arquivos CSV em um clique e, em seguida, exclua sua conta. A exclusão é permanente e remove seus dados pessoais.",
+    "faqSelfHostQuestion": "Posso executar a minha própria instância?",
+    "faqSelfHostAnswer": "Sim. TrackGeek é de código aberto e auto-hospedável, e você pode mover sua biblioteca entre instâncias com exportação e importação.",
+    "CTAReassurance": "Grátis para sempre, sem cartão de crédito, e você pode exportar ou excluir tudo a qualquer momento."
+  },
+  "addData": {
+    "description": "O TrackGeek depende de bancos de dados de terceiros como <tmdb>TMDB</tmdb> (The Movie Database), <mal>MAL</mal> (My Anime List), <al>Anilist</al>, <hc>HardCover</hc>, <igdb>IGDB</igdb> para os dados de Série, Filme, Jogos, Livro, Anime e Mangá. Se você encontrar que uma série, jogo, mangá, livro, anime ou filme específico está faltando no TrackGeek, você pode adicioná-lo ao banco de dados correspondente.",
+    "warning": "Novas entradas podem demorar até 24 horas para aparecerem na pesquisa do TrackGeek, já que atualizamos nosso índice diariamente.",
+    "forAnimes": "Para animes",
+    "forMovies": "Para filmes",
+    "forGames": "Para jogos",
+    "forBooks": "Para livros",
+    "forManga": "Para mangá",
+    "forTVShows": "Para séries",
+    "createAccount": "Crie uma <1>conta</1>, você precisará de uma conta para contribuir.",
+    "fillInfo": "Visite esta <1>página</1> para preencher as informações necessárias, como título, data de lançamento, capa.",
+    "saveAnime": "Depois de preencher o formulário, clique em \"Add Anime Series\" na parte inferior da página.",
+    "saveManga": "Assim que preencher o formulário, clique em \"Add Manga\" no final da página.",
+    "saveGame": "Depois de preencher o formulário, clique em \"Create Game\" na parte inferior da página.",
+    "save": "Depois de completar o formulário, clique em \"Salvar\" no final da página.",
+    "reminder": "Lembre-se que o TrackGeek depende da precisão e completude de outras bases de dados, então quaisquer mudanças que você fizer também beneficiarão toda comunidade."
+  },
+  "privacyPolicy": {
+    "intro": "TrackGeek (\"nós\") respeita a sua privacidade. Esta Política de Privacidade explica como coletamos, usamos, armazenamos e protegemos seus dados pessoais quando você usa trackgeek.net.",
+    "dataWeCollect.title": "Dados que Coletamos",
+    "dataWeCollect.account": "Quando você cria uma conta, coletamos seu endereço de e-mail, nome de usuário e avatar.",
+    "dataWeCollect.auth": "A autenticação é fornecida por e-mail com links mágicos e provedores de terceiros, como GitHub, Google e Discord.",
+    "dataWeCollect.content": "Nós armazenamos o seu conteúdo acompanhado, o seu progresso, as suas avaliações, as suas notas e os metadados relacionados que você escolhe salvar.",
+    "dataWeCollect.cookies": "Nós usamos cookies técnicos necessários para autenticação e funcionalidade da plataforma.",
+    "howWeUseData.title": "Como Usamos Seus Dados",
+    "howWeUseData.list1": "Fornece e mantém o serviço TrackGeek.",
+    "howWeUseData.list2": "Autenticação de usuários e contas seguras.",
+    "howWeUseData.list3": "Armazenar seus dados e preferências de rastreamento.",
+    "howWeUseData.list4": "Melhorar a experiência da plataforma e do usuário.",
+    "thirdParties.title": "Serviços de Terceiros",
+    "thirdParties.metadata": "TrackGeek usa APIs de terceiros (IGDB, TMDB, Anilist, MyAnimeList, HardCover) apenas para buscar metadados. Nenhum dado de usuário pessoal é compartilhado com esses provedores.",
+    "thirdParties.analytics": "O TrackGeek usa o Google Analytics para entender padrões gerais de uso e melhorar a plataforma. Os dados da análise são coletados apenas após o consentimento do usuário e processados de acordo com os requisitos do GDPR, incluindo anonimato de IP.",
+    "payments.title": "Doações e pagamentos",
+    "payments.info": "O TrackGeek pode oferecer níveis opcionais de doação através de plataformas de terceiros, como o Patreon. O processamento de pagamento é manipulado por essas plataformas, e o TrackGeek não armazena detalhes de pagamento.",
+    "dataRetention.title": "Retenção de dados",
+    "dataRetention.text": "Nós mantemos seus dados enquanto a sua conta estiver ativa. Você pode excluir sua conta a qualquer momento e seus dados serão removidos permanentemente.",
+    "userRights.title": "Seus Direitos (GDPR)",
+    "userRights.access": "Você tem o direito de acessar seus dados pessoais.",
+    "userRights.export": "Você pode solicitar uma exportação dos seus dados.",
+    "userRights.delete": "Você pode excluir sua conta e dados pessoais a qualquer momento.",
+    "userRights.rectify": "Você pode solicitar a correção de dados imprecisos.",
+    "security.title": "Segurança",
+    "security.text": "Usamos medidas de segurança padrão do setor para proteger seus dados, incluindo controles de criptografia e acesso.",
+    "children.title": "Crianças",
+    "children.text": "TrackGeek está disponível para todas as audiências. Nós não coletamos dados pessoais de crianças sem o consentimento dos pais quando exigido por lei.",
+    "changes.title": "Alterações nesta Política",
+    "changes.text": "Podemos atualizar esta Política de Privacidade de vez em quando. As alterações serão publicadas nesta página com uma data atualizada.",
+    "contact.text": "Se você tiver dúvidas sobre esta Política de Privacidade ou seus dados, entre em contato conosco pelo <email>privacy@trackgeek.net</email>."
+  },
+  "terms": {
+    "intro": {
+      "title": "1. Introdução",
+      "text": "Bem-vindo ao TrackGeek. TrackGeek é um projeto orientado pela comunidade, desenvolvido e mantido por colaboradores independentes. Ao acessar ou usar a plataforma TrackGeek, você concorda com estes Termos de Serviço. Se você não concordar com estes termos, não deve usar o TrackGeek."
+    },
+    "definitions": {
+      "title": "2. Definições",
+      "trackgeek": "\"TrackGeek\" refere-se à plataforma, website, software e serviços relacionados do TrackGeek.",
+      "user": "\"Usuário\" refere-se a qualquer indivíduo que cria uma conta no TrackGeek.",
+      "content": "\"Conteúdo\" significa quaisquer dados enviados por usuários, incluindo informações de rastreamento de mídia, revisões, classificações, texto e metadados.",
+      "linkedAccounts": "\"Contas vinculadas\" refere-se a serviços opcionais de terceiros conectados ao TrackGeek via OAuth ou sistemas de autenticação similares."
+    },
+    "userResponsibilities": {
+      "title": "3. Responsabilidades do Usuário",
+      "respect": "Os usuários têm de tratar os outros com respeito e não se podem envolver em comportamentos abusivos, assédio, odiosos ou discriminatórios.",
+      "legal": "Os usuários devem assegurar que todos os conteúdos estejam em conformidade com a legislação aplicável em Portugal e na União Europeia.",
+      "ip": "Os usuários não podem carregar conteúdo que infrinja os direitos de propriedade intelectual ou a privacidade de outros.",
+      "security": "Os usuários são responsáveis por manter a confidencialidade das suas credenciais de conta e por todas as atividades sob sua conta."
+    },
+    "contentOwnership": {
+      "title": "4. Conteúdo do Usuário e Propriedade",
+      "text": "Os usuários mantêm a propriedade do conteúdo deles. Ao apresentar conteúdo ao TrackGeek, usuários concedem uma licença não exclusiva, sem royalties em todo o mundo para armazenar, exibir, processar e usar esse conteúdo exclusivamente para operar, manter e melhorar a plataforma."
+    },
+    "linkedAccounts": {
+      "title": "5. Contas de terceiros vinculadas",
+      "text": "Vincular serviços externos de terceiros é opcional. O TrackGeek não armazena credenciais de login de terceiros e só acessa dados explicitamente autorizados pelo usuário. A utilização de serviços de terceiros é regida pelos seus próprios termos e políticas."
+    },
+    "platformRights": {
+      "title": "6. Moderação e Direitos da Plataforma",
+      "text": "TrackGeek reserva-se o direito de remover ou moderar conteúdo que viola estes Termos, suspender ou restringir contas de usuário que abusam da plataforma e modificar ou cancelar qualquer parte do serviço a qualquer momento."
+    },
+    "disclaimer": {
+      "title": "7. Isenção de Garantias",
+      "text": "TrackGeek é fornecido em uma base de \"como está\" e \"como disponível\". Como um projeto comunitário, TrackGeek não faz garantias nem sobre a disponibilidade, precisão, confiabilidade ou operação livre de erros."
+    },
+    "liability": {
+      "title": "8. Limitação de responsabilidade",
+      "text": "Na máxima extensão permitida pela lei portuguesa e da União Europeia, TrackGeek e os seus contribuintes não serão responsabilizados por qualquer indirecto, acidentais, consequentes ou especiais danos decorrentes ou relacionados ao uso da plataforma."
+    },
+    "changes": {
+      "title": "9. Alterações a estes Termos",
+      "text": "Estes Termos de Serviço podem ser atualizados de tempos em tempos. O uso contínuo do TrackGeek após quaisquer alterações constitui aceitação dos Termos revisados."
+    },
+    "governingLaw": {
+      "title": "10. Lei governativa",
+      "text": "Estes Termos de Serviço são regidos pelas leis de Portugal e pelos regulamentos aplicáveis da União Europeia."
+    },
+    "contact": {
+      "text": "Se você tiver questões sobre estes Termos de Serviço, por favor contacte-nos através de <email>support@trackgeek.net</email>"
+    }
+  },
+  "credits": {
+    "description": "TrackGeek é construído por uma incrível comunidade de desenvolvedores, designers, tradutores e entusiastas de todo o mundo.",
+    "core": {
+      "title": "Equipe principal",
+      "description": "As pessoas dedicadas que mantêm e desenvolvem a infraestrutura central do TrackGeek:"
+    },
+    "community": {
+      "title": "Contribuidores da Comunidade",
+      "description": "Todos os que contribuíram para o TrackGeek através de código, traduções, suporte ou testes alfa."
+    },
+    "specialThanks": {
+      "title": "Agradecimentos especiais para...",
+      "openSource": "Comunidade Open Source",
+      "openSourceDescription": "TrackGeek não existiria sem o incrível ecossistema de código aberto. Somos gratos a todos os projetos e mantenedores que construímos.",
+      "users": "Nossos Usuários",
+      "usersDescription": "Somos muito gratos a todas as pessoas que usam o TrackGeek e compartilham seu amor e ideias conosco.",
+      "translators": "Tradutores",
+      "translatorsDescription": "Obrigado a todos que ajudam a traduzir o TrackGeek em diferentes idiomas, tornando-o acessível para usuários de todo o mundo."
+    },
+    "wantsToContribute": {
+      "title": "Quer contribuir?",
+      "description": "Sempre procuramos novos colaboradores para nos ajudar a construir o TrackGeek. Se você é um desenvolvedor, designer, tradutor ou apenas apaixonado pelo projeto, há um lugar para você."
+    }
+  },
+  "donate": {
+    "supportTitle": "Suporte TrackGeek",
+    "supportOptions": "Uma vez ou mensal! Você escolhe.",
+    "contributors": "Contribuidores",
+    "description": "Sua doação ajuda a cobrir servidores e desenvolvimento, mantendo o TrackGeek em funcionamento para a comunidade.",
+    "geeks": "Os GeekKeepers que tornam o TrackGeek vivo",
+    "perks": {
+      "title": "Um obrigado pelo seu apoio",
+      "description": "Desbloqueie benefícios à medida que suas doações aumentam. Cada nível inclui os benefícios do anterior.",
+      "get": "Obter esta regalia",
+      "items": {
+        "Tracker": {
+          "description": "Torne-se um apoiador e obtenha reconhecimento através da plataforma com cosméticos exclusivos e acesso prioritário.",
+          "benefits": [
+            "Emblema exclusivo de apoiador em seu perfil",
+            "Ocultar tipos de conteúdo irrelevante para você",
+            "O seu perfil aparecerá na página Doar",
+            "Suporte priorizado da nossa equipe"
+          ]
+        },
+        "Archivist": {
+          "description": "Tudo o que um Rastreador obtém, além de uma visão mais profunda das suas estatísticas e acesso antecipado ao que está por vir.",
+          "benefits": [
+            "Tudo do Rastreador",
+            "Estatísticas avançadas de perfil personalizadas à sua atividade",
+            "Acesso antecipado aos próximos recursos e experimentos",
+            "Atribuição prioritária de comentários e solicitações de recursos"
+          ]
+        },
+        "ArchiveMaster": {
+          "description": "O nível definitivo do apoiador. Tudo que um Arquivista ganha, mais o nível mais alto de reconhecimento na plataforma.",
+          "benefits": [
+            "Tudo do Arquivista",
+            "Cores e decorações de avatar para seu perfil",
+            "Medalha Mestre de Arquivo Exclusivo em toda a plataforma",
+            "Maior influência nas discussões e prioridades do planejamento",
+            "Reconhecimento especial em páginas voltadas para a comunidade",
+            "Estado do apoiador superior dentro do TrackGeek"
+          ]
+        }
+      }
+    },
+    "wantsToDonate": {
+      "title": "Quer doar?",
+      "description": "Por favor, note que o valor mínimo de doação é de $1. Um enorme obrigado a qualquer um que doa, nós realmente apreciamos!"
+    },
+    "modal": {
+      "description": "Escolha as suas opções de doação abaixo",
+      "type": "Tipo de Doação",
+      "select": "Selecionar Quantia",
+      "fixed": "Montante fixo",
+      "custom": "Valor personalizado",
+      "enter": "Introduzir quantia",
+      "method": "Método de pagamento",
+      "card": "Cartão de Crédito",
+      "footer": "Doação mínima é de $1. Seu suporte nos ajuda a manter o TrackGeek funcionando!"
+    },
+    "transparencyReports": "Relatórios de Transparência",
+    "success": {
+      "title": "Muito obrigado pelo seu apoio!",
+      "description": "Sua doação foi processada com sucesso. Nós realmente apreciamos sua contribuição para manter o TrackGeek vivo."
+    },
+    "error": {
+      "title": "Falha no pagamento",
+      "description": "Algo deu errado ao processar seu pagamento. Por favor, tente novamente ou entre em contato conosco se o problema persistir."
+    }
+  },
+  "billing": {
+    "fields": {
+      "name": "Descrição",
+      "date": "Data",
+      "amount": "Quantidade",
+      "type": "Tipo"
+    },
+    "subscription": {
+      "title": "Assinatura",
+      "description": "Gerencie seu plano de assinatura atual.",
+      "plan": "Plano",
+      "price": "Preço",
+      "renewsAt": "Renovar em",
+      "cancel": "Cancelar Assinatura",
+      "cancelConfirm": "Tem certeza que deseja cancelar sua assinatura?",
+      "cancelBack": "Voltar atrás",
+      "cancelConfirmButton": "Sim, cancelar",
+      "cancelSuccess": "Sua assinatura foi cancelada com sucesso.",
+      "cancelError": "Falha ao cancelar sua assinatura. Tente novamente.",
+      "noSubscription": "Sem assinatura ativa",
+      "noSubscriptionDescription": "Você não tem uma assinatura ativa. Suporte TrackGeek e desbloqueie vantagens exclusivas!",
+      "subscribe": "Ver Planos",
+      "statuses": {
+        "active": "Ativo",
+        "canceled": "Cancelado",
+        "past_due": "Vencido",
+        "unpaid": "Não pago",
+        "trialing": "Em teste"
+      }
+    },
+    "payments": {
+      "title": "Histórico de Pagamentos",
+      "description": "Veja todos os seus pagamentos e transações anteriores.",
+      "empty": "Não há pagamentos ainda!",
+      "emptyDescription": "Você ainda não fez nenhum pagamento.",
+      "statuses": {
+        "Pending": "Pendente",
+        "Succeeded": "Sucesso",
+        "Failed": "Falha"
+      }
+    },
+    "detail": {
+      "title": "Detalhes de Pagamento",
+      "subtotal": "Subtotal",
+      "discount": "Desconto",
+      "total": "Total",
+      "currency": "Moeda",
+      "expiredAt": "Valido até",
+      "invoice": "Nota Fiscal",
+      "viewInvoice": "Ver Nota Fiscal",
+      "viewCheckoutSession": "Ver Sessão de Checkout"
+    }
+  },
+  "compare": {
+    "metaTitle": "TrackGeek vs outros rastreadores de mídia",
+    "metaDescription": "Compare TrackGeek com Simkl, AniList, Backloggd, MyLists e StoryGraph. Veja cobertura de recursos, ferramentas sociais e profundidade do rastreamento.",
+    "heroTitle": "TrackGeek como uma alternativa",
+    "heroDescription": "Uma visualização honesta de recurso das principais plataformas de rastreamento de mídia. Escolha a ferramenta que corresponde ao seu fluxo de trabalho.",
+    "table": {
+      "features": "Recursos",
+      "note": "Nota: atualizações da plataforma podem causar ligeiras discrepâncias nesta tabela."
+    },
+    "support": {
+      "yes": "Suportado",
+      "no": "Não suportado",
+      "partial": "Parcialmente suportado"
+    },
+    "notes": {
+      "storygraphBooksOnly": "Progresso de leitura de livros somente.",
+      "mylistsCommentsOnly": "Comentários em listas em vez de avaliações completas.",
+      "storygraphPartnerIntegrations": "Integrações limitadas para aplicativos de parceiros.",
+      "anilistCommunityApps": "Nenhum aplicativo oficial; apps da comunidade disponíveis.",
+      "backloggdLimitedExport": "Importação disponível; exportação é limitada."
+    },
+    "criteria": {
+      "anime": {
+        "label": "Anime"
+      },
+      "manga": {
+        "label": "Mangá"
+      },
+      "books": {
+        "label": "Livros"
+      },
+      "games": {
+        "label": "Jogos"
+      },
+      "movies": {
+        "label": "Filmes"
+      },
+      "series": {
+        "label": "Séries"
+      },
+      "granular-progress": {
+        "label": "Progresso granular",
+        "description": "Progresso granular por episódio/capítulo/entrada."
+      },
+      "reviews": {
+        "label": "Avaliações",
+        "description": "Avaliações e pontuações por escrito"
+      },
+      "custom-lists": {
+        "label": "Listas Personalizadas",
+        "description": "Criar listas personalizadas públicas ou privadas."
+      },
+      "public-profile": {
+        "label": "Perfil público",
+        "description": "Compartilhar perfil com outros usuários."
+      },
+      "public-api": {
+        "label": "API público",
+        "description": "API pública voltada para desenvolvedores."
+      },
+      "feed": {
+        "label": "Feed social",
+        "description": "Seguir atividade pelos amigos/comunidades."
+      },
+      "mobile": {
+        "label": "Celular (PWA/App)",
+        "description": "Experiência móvel dedicada."
+      },
+      "import-export": {
+        "label": "Importar / Exportar",
+        "description": "Mover dados dentro e fora da plataforma."
+      }
+    }
+  }
+}

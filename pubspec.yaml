@@ -33,8 +33,25 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
-
+  cupertino_icons: ^2.0.0
+  http: ^1.6.0
+  hugeicons: ^1.2.0
+  shared_preferences: ^2.5.6
+  flutter_inappwebview: ^6.2.0-beta.3
+  google_sign_in: ^7.2.0
+  passkeys: ^2.23.1
+  app_links: ^7.2.2
+  flutter_svg: ^2.3.0
+  url_launcher: ^6.3.3
+  share_plus: ^13.3.1
+  intl: ^0.20.3
+  flutter_markdown_plus: ^1.0.12
+  image_picker: ^1.2.4
+  qr_flutter: ^4.1.0
+  flutter_timezone: ^5.1.1
+  http_parser: ^4.1.2
+  workmanager: ^0.10.10
+  flutter_local_notifications: 22.3.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -45,6 +62,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  fake_async: ^1.3.3
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -56,6 +74,46 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/auth/
+    - assets/icons/social/
+    - assets/i18n/af-ZA/
+    - assets/i18n/ar-SA/
+    - assets/i18n/ca-ES/
+    - assets/i18n/cs-CZ/
+    - assets/i18n/da-DK/
+    - assets/i18n/de-DE/
+    - assets/i18n/el-GR/
+    - assets/i18n/en-US/
+    - assets/i18n/es-ES/
+    - assets/i18n/fi-FI/
+    - assets/i18n/fr-FR/
+    - assets/i18n/he-IL/
+    - assets/i18n/hu-HU/
+    - assets/i18n/it-IT/
+    - assets/i18n/ja-JP/
+    - assets/i18n/ko-KR/
+    - assets/i18n/nl-NL/
+    - assets/i18n/no-NO/
+    - assets/i18n/pl-PL/
+    - assets/i18n/pt-BR/
+    - assets/i18n/pt-PT/
+    - assets/i18n/ro-RO/
+    - assets/i18n/ru-RU/
+    - assets/i18n/sr-SP/
+    - assets/i18n/sv-SE/
+    - assets/i18n/tr-TR/
+    - assets/i18n/uk-UA/
+    - assets/i18n/vi-VN/
+    - assets/i18n/zh-CN/
+    - assets/i18n/zh-TW/
+
+  fonts:
+    - family: Archivo
+      fonts:
+        - asset: assets/fonts/Archivo-Variable.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:

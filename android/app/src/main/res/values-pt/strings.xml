@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_title">TrackGeek</string>
+    <string name="widget_watching">AINDA A VER</string>
+    <string name="widget_reading">AINDA A LER</string>
+    <string name="widget_empty">Nada em progresso — abre o TrackGeek</string>
+    <string name="widget_refresh">Atualizar</string>
+    <string name="widget_description">Os teus animes, séries, mangás e livros em progresso</string>
+    <string name="widget_config_title">Widget TrackGeek</string>
+    <string name="widget_config_subtitle">Escolhe o que o widget mostra no launcher.</string>
+    <string name="widget_option_watching">Secção Ainda a Ver</string>
+    <string name="widget_option_reading">Secção Ainda a Ler</string>
+    <string name="widget_option_background">Fundo do widget</string>
+    <string name="widget_option_covers_only">Mostrar só as capas</string>
+    <string name="widget_add">Adicionar widget</string>
+    <string name="widget_preview_title">Frieren: Beyond Journey\'s End</string>
+</resources>

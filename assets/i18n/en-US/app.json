@@ -1,0 +1,30 @@
+{
+  "webOnly": {
+    "title": "Only on the website",
+    "description": "This feature is only available on the TrackGeek website for now.",
+    "import": "Import from other sources",
+    "oauthClients": "Create OAuth2 client",
+    "addData": "Add data"
+  },
+  "tabs": {
+    "home": "Home",
+    "search": "Search",
+    "settings": "Settings"
+  },
+  "auth": {
+    "password": "Password",
+    "signInTitle": "Sign in",
+    "signUpTitle": "Create account"
+  },
+  "server": {
+    "default": "Default (TrackGeek)",
+    "custom": "Custom instance",
+    "url": "Instance URL",
+    "invalid": "Invalid server URL"
+  },
+  "filters": {
+    "apply": "Apply",
+    "direction": "Direction"
+  },
+  "library": "Library"
+}

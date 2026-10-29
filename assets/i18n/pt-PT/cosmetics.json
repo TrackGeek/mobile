@@ -1,0 +1,81 @@
+{
+  "profileColors": "Cores do perfil",
+  "locked": "Bloqueado",
+  "unlocked": "Desbloqueado",
+  "requirements": {
+    "level": "Alcance o nível {{level}}",
+    "mission": "Complete “{{mission}}”",
+    "purchase": "Comprar por {{price}} moedas"
+  },
+  "colors": {
+    "emerald": "Esmeralda",
+    "slate": "Ardósia",
+    "blue": "Azul",
+    "rose": "Rosa",
+    "amber": "Âmbar",
+    "violet": "Violeta",
+    "cyan": "Ciano",
+    "fuchsia": "Fúcsia",
+    "gold": "Ouro",
+    "crimson": "Carmesim",
+    "obsidian": "Obsidiana",
+    "otaku": "Rosa Otaku",
+    "critic": "Azul-petróleo Crítico",
+    "omnivore": "Roxo Omnívoro",
+    "devoted": "Laranja Devoto",
+    "graphite": "Grafite",
+    "ruby": "Rubi",
+    "sapphire": "Safira",
+    "jade": "Jade",
+    "sunset": "Pôr do sol",
+    "orchid": "Orquídea"
+  },
+  "avatarFrames": "Molduras de avatar",
+  "profileTitles": "Títulos de perfil",
+  "bannerEffects": "Efeitos do banner",
+  "owned": "Adquirido",
+  "equipped": "Equipado",
+  "equip": {
+    "title": "Cosméticos",
+    "description": "Equipe os cosméticos que você desbloqueou ou comprou na loja."
+  },
+  "frames": {
+    "none": "Nenhum",
+    "glow": "Brilho de Esmeralda",
+    "neon": "Pulso Néon",
+    "gold_ring": "Anel de Ouro",
+    "rose_petals": "Pétalas de Rosa",
+    "aurora": "Aurora",
+    "obsidian_ring": "Anel de Obsidiana"
+  },
+  "titles": {
+    "none": "Nenhum",
+    "collector": "Colecionador",
+    "night_owl": "Coruja Noturna",
+    "binge_watcher": "Maratonista",
+    "page_turner": "Vira-páginas",
+    "trendsetter": "Influenciador",
+    "veteran": "Veterano",
+    "curator": "Curador",
+    "legend": "Lenda",
+    "founder": "Fundador"
+  },
+  "bannerEffectNames": {
+    "none": "Nenhum",
+    "gradient_wave": "Onda Gradiente",
+    "particles": "Partículas",
+    "scanlines": "Linhas de varredura",
+    "vignette_glow": "Brilho da Vinheta",
+    "aurora_sky": "Céu Aurora"
+  },
+  "gradientColors": "Cores gradientes",
+  "customColor": "Cor personalizada",
+  "gradients": {
+    "dusk": "Crepúsculo",
+    "oceanic": "Oceânico",
+    "sunrise": "Nascer do sol",
+    "nebula": "Nebulosa",
+    "aurora_flow": "Fluxo de Aurora",
+    "prism": "Prisma"
+  }
+}

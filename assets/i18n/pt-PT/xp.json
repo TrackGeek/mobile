@@ -1,0 +1,42 @@
+{
+  "level": "Nível",
+  "levelShort": "Lv. {{level}}",
+  "totalXp": "Total de {{count}} XP",
+  "xp": "XP",
+  "toNextLevel": "{{current}} / {{next}} XP para nível {{level}}",
+  "maxProgress": "Progresso máximo atingido",
+  "progression": "Progressão",
+  "byContentType": "Níveis por mídia",
+  "streak": "Sequência",
+  "longestStreak": "Melhor: {{count}} dias",
+  "noStreak": "Sem sequência ativa",
+  "coins": "Moedas",
+  "balance": "Saldo",
+  "lifetimeEarned": "Ganho: {{count}}",
+  "lifetimeSpent": "Gasto: {{count}}",
+  "history": "Histórico do XP",
+  "reasons": {
+    "EpisodeWatched": "Episódios vistos",
+    "ProgressStarted": "Título iniciado",
+    "ProgressCompleted": "Título concluído",
+    "ReviewAdded": "Análise escrita",
+    "ListCreated": "Lista criada",
+    "ListItemAdded": "Item adicionado a uma lista",
+    "FavoriteAdded": "Favorito adicionado",
+    "Followed": "Usuário seguido",
+    "CommentAdded": "Comentário escrito",
+    "ReactionAdded": "Reação adicionada",
+    "StreakBonus": "Bônus de Sequência",
+    "MissionCompleted": "Missão concluída"
+  },
+  "coinReasons": {
+    "LevelUp": "Subiu de nível",
+    "MissionCompleted": "Missão concluída",
+    "AdminGrant": "Concedido pela equipe",
+    "Purchase": "Compra de loja"
+  },
+  "levelUpToast": {
+    "title": "Nível {{level}} atingido!",
+    "description": "Continue monitorando para desbloquear mais recompensas."
+  }
+}

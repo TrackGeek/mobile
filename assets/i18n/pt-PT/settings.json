@@ -1,0 +1,441 @@
+{
+  "tabs": {
+    "preferences": "Preferências",
+    "security": "Segurança",
+    "connections": "Conexões",
+    "import": "Importar",
+    "appearance": "Aparência",
+    "account": "Conta",
+    "data": "Dados da biblioteca"
+  },
+  "export": {
+    "title": "Exportar seus dados",
+    "description": "Descarregue tudo o que rastreou como um ZIP dos arquivos CSV, pronto para ser importado em outra instância do TrackGeek.",
+    "contents": "Inclui o seu progresso, análises, episódios assistidos e capturas de tela para todos os tipos de conteúdo.",
+    "action": "Exportar",
+    "exporting": "A preparar...",
+    "slowNotice": "Históricos de episódios são lidos um título de cada vez, então grandes bibliotecas demoram um tempo. Mantenha esta aba aberta.",
+    "importAction": "Importar um backup",
+    "finished_one": "Exportação pronta com {{count}} entrada.",
+    "finished_other": "Exportação pronta com {{count}} entradas.",
+    "empty": "Ainda não há nada para exportar.",
+    "failed": "Não foi possível exportar seus dados."
+  },
+  "import": {
+    "description": "Traga a sua biblioteca de outro rastreador.",
+    "action": "Importar",
+    "states": {
+      "skipped": "Ignorado",
+      "unmatched": "Sem correspondência",
+      "pending": "Aguardando",
+      "running": "Importando",
+      "waiting": "Tentativa {{attempt}}",
+      "done": "Importado",
+      "error": "Falhou"
+    },
+    "errors": {
+      "notFound": "Mídia não encontrada",
+      "failed": "Não foi possível importar"
+    },
+    "file": {
+      "uploadTitle": "Envie seu arquivo",
+      "xmlDescription": "Carregar uma exportação XML do {{provider}} (.xml ou .xml.gz).",
+      "xmlDropzone": "<span>Selecione um arquivo</span> ou solte a sua exportação {{provider}} XML aqui",
+      "emptyTitle": "Nenhum ficheiro selecionado",
+      "emptyDescription": "Uma vez que enviar o seu arquivo, as entradas encontradas nele serão listadas aqui.",
+      "summary_one": "{{count}} entrada preparada para importar",
+      "summary_other": "{{count}} entradas preparadas para importar",
+      "finished_one": "{{count}} entrada importada.",
+      "finished_other": "{{count}} entradas importadas.",
+      "invalidFile": "Este arquivo não é uma exportação válida do {{provider}}.",
+      "emptyFile": "Nenhuma entrada rastreável foi encontrada neste arquivo."
+    },
+    "importing": "A importar...",
+    "downloadFailures": "Descarregar falhados",
+    "progress": "{{done}} importado, {{failed}} falhou de {{total}}",
+    "rateNotice": "Mantenha esta aba aberta até que termine.",
+    "ignored_one": "· {{count}} entrada ignorada",
+    "ignored_other": "· {{count}} entradas ignoradas",
+    "fileTooLarge": "Este arquivo é muito grande.",
+    "providers": {
+      "anilist": {
+        "name": "AniList",
+        "description": "Importe a sua biblioteca pública de anime e manga com pontuações, episódios assistidos e datas de um perfil Anilist."
+      },
+      "backloggd": {
+        "name": "Backloggd",
+        "description": "Importe seus jogos, avaliações, horas e datas de uma exportação do Backloggd Plus."
+      },
+      "myanimelist_anime": {
+        "name": "MyAnimeList",
+        "description": "Importe os seus animes, mangás, análises, episódios assistidos, capítulos lidos e datas de uma exportação do MyAnimeList."
+      },
+      "kitsu": {
+        "name": "Kitsu",
+        "description": "Importe os seus animes, mangás, análises, episódios assistidos, capítulos lidos e datas de uma exportação do Kitsu."
+      },
+      "trakt": {
+        "name": "Trakt",
+        "description": "Importe os seus filmes, séries de TV, análises e listas de uma exportação Trakt em ZIP."
+      }
+    },
+    "anilist": {
+      "title": "Revise os dados do seu AniList",
+      "description": "TrackGeek lê as suas listas públicas de anime e mangá do Anilist. Entradas privadas requerem autorização AniList e não estão incluídas.",
+      "collect": "Obter dados",
+      "collecting": "Coletando biblioteca pública...",
+      "noImport": "Nenhum dado foi importado para o TrackGeek. Reveja o relatório antes de decidir importá-lo.",
+      "review": "Como estes dados devem ser mapeados e importados para o TrackGeek?",
+      "updateNotice": "Importar estes dados atualizam as entradas correspondentes na sua biblioteca.",
+      "reportTitle": "Importar relatório",
+      "downloadReport": "Descarregar relatório de importação",
+      "background": "A sua importação continua em segundo plano. Podes retornar a esta página para verificar o relatório.",
+      "jobError": "Os dados expiraram ou a importação não está mais disponível. Colete novos dados e tente novamente.",
+      "reportSummary": "{{imported}} importado, {{skipped}} ignorado, {{unmatched}} sem correspondência, {{failed}} falhou de {{total}}.",
+      "reasons": {
+        "missingMalId": "ID MyAnimeList ausente",
+        "unsupportedStatus": "Status AniList não suportado",
+        "invalidEntry": "Entrada AniList inválida"
+      },
+      "warnings": {
+        "partialStartedAt": "Data de início parcial preenchida com o primeiro dia ou mês conhecido.",
+        "partialCompletedAt": "Data parcial de conclusão preenchida com o primeiro dia ou mês conhecido.",
+        "listRenamed": "Lista personalizada renomeada para {{name}} para manter os tipos de conteúdo separados.",
+        "invalidAdvancedScore": "A pontuação avançada {{name}} não pôde ser convertida."
+      },
+      "summary_one": "{{count}} item coletado de {{username}}.",
+      "summary_other": "{{count}} itens coletados de {{username}}.",
+      "typeCount_one": "{{count}} {{type}} entrada",
+      "typeCount_other": "{{count}} {{type}} entradas",
+      "errors": {
+        "notFound": "Este utilizador AniList não foi encontrado.",
+        "private": "Esta biblioteca AniList é privada.",
+        "rateLimit": "Taxa de requisições AniList atingida. Aguarde antes de tentar novamente.",
+        "failed": "O AniList não pôde ser alcançado. Tente mais tarde."
+      }
+    },
+    "backloggd": {
+      "instructions": {
+        "title": "Exporte seus dados primeiro",
+        "description": "O Backloggd não tem exportação oficial, então precisa da extensão de navegador Backloggd Plus para gerar o arquivo JSON.",
+        "firefox": "Disponível na loja oficial de complementos do Firefox, então é instalado num clique.",
+        "firefoxAction": "Obtenha o complemento",
+        "chromium": "Chrome, Edge, Brave…",
+        "chromiumDescription": "Nenhuma listagem de loja ainda — baixe a última versão e carrege-a manualmente.",
+        "chromiumAction": "Baixar do GitHub",
+        "chromiumSteps": {
+          "extract": "Extraia o lançamento <code>*-chrome.zip</code> que baixou.",
+          "openExtensions": "Abra <code>chrome://extensions</code>.",
+          "developerMode": "Habilite <strong>modo de desenvolvedor</strong>.",
+          "loadUnpacked": "Clique em <strong>Carregar descompactado</strong> e selecione a pasta extraída."
+        }
+      },
+      "upload": {
+        "description": "Selecione o arquivo JSON gerado pelo Backloggd Plus.",
+        "dropzone": "<span>Clique para selecionar</span> ou solte o seu Backloggd JSON aqui"
+      }
+    },
+    "myanimelist": {
+      "instructions": {
+        "title": "Exporte primeiro a sua lista",
+        "description": "O MyAnimeList gera a exportação a partir do painel da sua conta como um arquivo XML gzipado.",
+        "action": "Abrir o painel de exportação",
+        "steps": {
+          "openPanel": "Abrir <code>myanimelist.net/panel.php?go=export</code> enquanto estiver conectado.",
+          "pickAnime": "Escolha <strong>Anime List</strong> ou <strong>Manga List</strong> como o tipo de exportação e confirme.",
+          "download": "Baixe o arquivo <code>animelist_*.xml.gz</code> ou <code>mangalist_*.xml.gz</code> que o MyAnimeList oferece.",
+          "upload": "Solte-o abaixo — o arquivo funciona como está, não há necessidade de extraí-lo."
+        }
+      },
+      "upload": {
+        "description": "Selecione o arquivo XML exportado pelo MyAnimeList, gzipped ou extraído.",
+        "dropzone": "<span>Clique para selecionar</span> ou largue sua exportação MyAnimeList aqui"
+      }
+    },
+    "kitsu": {
+      "instructions": {
+        "description": "Exporte as suas bibliotecas Kitsu e importe os arquivos abaixo.",
+        "action": "Abra o Kitsu",
+        "steps": {
+          "openSite": "Acesse <code>kitsu.app</code>.",
+          "openSettings": "Vá para <strong>Configurações > Exportar</strong>.",
+          "download": "Baixe os arquivos da sua biblioteca de mangá e biblioteca de anime.",
+          "upload": "Importar abaixo."
+        }
+      }
+    },
+    "trackgeek": {
+      "instructions": {
+        "title": "Restaurar backup do TrackGeek",
+        "description": "Traga o progresso, análises, episódios assistidos e capturas de tela de uma exportação do TrackGeek para esta instância.",
+        "steps": {
+          "export": "Abra <code>Configurações > Importar</code> na outra instância e exporte os seus dados.",
+          "keep": "Mantenha o ZIP como está — os arquivos CSV dentro dele são lidos pelos seus nomes.",
+          "upload": "Arraste abaixo o arquivo <code>trackgeek-backup-*.zip</code>.",
+          "merge": "As entradas já registradas aqui são atualizadas, e as capturas de tela que já tem são ignoradas."
+        }
+      },
+      "upload": {
+        "description": "Selecione o arquivo ZIP gerado pela exportação.",
+        "dropzone": "<span>Clique para selecionar</span> ou solte o backup do TrackGeek aqui"
+      }
+    },
+    "trakt": {
+      "title": "Importar de Trakt",
+      "description": "Carregue a sua exportação do Trakt por ZIP. Assistidos, planejando, análises e listas pessoais são importados através da sua conta.",
+      "instructions": {
+        "steps": {
+          "openPanel": "Abrir <code>app.trakt.tv/settings/data?mode=media</code> enquanto estiver conectado.",
+          "download": "Clique <strong>Export Now</strong> para descarregar a sua exportação ZIP."
+        }
+      },
+      "upload": {
+        "description": "Selecione o arquivo ZIP gerado pelo Trakt.",
+        "dropzone": "<span>Clique para selecionar</span> ou largue a sua exportação Trakt aqui"
+      },
+      "retryFailures": "Repetir entradas com falha",
+      "countMismatch": "As contagens de exportação diferem para {{metric}}: {{expected}} esperado, {{actual}} encontrado.",
+      "specialMissing": "O episódio {{season}}×{{episode}} está a faltar no catálogo e não foi importado.",
+      "errors": {
+        "invalidEntry": "Entrada de exportação inválida",
+        "missingTmdbId": "ID TMDB ausente",
+        "missingList": "Lista com metadados em falta",
+        "missingListFile": "Conteúdo da lista não encontrados na exportação",
+        "unsupportedType": "Este tipo de item não é suportado",
+        "pendingFormat": "Notas e revisões de texto requerem uma amostra de exportação suportada",
+        "catalog": "Não foi possível carregar essa mídia do catálogo",
+        "progress": "Não foi possível atualizar o progresso",
+        "episodes": "Não foi possível importar episódios assistidos",
+        "rating": "Não foi possível importar a avaliação",
+        "list": "Não foi possível criar ou atualizar esta lista",
+        "listType": "Uma lista existente com este nome tem um tipo de conteúdo diferente",
+        "listItem": "Não foi possível adicionar este item à lista",
+        "seasonNotFound": "Esta temporada planeada está a faltar no catálogo"
+      }
+    }
+  },
+  "connections": {
+    "description": "Associe as redes sociais a qualquer uma delas.",
+    "connected": "Conectado",
+    "connect": "Conectar",
+    "disconnect": "Desconectar",
+    "lastMethod": "Não podes desconectar o teu único método de login.",
+    "link": {
+      "error": "Falha ao conectar esta conta. Por favor, tente novamente."
+    },
+    "unlink": {
+      "success": "Conta desconectada com sucesso.",
+      "error": "Falha ao desconectar esta conta. Por favor, tente novamente."
+    }
+  },
+  "banner": {
+    "title": "Banner",
+    "description": "Formatos permitidos: JPG, JPEG, PNG, GIF. Tamanho máximo: 5mb. Dimensões ideais: 1200x330",
+    "upload": {
+      "title": "Carregar banner",
+      "success": "Banner carregado com sucesso.",
+      "error": "Falha ao carregar o banner. Por favor, tente novamente."
+    },
+    "delete": {
+      "success": "Banner excluído com sucesso.",
+      "error": "Falha ao excluir o banner. Por favor, tente novamente."
+    }
+  },
+  "avatar": {
+    "title": "Imagem de Perfil",
+    "description": "Formatos permitidos: JPG, JPEG, PNG, GIF. Tamanho máximo: 5mb. Dimensões ideais: 500x500",
+    "upload": {
+      "title": "Carregar Imagem de Perfil",
+      "success": "Imagem de perfil carregada com sucesso.",
+      "error": "Falha ao carregar a imagem de perfil. Por favor, tente novamente."
+    },
+    "delete": {
+      "success": "Imagem de perfil excluído com sucesso.",
+      "error": "Falha ao excluir a imagem de perfil. Por favor, tente novamente."
+    }
+  },
+  "profile": {
+    "title": "Informações pessoais",
+    "description": "Gerencie as suas informações pessoais e preferências.",
+    "username": "Nome de utilizador",
+    "about": "Sobre Mim",
+    "errors": {
+      "nameMin": "O nome deve ter pelo menos 2 caracteres.",
+      "nameMax": "O nome deve ter no máximo 50 caracteres.",
+      "usernameMin": "O nome de utilizador deve ter pelo menos 3 caracteres",
+      "usernameMax": "O nome de utilizador deve ter no máximo 20 caracteres.",
+      "usernameFormat": "O nome de utilizador pode conter somente letras, números e subtraço.",
+      "aboutMax": "Sobre deve ter no máximo 500 caracteres."
+    }
+  },
+  "color": {
+    "title": "Cor do Tema",
+    "options": "Opções de Cores",
+    "description": "Escolha uma cor para o seu perfil.",
+    "custom": "Cor Personalizada",
+    "reset": "Repor para a predefinição",
+    "errors": {
+      "invalid": "A cor deve ser um código hexadecimal válido."
+    }
+  },
+  "save": {
+    "success": "Configurações guardadas com sucesso.",
+    "error": "Falha ao salvar as configurações. Por favor, tente novamente."
+  },
+  "preferences": {
+    "title": "Localização",
+    "description": "Defina o idioma e o fuso horário para sua conta.",
+    "language": {
+      "placeholder": "Selecione o seu idioma preferido"
+    },
+    "timezone": {
+      "title": "Fuso horário",
+      "placeholder": "Selecione o seu fuso horário"
+    }
+  },
+  "contentTypes": {
+    "title": "Tipos de conteúdo",
+    "description": "Escolha quais tipos de conteúdo aparecem no TrackGeek. Pelo menos um deve permanecer ativado."
+  },
+  "watchLinks": {
+    "title": "Links úteis personalizados",
+    "description": "Salte de um título diretamente para o seu site ou streaming favorito. Variáveis são substituídas pelos detalhes do título.",
+    "empty": "Nenhum link para assistir ainda.",
+    "labelPlaceholder": "Stremio",
+    "toggle": "Ativar este link",
+    "variablesTitle": "Variáveis disponíveis",
+    "urlInvalid": "Digite uma URL absoluta, como stremio://detail/movie/%ID_IMDB%",
+    "urlTooLong_one": "A URL deve ter no máximo {{count}} caracter.",
+    "urlTooLong_other": "A URL deve ter no máximo {{count}} caracteres.",
+    "urlUnknownVariable": "A URL usa uma variável que não existe.",
+    "contentTypesRequired": "Selecione pelo menos um tipo de conteúdo.",
+    "limitReached_one": "Podes ter no máximo {{count}} link.",
+    "limitReached_other": "Podes ter no máximo {{count}} links."
+  },
+  "password": {
+    "description": "Define uma senha para a tua conta ou altera a senha que já usas para entrar.",
+    "noPassword": "Se cadastrou com um provedor social e ainda não tem uma senha. Nós enviaremos-lhe um link para definir uma.",
+    "current": "Senha atual",
+    "new": "Nova senha",
+    "confirm": "Confirme a nova senha",
+    "set": {
+      "button": "Enviar link de definir a senha",
+      "success": "Verifique a sua caixa de entrada — enviamos um link para definir a sua senha.",
+      "error": "Falha ao enviar o link da definição de senha. Por favor, tente novamente."
+    },
+    "change": {
+      "button": "Alterar senha",
+      "success": "A senha foi alterada. Seus outros dispositivos foram desconectados.",
+      "error": "Falha ao alterar a sua senha. Por favor, tente novamente."
+    },
+    "errors": {
+      "min": "A senha deve conter pelo menos 8 caracteres.",
+      "mismatch": "Senhas não coincidem.",
+      "same": "A nova senha tem que ser diferente da atual."
+    }
+  },
+  "passkeys": {
+    "title": "Chaves de acesso",
+    "description": "Faça o login com a sua impressão digital, rosto ou PIN de dispositivo ao invés de uma senha.",
+    "unsupported": "Este navegador não suporta chaves de acesso.",
+    "empty": "Ainda não adicionou nenhuma chave de acesso.",
+    "unnamed": "Chave de acesso sem nome",
+    "nameLabel": "Nome da chave",
+    "namePlaceholder": "Meu computador portátil",
+    "addedAt": "Adicionado em {{date}}",
+    "add": {
+      "button": "Adicionar chave de acesso",
+      "success": "Chave de acesso adicionada com sucesso.",
+      "error": "Falha ao adicionar a chave de acesso. Tente novamente."
+    },
+    "delete": {
+      "button": "Remover",
+      "success": "Chave de acesso removida com sucesso.",
+      "error": "Falha ao remover a chave de acesso. Por favor, tente novamente."
+    }
+  },
+  "twoFactor": {
+    "title": "Autenticação de dois fatores",
+    "description": "Exige um código do seu aplicativo autenticador ao entrar com o seu e-mail e senha.",
+    "active": "Ativo",
+    "confirm": "Confirmar",
+    "noPassword": "Cadastrou-se com um provedor social. Defina uma senha para a sua conta utilizar a autenticação de dois fatores.",
+    "scanInstructions": "Escaneie este código QR com o seu aplicativo de autenticação, e digite o código gerado abaixo.",
+    "manualEntry": "Não é possível escanear? Digite esta chave manualmente:",
+    "verifyLabel": "Insera o código de 6 algarismos",
+    "enable": {
+      "button": "Ativar",
+      "success": "A autenticação dois fatores (2FA) está ativada.",
+      "error": "Falha ao ativar a autenticação de dois fatores. Por favor, tente novamente."
+    },
+    "disable": {
+      "button": "Desativar",
+      "success": "A autenticação de dois fatores foi desativada.",
+      "error": "Falha ao desativar a autenticação de dois fatores. Por favor tente novamente."
+    },
+    "regenerate": {
+      "button": "Novos códigos de backup",
+      "success": "Novos códigos de backup gerados. Seus códigos antigos não funcionarão mais.",
+      "error": "Falha ao gerar códigos de backup. Por favor, tente novamente."
+    },
+    "backupCodes": {
+      "title": "Códigos de backup",
+      "warning": "Salve esses em um lugar seguro. Eles são mostrados apenas uma vez e cada um funciona por vez.",
+      "copy": "Copiar",
+      "download": "Descarregar",
+      "copied": "Códigos de backup copiados para a área de transferência."
+    }
+  },
+  "deleteAccount": {
+    "title": "Eliminar conta",
+    "description": "Apaga permanentemente a sua conta e todos os dados dela.",
+    "warning": "Sua biblioteca, listas, análises, capturas de tela, comentários e atividades são definitivamente apagados. Uma assinatura de doação ativa é cancelada. Isto não pode ser desfeito.",
+    "dialog": {
+      "title": "Excluir a sua conta?",
+      "description": "Vamos enviar um e-mail para <strong>{{email}}</strong> com uma ligação de confirmação. A sua conta só será excluída depois que você abrir a ligação, e ele expira em 3 horas.",
+      "confirmLabel": "Digite <strong>{{username}}</strong> para confirmar",
+      "confirm": "Enviar e-mail de confirmação"
+    },
+    "success": "Verifique a sua caixa de entrada — abra a ligação enviada para concluir a exclusão da sua conta.",
+    "error": "Falha ao iniciar a exclusão da conta. Por favor, tente novamente."
+  },
+  "navigation": {
+    "description": "Gerencie o seu perfil, preferências e conta.",
+    "section": "Escolha uma seção de configurações",
+    "groups": {
+      "personal": "Seu perfil",
+      "application": "Aplicação",
+      "account": "Sua conta"
+    },
+    "descriptions": {
+      "profile": "Atualize o seu nome, nome de utilizador e bio.",
+      "appearance": "Personalize o seu avatar, banner e estilo do perfil.",
+      "preferences": "Escolha o seu idioma, fuso horário e tipos de conteúdo.",
+      "watchLinks": "Gerencie atalhos para os seus players e sites favoritos.",
+      "security": "Gerencie a sua senha, chaves de acesso e autenticação em duas etapas.",
+      "data": "Importe ou exporte a sua biblioteca rastreada."
+    }
+  },
+  "oauth": {
+    "title": "Aplicações autorizadas",
+    "description": "Gerir acesso concedido a outras aplicações.",
+    "empty": "Nenhum aplicativo tem acesso à sua conta.",
+    "failed": "Não foi possível gerir o acesso ao aplicativo. Por favor, tente novamente.",
+    "developer": {
+      "title": "Aplicativos do programador",
+      "description": "Registrar uma interface, bot ou integração. Navegador e aplicativos nativos devem usar um cliente público. Os aplicativos de servidores podem manter um cliente em segredo. Todos os clientes usam PKCE.",
+      "name": "Nome da aplicação",
+      "redirects": "URIs de Redirecionamento",
+      "redirectHint": "Digite uma URL de callback HTTPS por linha. HTTP é permitido para desenvolvimento local.",
+      "confidential": "Esta aplicação tem um servidor que pode manter um segredo de cliente",
+      "permissions": "Máximo de permissões que esta aplicação pode solicitar",
+      "create": "Registar aplicação",
+      "credentialsHint": "Salve essas credenciais com segurança. O segredo do cliente é exibido apenas uma vez. Nunca o coloque no seu código sem proteção.",
+      "clientId": "ID do cliente",
+      "clientSecret": "Segredo do cliente",
+      "dismissCredentials": "Eu salvei as credenciais",
+      "deleteTitle": "Excluir {{name}}?",
+      "deleteDescription": "Isso exclui permanentemente o aplicativo e desconecta todos os utilizadores que o autorizaram."
+    }
+  }
+}

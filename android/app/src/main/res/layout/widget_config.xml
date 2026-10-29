@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#09090B">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/widget_config_title"
+            android:textColor="#FAFAFA"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/widget_config_subtitle"
+            android:textColor="#A1A1AA"
+            android:textSize="13sp" />
+
+        <FrameLayout
+            android:id="@+id/preview_container"
+            android:layout_width="match_parent"
+            android:layout_height="190dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/widget_background">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/preview_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="6dp"
+                    android:text="@string/widget_watching"
+                    android:textColor="#A1A1AA"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/widget_cover_placeholder">
+
+                        <TextView
+                            android:id="@+id/preview_text_1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom"
+                            android:padding="8dp"
+                            android:background="@drawable/widget_scrim"
+                            android:text="@string/widget_preview_title"
+                            android:textColor="#FAFAFA"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:maxLines="2" />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/widget_cover_placeholder">
+
+                        <TextView
+                            android:id="@+id/preview_text_2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom"
+                            android:padding="8dp"
+                            android:background="@drawable/widget_scrim"
+                            android:text="@string/widget_preview_title"
+                            android:textColor="#FAFAFA"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:maxLines="2" />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/widget_cover_placeholder">
+
+                        <TextView
+                            android:id="@+id/preview_text_3"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom"
+                            android:padding="8dp"
+                            android:background="@drawable/widget_scrim"
+                            android:text="@string/widget_preview_title"
+                            android:textColor="#FAFAFA"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:maxLines="2" />
+                    </FrameLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:orientation="vertical"
+            android:background="@drawable/widget_background"
+            android:padding="16dp">
+
+            <CheckBox
+                android:id="@+id/check_watching"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/widget_option_watching"
+                android:textColor="#FAFAFA"
+                android:textSize="14sp"
+                android:buttonTint="#34D399" />
+
+            <CheckBox
+                android:id="@+id/check_reading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:checked="true"
+                android:text="@string/widget_option_reading"
+                android:textColor="#FAFAFA"
+                android:textSize="14sp"
+                android:buttonTint="#34D399" />
+
+            <Switch
+                android:id="@+id/switch_background"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:checked="true"
+                android:text="@string/widget_option_background"
+                android:textColor="#FAFAFA"
+                android:textSize="14sp" />
+
+            <CheckBox
+                android:id="@+id/check_covers_only"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/widget_option_covers_only"
+                android:textColor="#FAFAFA"
+                android:textSize="14sp"
+                android:buttonTint="#34D399" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/button_add"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/widget_button"
+            android:text="@string/widget_add"
+            android:textColor="#052E16"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textAllCaps="false" />
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,17 @@
+{
+  "title": "Comentários",
+  "count_one": "{{count}} comentário",
+  "count_other": "{{count}} comentários",
+  "placeholder": "Escreva um comentário...",
+  "required": "O comentário não pode estar vazio.",
+  "tooLong": "O comentário é muito longo",
+  "empty": "Ainda não há comentários.",
+  "emptyDescription": "Seja o primeiro a deixar um comentário.",
+  "loginToComment": "Conecte-se para deixar um comentário",
+  "addSuccess": "Comentário publicado.",
+  "addError": "Falha ao publicar comentário.",
+  "deleteSuccess": "Comentário apagado.",
+  "deleteError": "Falha ao apagar comentário.",
+  "spoiler": "Marcar como spoiler",
+  "spoilerReveal": "Spoiler — clique para revelar"
+}
