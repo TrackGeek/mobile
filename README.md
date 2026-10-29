@@ -3,18 +3,18 @@
 </p>
 
 <h1 align="center">
-  <samp>Mobile Android</samp>
+  <samp>Mobile App</samp>
 </h1>
 
 <h4 align="center">
-  <samp>Android app for tracking all your media in one unified platform.</samp>
+  <samp>Mobile app for Android and iOS to track all your media in one unified platform.</samp>
 </h4>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Kotlin-99e3a0?style=for-the-badge&logo=kotlin&logoColor=FFFFFF">
-  <img src="https://img.shields.io/badge/Jetpack%20Compose-99e3a0?style=for-the-badge&logo=jetpackcompose&logoColor=FFFFFF">
+  <img src="https://img.shields.io/badge/Flutter-99e3a0?style=for-the-badge&logo=flutter&logoColor=FFFFFF">
+  <img src="https://img.shields.io/badge/Dart-99e3a0?style=for-the-badge&logo=dart&logoColor=FFFFFF">
   <img src="https://img.shields.io/badge/Android-99e3a0?style=for-the-badge&logo=android&logoColor=FFFFFF">
-  <img src="https://img.shields.io/badge/Material%203-99e3a0?style=for-the-badge&logo=materialdesign&logoColor=FFFFFF">
+  <img src="https://img.shields.io/badge/iOS-99e3a0?style=for-the-badge&logo=apple&logoColor=FFFFFF">
   <a href="https://translate.trackgeek.net"><img src="https://img.shields.io/badge/Crowdin-99e3a0?style=for-the-badge&logo=crowdin&logoColor=FFFFFF"></a>
 </p>
 
@@ -22,7 +22,7 @@
 
 <samp>
 
-- Native Android app with modern Material Design 3;
+- Cross-platform app for Android and iOS built with Flutter;
 - Track games, anime, movies, TV shows, books, and manga with progress system;
 - Custom lists management;
 - User profiles with favorites;
@@ -40,15 +40,15 @@
 
 <samp>
 
-- Kotlin
-- Jetpack Compose
+- Flutter
+- Dart
 - Material Design 3
-- Android SDK 36
-- Coroutines
-- Flow
-- Retrofit
-- Hilt/Dagger
-- Coil
+- http
+- Google Sign-In & Passkeys
+- flutter_local_notifications & Workmanager
+- Shared Preferences
+- flutter_svg & Hugeicons
+- intl
 
 </samp>
 
@@ -58,52 +58,50 @@
 
 ### Prerequisites
 
-- Android Studio Ladybug or newer
-- JDK 11 or higher
-- Android SDK 36
-- Physical device or emulator with Android 10 (API 29) or higher
+- Flutter SDK 3.13.7 or newer
+- For Android: Android Studio, Android SDK, and a physical device or emulator
+- For iOS: Xcode and CocoaPods on macOS, and a physical device or simulator
 
 ### Steps
 
 1. Clone the project
 
 ```bash
-git clone https://github.com/TrackGeek/mobile-android.git
+git clone https://github.com/TrackGeek/mobile.git
 ```
 
-2. Open Android Studio
-
-- Launch Android Studio
-- Click on "Open" or "Open an Existing Project"
-- Navigate to the cloned repository folder and select it
-- Wait for Gradle sync to complete
-
-3. Configure the project
-
-- Copy `local.properties.example` to `local.properties` if needed
-- Update API endpoints in the configuration files
-
-4. Build the project
-
-- Click on "Build" > "Make Project" (or press Ctrl+F9 / Cmd+F9)
-- Wait for the build to complete successfully
-
-5. Run the app
-
-- Connect your Android device via USB with USB debugging enabled, or start an emulator
-- Click on the "Run" button (green play icon) or press Shift+F10 / Ctrl+R
-- Select your target device
-- Wait for the app to install and launch
-
-### Build APK
-
-To generate a release APK:
+2. Install dependencies
 
 ```bash
-./gradlew assembleRelease
+flutter pub get
 ```
 
-The APK will be generated in `app/build/outputs/apk/release/`
+3. Run the app
+
+- Connect a device or start an emulator/simulator
+- Launch with the API URL configured:
+
+```bash
+flutter run --dart-define=TRACKGEEK_API_URL=https://api.trackgeek.net
+```
+
+- Optionally set `TRACKGEEK_GOOGLE_CLIENT_ID` to enable Google sign-in
+
+### Build
+
+To generate release builds:
+
+```bash
+# Android
+flutter build apk --release
+# or
+flutter build appbundle --release
+
+# iOS
+flutter build ios --release
+```
+
+The APK will be generated in `build/app/outputs/flutter-apk/`
 
 </samp>
 
@@ -118,4 +116,3 @@ See `CONTRIBUTING.md` for ways to get started.
 Please adhere to this project's `code of conduct`.
 
 </samp>
-
