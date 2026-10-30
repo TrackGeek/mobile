@@ -27,8 +27,8 @@ class FeedTabs extends StatelessWidget {
       ),
     ];
     return Container(
-      height: 52 + (MediaQuery.textScalerOf(context).scale(14) - 14),
-      padding: const EdgeInsets.all(4),
+      height: 48 + (MediaQuery.textScalerOf(context).scale(14) - 14),
+      padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(10),
@@ -44,6 +44,7 @@ class FeedTabs extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   onTap: () => onChanged(kind),
                   child: AnimatedContainer(
+                    height: double.infinity,
                     duration: MediaQuery.disableAnimationsOf(context)
                         ? Duration.zero
                         : const Duration(milliseconds: 180),
@@ -54,6 +55,7 @@ class FeedTabs extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         HugeIcon(

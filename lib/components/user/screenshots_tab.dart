@@ -35,7 +35,6 @@ class _UserScreenshotsTabState extends State<UserScreenshotsTab>
     with AutomaticKeepAliveClientMixin {
   final _items = <GameScreenshot>[];
   final _revealed = <String>{};
-  final _scroll = ScrollController();
   bool _loading = false;
   bool _loadingMore = false;
   bool _loaded = false;
@@ -49,18 +48,11 @@ class _UserScreenshotsTabState extends State<UserScreenshotsTab>
   @override
   void initState() {
     super.initState();
-    _scroll.addListener(() {
-      if (_scroll.hasClients &&
-          _scroll.position.pixels > _scroll.position.maxScrollExtent - 300) {
-        _loadMore();
-      }
-    });
     _load();
   }
 
   @override
   void dispose() {
-    _scroll.dispose();
     super.dispose();
   }
 
@@ -136,164 +128,174 @@ class _UserScreenshotsTabState extends State<UserScreenshotsTab>
       byGame.putIfAbsent(item.gameId, () => []).add(item);
     }
     final groups = byGame.entries.toList();
-    return RefreshIndicator(
-      onRefresh: _load,
-      child: CustomScrollView(
-        controller: _scroll,
-        physics: const AlwaysScrollableScrollPhysics(),
-        slivers: [
-          if (_loading && _items.isEmpty)
-            const SliverFillRemaining(
-              child: Center(child: CircularProgressIndicator()),
-            )
-          else if (_error != null && _items.isEmpty)
-            SliverFillRemaining(child: UserError(onRetry: _load))
-          else if (_loaded && _items.isEmpty)
-            SliverFillRemaining(
-              child: UserEmpty(
-                icon: HugeIcons.strokeRoundedImage01,
-                title: context.t('user:noScreenshots'),
-                description: context.t('user:noScreenshotsDescription'),
-              ),
-            )
-          else
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-              sliver: SliverList.separated(
-                itemCount: groups.length + (_loadingMore ? 1 : 0),
-                separatorBuilder: (_, _) => const SizedBox(height: 16),
-                itemBuilder: (context, index) {
-                  if (index >= groups.length) {
-                    return const Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    );
-                  }
-                  final group = groups[index];
-                  final shots = group.value;
-                  final first = shots.first;
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      InkWell(
-                        onTap: widget.onOpenGame == null
-                            ? null
-                            : () => widget.onOpenGame!('${first.gameIgdbId}'),
-                        borderRadius: BorderRadius.circular(6),
-                        child: Row(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: Image.network(
-                                first.gameCoverUrl ?? '',
-                                width: 24,
-                                height: 32,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, _, _) => Container(
+    return NotificationListener<ScrollNotification>(
+      onNotification: (n) {
+        if (n.metrics.pixels > n.metrics.maxScrollExtent - 300) {
+          _loadMore();
+        }
+        return false;
+      },
+      child: RefreshIndicator(
+        onRefresh: _load,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            if (_loading && _items.isEmpty)
+              const SliverFillRemaining(
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else if (_error != null && _items.isEmpty)
+              SliverFillRemaining(child: UserError(onRetry: _load))
+            else if (_loaded && _items.isEmpty)
+              SliverFillRemaining(
+                child: UserEmpty(
+                  icon: HugeIcons.strokeRoundedImage01,
+                  title: context.t('user:noScreenshots'),
+                  description: context.t('user:noScreenshotsDescription'),
+                ),
+              )
+            else
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                sliver: SliverList.separated(
+                  itemCount: groups.length + (_loadingMore ? 1 : 0),
+                  separatorBuilder: (_, _) => const SizedBox(height: 16),
+                  itemBuilder: (context, index) {
+                    if (index >= groups.length) {
+                      return const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      );
+                    }
+                    final group = groups[index];
+                    final shots = group.value;
+                    final first = shots.first;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        InkWell(
+                          onTap: widget.onOpenGame == null
+                              ? null
+                              : () => widget.onOpenGame!('${first.gameIgdbId}'),
+                          borderRadius: BorderRadius.circular(6),
+                          child: Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(4),
+                                child: Image.network(
+                                  first.gameCoverUrl ?? '',
                                   width: 24,
                                   height: 32,
-                                  color:
-                                      theme.colorScheme.surfaceContainerHighest,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, _, _) => Container(
+                                    width: 24,
+                                    height: 32,
+                                    color: theme
+                                        .colorScheme
+                                        .surfaceContainerHighest,
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                first.gameName,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  fontWeight: FontWeight.w600,
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  first.gameName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 8,
-                              crossAxisSpacing: 8,
-                              childAspectRatio: 16 / 9,
-                            ),
-                        itemCount: shots.length,
-                        itemBuilder: (context, i) {
-                          final shot = shots[i];
-                          final revealed =
-                              !shot.isSpoiler || _revealed.contains(shot.id);
-                          final video = shot.type == 'Video'
-                              ? parseVideoUrl(shot.url)
-                              : null;
-                          final source = video != null
-                              ? videoThumbnailUrl(video) ?? ''
-                              : shot.url;
-                          return InkWell(
-                            onTap: () => revealed
-                                ? _openGallery(shots, i)
-                                : setState(() => _revealed.add(shot.id)),
-                            borderRadius: BorderRadius.circular(8),
-                            child: ClipRRect(
+                        const SizedBox(height: 8),
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                mainAxisSpacing: 8,
+                                crossAxisSpacing: 8,
+                                childAspectRatio: 16 / 9,
+                              ),
+                          itemCount: shots.length,
+                          itemBuilder: (context, i) {
+                            final shot = shots[i];
+                            final revealed =
+                                !shot.isSpoiler || _revealed.contains(shot.id);
+                            final video = shot.type == 'Video'
+                                ? parseVideoUrl(shot.url)
+                                : null;
+                            final source = video != null
+                                ? videoThumbnailUrl(video) ?? ''
+                                : shot.url;
+                            return InkWell(
+                              onTap: () => revealed
+                                  ? _openGallery(shots, i)
+                                  : setState(() => _revealed.add(shot.id)),
                               borderRadius: BorderRadius.circular(8),
-                              child: Container(
-                                color: TgColors.background,
-                                child: Stack(
-                                  fit: StackFit.expand,
-                                  children: [
-                                    if (source.isNotEmpty)
-                                      ImageFiltered(
-                                        enabled: !revealed,
-                                        imageFilter: ImageFilter.blur(
-                                          sigmaX: 16,
-                                          sigmaY: 16,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Container(
+                                  color: TgColors.background,
+                                  child: Stack(
+                                    fit: StackFit.expand,
+                                    children: [
+                                      if (source.isNotEmpty)
+                                        ImageFiltered(
+                                          enabled: !revealed,
+                                          imageFilter: ImageFilter.blur(
+                                            sigmaX: 16,
+                                            sigmaY: 16,
+                                          ),
+                                          child: Image.network(
+                                            source,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (_, _, _) =>
+                                                const SizedBox.shrink(),
+                                          ),
                                         ),
-                                        child: Image.network(
-                                          source,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (_, _, _) =>
-                                              const SizedBox.shrink(),
-                                        ),
-                                      ),
-                                    if (!revealed)
-                                      Container(
-                                        color: Colors.black.withValues(
-                                          alpha: 0.4,
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            context.t('comments:spoilerReveal'),
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12,
+                                      if (!revealed)
+                                        Container(
+                                          color: Colors.black.withValues(
+                                            alpha: 0.4,
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              context.t(
+                                                'comments:spoilerReveal',
+                                              ),
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12,
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    if (revealed && video != null)
-                                      const Center(
-                                        child: HugeIcon(
-                                          icon: HugeIcons.strokeRoundedPlay,
-                                          size: 32,
-                                          color: Colors.white,
+                                      if (revealed && video != null)
+                                        const Center(
+                                          child: HugeIcon(
+                                            icon: HugeIcons.strokeRoundedPlay,
+                                            size: 32,
+                                            color: Colors.white,
+                                          ),
                                         ),
-                                      ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  );
-                },
+                            );
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

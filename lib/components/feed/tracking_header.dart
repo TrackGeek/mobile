@@ -86,7 +86,7 @@ class _TrackingSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
+          padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
           child: Row(
             children: [
               HugeIcon(

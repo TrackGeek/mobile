@@ -180,106 +180,114 @@ class _SearchPageState extends State<SearchPage> {
     _ensureVisibleKind(visible);
     final kinds = _visibleKinds(visible);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.t('common:search')),
-        actions: [
-          ListenableBuilder(
-            listenable: _controller,
-            builder: (context, _) {
-              if (_controller.kind is! MediaSearchKind) {
-                return const SizedBox.shrink();
-              }
-              return IconButton(
-                tooltip: context.t('common:filters'),
-                icon: Badge.count(
-                  count: _controller.filters.length,
-                  isLabelVisible: _controller.filters.isNotEmpty,
-                  child: const HugeIcon(icon: HugeIcons.strokeRoundedFilter),
-                ),
-                onPressed: () => _openFilters(context),
-              );
-            },
-          ),
-        ],
-      ),
-      body: ContentFrame(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-              child: SearchBar(
-                controller: _searchField,
-                onChanged: _controller.onQueryChanged,
-                elevation: const WidgetStatePropertyAll(0),
-                backgroundColor: WidgetStatePropertyAll(
-                  Theme.of(context).colorScheme.surfaceContainerLow,
-                ),
-                side: WidgetStatePropertyAll(
-                  BorderSide(
-                    color: Theme.of(context).colorScheme.outlineVariant,
+      body: SafeArea(
+        child: ContentFrame(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                child: SearchBar(
+                  controller: _searchField,
+                  onChanged: _controller.onQueryChanged,
+                  elevation: const WidgetStatePropertyAll(0),
+                  backgroundColor: WidgetStatePropertyAll(
+                    Theme.of(context).colorScheme.surfaceContainerLow,
                   ),
-                ),
-                shape: WidgetStatePropertyAll(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                  side: WidgetStatePropertyAll(
+                    BorderSide(
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                    ),
                   ),
-                ),
-                hintText: context.t('common:search'),
-                leading: const HugeIcon(icon: HugeIcons.strokeRoundedSearch01),
-                trailing: [
-                  ListenableBuilder(
-                    listenable: _controller,
-                    builder: (context, _) => _controller.query.isEmpty
-                        ? const SizedBox.shrink()
-                        : IconButton(
-                            icon: const HugeIcon(
-                              icon: HugeIcons.strokeRoundedCancel01,
+                  shape: WidgetStatePropertyAll(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  hintText: context.t('common:search'),
+                  leading: Navigator.of(context).canPop()
+                      ? IconButton(
+                          icon: const HugeIcon(
+                            icon: HugeIcons.strokeRoundedArrowLeft01,
+                            size: 20,
+                          ),
+                          onPressed: () => Navigator.of(context).pop(),
+                        )
+                      : const HugeIcon(icon: HugeIcons.strokeRoundedSearch01),
+                  trailing: [
+                    ListenableBuilder(
+                      listenable: _controller,
+                      builder: (context, _) => _controller.query.isEmpty
+                          ? const SizedBox.shrink()
+                          : IconButton(
+                              icon: const HugeIcon(
+                                icon: HugeIcons.strokeRoundedCancel01,
+                                size: 18,
+                              ),
+                              onPressed: () {
+                                _searchField.clear();
+                                _controller.search('');
+                              },
+                            ),
+                    ),
+                    IconButton(
+                      icon: const HugeIcon(
+                        icon: HugeIcons.strokeRoundedClipboard,
+                        size: 18,
+                      ),
+                      tooltip: context.t('common:clipboard.paste'),
+                      onPressed: _paste,
+                    ),
+                    ListenableBuilder(
+                      listenable: _controller,
+                      builder: (context, _) {
+                        if (_controller.kind is! MediaSearchKind) {
+                          return const SizedBox.shrink();
+                        }
+                        return IconButton(
+                          tooltip: context.t('common:filters'),
+                          icon: Badge.count(
+                            count: _controller.filters.length,
+                            isLabelVisible: _controller.filters.isNotEmpty,
+                            child: const HugeIcon(
+                              icon: HugeIcons.strokeRoundedFilter,
                               size: 18,
                             ),
-                            onPressed: () {
-                              _searchField.clear();
-                              _controller.search('');
-                            },
                           ),
-                  ),
-                  IconButton(
-                    icon: const HugeIcon(
-                      icon: HugeIcons.strokeRoundedClipboard,
-                      size: 18,
+                          onPressed: () => _openFilters(context),
+                        );
+                      },
                     ),
-                    tooltip: context.t('common:clipboard.paste'),
-                    onPressed: _paste,
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 56 + (MediaQuery.textScalerOf(context).scale(14) - 14),
-              child: ListenableBuilder(
-                listenable: _controller,
-                builder: (context, _) => ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: kinds.length,
-                  separatorBuilder: (_, _) => const SizedBox(width: 8),
-                  itemBuilder: (context, index) {
-                    final kind = kinds[index];
-                    return ChoiceChip(
-                      label: Text(_kindLabel(context, kind)),
-                      selected: kind.path == _controller.kind.path,
-                      onSelected: (_) => _selectKind(kind),
-                    );
-                  },
+                  ],
                 ),
               ),
-            ),
-            Expanded(
-              child: ListenableBuilder(
-                listenable: _controller,
-                builder: (context, _) => _buildBody(context),
+              SizedBox(
+                height: 56 + (MediaQuery.textScalerOf(context).scale(14) - 14),
+                child: ListenableBuilder(
+                  listenable: _controller,
+                  builder: (context, _) => ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: kinds.length,
+                    separatorBuilder: (_, _) => const SizedBox(width: 8),
+                    itemBuilder: (context, index) {
+                      final kind = kinds[index];
+                      return ChoiceChip(
+                        label: Text(_kindLabel(context, kind)),
+                        selected: kind.path == _controller.kind.path,
+                        onSelected: (_) => _selectKind(kind),
+                      );
+                    },
+                  ),
+                ),
               ),
-            ),
-          ],
+              Expanded(
+                child: ListenableBuilder(
+                  listenable: _controller,
+                  builder: (context, _) => _buildBody(context),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

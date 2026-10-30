@@ -304,11 +304,18 @@ class _PostCardState extends State<PostCard> {
                           child: entry.coverUrl.isNotEmpty
                               ? ClipRRect(
                                   borderRadius: BorderRadius.circular(4),
-                                  child: Image.network(
-                                    entry.coverUrl,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, _, _) =>
-                                        const _MediaFallback(),
+                                  child: ImageFiltered(
+                                    enabled: entry.isAdult,
+                                    imageFilter: ImageFilter.blur(
+                                      sigmaX: 8,
+                                      sigmaY: 8,
+                                    ),
+                                    child: Image.network(
+                                      entry.coverUrl,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, _, _) =>
+                                          const _MediaFallback(),
+                                    ),
                                   ),
                                 )
                               : const _MediaFallback(),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../l10n/l10n_context.dart';
+import '../../utils/dates.dart';
 
 class RefreshDataCard extends StatelessWidget {
   const RefreshDataCard({
@@ -27,79 +27,67 @@ class RefreshDataCard extends StatelessWidget {
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final locale = L10nScope.of(context).language;
-    final refreshed = lastRefreshedAt;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: theme.colorScheme.outlineVariant),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              HugeIcon(
-                icon: HugeIcons.strokeRoundedRefresh,
-                size: 15,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                context.t('library:refreshData'),
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
+  Future<void> _confirm(BuildContext context) async {
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(context.t('library:refreshDataModal.title')),
+        content: Text(context.t('library:refreshDataModal.description')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(context.t('common:cancel')),
           ),
-          const SizedBox(height: 8),
-          Text(
-            refreshed == null
-                ? '-'
-                : DateFormat.yMd(locale).add_Hm().format(refreshed.toLocal()),
-            style: theme.textTheme.bodySmall?.copyWith(
-              fontWeight: FontWeight.w600,
+          TextButton.icon(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              _openSource();
+            },
+            icon: const HugeIcon(icon: HugeIcons.strokeRoundedLink01, size: 16),
+            label: Text(context.t('library:refreshDataModal.checkSource')),
+          ),
+          FilledButton.icon(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              onRefresh();
+            },
+            icon: const HugeIcon(
+              icon: HugeIcons.strokeRoundedRefresh,
+              size: 16,
+            ),
+            label: Text(
+              context.t('library:refreshDataModal.refreshInfoButton'),
             ),
           ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: pending ? null : onRefresh,
-                  icon: pending
-                      ? const SizedBox(
-                          width: 14,
-                          height: 14,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const HugeIcon(
-                          icon: HugeIcons.strokeRoundedRefresh,
-                          size: 14,
-                        ),
-                  label: Text(context.t('library:refreshData')),
-                ),
-              ),
-              const SizedBox(width: 8),
-              IconButton(
-                onPressed: _openSource,
-                tooltip: sourceName,
-                icon: HugeIcon(
-                  icon: HugeIcons.strokeRoundedLink01,
-                  size: 18,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
         ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final refreshed = lastRefreshedAt;
+    final relative = refreshed == null
+        ? null
+        : formatRelativeTime(refreshed, context.t);
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: pending ? null : () => _confirm(context),
+        icon: pending
+            ? const SizedBox(
+                width: 14,
+                height: 14,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : const HugeIcon(icon: HugeIcons.strokeRoundedRefresh, size: 14),
+        label: Text(
+          relative == null
+              ? context.t('library:refreshData')
+              : '${context.t('library:refreshData')} • $relative',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
       ),
     );
   }

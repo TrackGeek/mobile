@@ -44,6 +44,7 @@ class PersonHero extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
       child: Container(
+        width: double.infinity,
         decoration: BoxDecoration(
           border: Border.all(color: theme.colorScheme.outlineVariant),
           borderRadius: BorderRadius.circular(12),

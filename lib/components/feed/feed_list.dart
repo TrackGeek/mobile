@@ -40,26 +40,6 @@ class FeedList extends StatefulWidget {
 }
 
 class _FeedListState extends State<FeedList> {
-  final _scroll = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-    _scroll.addListener(_maybeLoadMore);
-  }
-
-  @override
-  void dispose() {
-    _scroll.dispose();
-    super.dispose();
-  }
-
-  void _maybeLoadMore() {
-    if (_scroll.position.pixels > _scroll.position.maxScrollExtent - 600) {
-      widget.controller.loadMore();
-    }
-  }
-
   Future<void> _react(
     FeedEntry entry,
     String emoji,
@@ -86,131 +66,141 @@ class _FeedListState extends State<FeedList> {
   @override
   Widget build(BuildContext context) {
     final controller = widget.controller;
-    return RefreshIndicator(
-      onRefresh: widget.onRefresh ?? controller.refresh,
-      child: ListenableBuilder(
-        listenable: controller,
-        builder: (context, _) {
-          final header = widget.header;
-          final leading = header == null ? 0 : 1;
-          if (!controller.loaded && controller.isLoading) {
-            return ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.only(bottom: 24),
-              children: [?header, const _FeedSkeleton()],
-            );
-          }
-          if (controller.error != null && controller.entries.isEmpty) {
-            return ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              children: [
-                ?header,
-                SizedBox(
-                  height: 320,
-                  child: _FeedError(onRetry: controller.load),
-                ),
-              ],
-            );
-          }
-          if (controller.entries.isEmpty && controller.loaded) {
-            return ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              children: [
-                ?header,
-                SizedBox(
-                  height: 320,
-                  child: _FeedEmpty(
-                    title: widget.emptyTitle,
-                    description: widget.emptyDescription,
+    return NotificationListener<ScrollNotification>(
+      onNotification: (n) {
+        if (n.metrics.pixels > n.metrics.maxScrollExtent - 600) {
+          controller.loadMore();
+        }
+        return false;
+      },
+      child: RefreshIndicator(
+        onRefresh: widget.onRefresh ?? controller.refresh,
+        child: ListenableBuilder(
+          listenable: controller,
+          builder: (context, _) {
+            final header = widget.header;
+            final leading = header == null ? 0 : 1;
+            if (!controller.loaded && controller.isLoading) {
+              return ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.only(bottom: 24),
+                children: [?header, const _FeedSkeleton()],
+              );
+            }
+            if (controller.error != null && controller.entries.isEmpty) {
+              return ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  ?header,
+                  SizedBox(
+                    height: 320,
+                    child: _FeedError(onRetry: controller.load),
                   ),
-                ),
-              ],
-            );
-          }
-          return ListView.separated(
-            controller: _scroll,
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-            itemCount:
-                leading +
-                controller.entries.length +
-                (controller.isLoadingMore ? 1 : 0),
-            separatorBuilder: (_, _) => const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              if (index == 0 && header != null) return header;
-              index -= leading;
-              if (index >= controller.entries.length) {
-                return const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Center(child: CircularProgressIndicator()),
+                ],
+              );
+            }
+            if (controller.entries.isEmpty && controller.loaded) {
+              return ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  ?header,
+                  SizedBox(
+                    height: 320,
+                    child: _FeedEmpty(
+                      title: widget.emptyTitle,
+                      description: widget.emptyDescription,
+                    ),
+                  ),
+                ],
+              );
+            }
+            return ListView.separated(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.only(top: header == null ? 8 : 0, bottom: 24),
+              itemCount:
+                  leading +
+                  controller.entries.length +
+                  (controller.isLoadingMore ? 1 : 0),
+              separatorBuilder: (_, _) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                if (index == 0 && header != null) return header;
+                index -= leading;
+                if (index >= controller.entries.length) {
+                  return const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                final entry = controller.entries[index];
+                final mediaLink = entry.media;
+                final titleLink = entry.titleLink;
+                final currentUserId = widget.session.user?.id ?? '';
+                void onReact(String emoji, FeedReaction? current) =>
+                    _react(entry, emoji, current);
+                final isReacting = controller.isReacting(entry);
+                final onTitleTap = titleLink is FeedMediaTitleLink
+                    ? () => widget.onOpenMedia?.call(
+                        FeedMediaLink(
+                          slug: titleLink.slug,
+                          type: titleLink.type,
+                          person: titleLink.person,
+                        ),
+                      )
+                    : titleLink is FeedUserTitleLink
+                    ? () => widget.onOpenUser?.call(titleLink)
+                    : null;
+                final onUserTap = entry.profile.username != null
+                    ? () => widget.onOpenUser?.call(
+                        FeedUserTitleLink(
+                          username: entry.profile.username!,
+                          tab: 'overview',
+                        ),
+                      )
+                    : null;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: switch (entry.kind) {
+                    FeedEntryKind.screenshot => ScreenshotCard(
+                      entry: entry,
+                      currentUserId: currentUserId,
+                      onMediaTap: mediaLink != null
+                          ? () => widget.onOpenMedia?.call(mediaLink)
+                          : null,
+                      onUserTap: onUserTap,
+                      onTitleLinkTap: onTitleTap,
+                      onReact: onReact,
+                      isReacting: isReacting,
+                    ),
+                    FeedEntryKind.post => PostCard(
+                      entry: entry,
+                      currentUserId: currentUserId,
+                      onMediaTap: mediaLink != null
+                          ? () => widget.onOpenMedia?.call(mediaLink)
+                          : null,
+                      onUserTap: onUserTap,
+                      onTitleLinkTap: onTitleTap,
+                      onReact: onReact,
+                      isReacting: isReacting,
+                      onUpdate: widget.onUpdatePost,
+                      onDelete: widget.onDeletePost,
+                    ),
+                    _ => FeedItemCard(
+                      entry: entry,
+                      currentUserId: currentUserId,
+                      onMediaTap: mediaLink != null
+                          ? () => widget.onOpenMedia?.call(mediaLink)
+                          : null,
+                      onUserTap: onUserTap,
+                      onTitleLinkTap: onTitleTap,
+                      onReact: onReact,
+                      isReacting: isReacting,
+                    ),
+                  },
                 );
-              }
-              final entry = controller.entries[index];
-              final mediaLink = entry.media;
-              final titleLink = entry.titleLink;
-              final currentUserId = widget.session.user?.id ?? '';
-              void onReact(String emoji, FeedReaction? current) =>
-                  _react(entry, emoji, current);
-              final isReacting = controller.isReacting(entry);
-              final onTitleTap = titleLink is FeedMediaTitleLink
-                  ? () => widget.onOpenMedia?.call(
-                      FeedMediaLink(
-                        slug: titleLink.slug,
-                        type: titleLink.type,
-                        person: titleLink.person,
-                      ),
-                    )
-                  : titleLink is FeedUserTitleLink
-                  ? () => widget.onOpenUser?.call(titleLink)
-                  : null;
-              final onUserTap = entry.profile.username != null
-                  ? () => widget.onOpenUser?.call(
-                      FeedUserTitleLink(
-                        username: entry.profile.username!,
-                        tab: 'overview',
-                      ),
-                    )
-                  : null;
-              return switch (entry.kind) {
-                FeedEntryKind.screenshot => ScreenshotCard(
-                  entry: entry,
-                  currentUserId: currentUserId,
-                  onMediaTap: mediaLink != null
-                      ? () => widget.onOpenMedia?.call(mediaLink)
-                      : null,
-                  onUserTap: onUserTap,
-                  onTitleLinkTap: onTitleTap,
-                  onReact: onReact,
-                  isReacting: isReacting,
-                ),
-                FeedEntryKind.post => PostCard(
-                  entry: entry,
-                  currentUserId: currentUserId,
-                  onMediaTap: mediaLink != null
-                      ? () => widget.onOpenMedia?.call(mediaLink)
-                      : null,
-                  onUserTap: onUserTap,
-                  onTitleLinkTap: onTitleTap,
-                  onReact: onReact,
-                  isReacting: isReacting,
-                  onUpdate: widget.onUpdatePost,
-                  onDelete: widget.onDeletePost,
-                ),
-                _ => FeedItemCard(
-                  entry: entry,
-                  currentUserId: currentUserId,
-                  onMediaTap: mediaLink != null
-                      ? () => widget.onOpenMedia?.call(mediaLink)
-                      : null,
-                  onUserTap: onUserTap,
-                  onTitleLinkTap: onTitleTap,
-                  onReact: onReact,
-                  isReacting: isReacting,
-                ),
-              };
-            },
-          );
-        },
+              },
+            );
+          },
+        ),
       ),
     );
   }

@@ -145,7 +145,7 @@ class _TvDetailPageState extends State<TvDetailPage> {
   }
 
   Future<void> _load() async {
-    final language = L10nScope.of(context).language;
+    final language = L10nScope.read(context).language;
     setState(() {
       _loading = true;
       _error = null;

@@ -131,7 +131,6 @@ class _UserProgressTabState extends State<UserProgressTab>
     with AutomaticKeepAliveClientMixin {
   final _items = <ProgressItem>[];
   final _search = TextEditingController();
-  final _scroll = ScrollController();
   Timer? _debounce;
   String _status = 'Playing';
   Map<String, int> _statusCounts = const {};
@@ -161,12 +160,6 @@ class _UserProgressTabState extends State<UserProgressTab>
     super.initState();
     _type = widget.contentType;
     _resetForType();
-    _scroll.addListener(() {
-      if (_scroll.hasClients &&
-          _scroll.position.pixels > _scroll.position.maxScrollExtent - 300) {
-        _loadMore();
-      }
-    });
     _load();
     _loadOptions();
   }
@@ -186,7 +179,6 @@ class _UserProgressTabState extends State<UserProgressTab>
   void dispose() {
     _debounce?.cancel();
     _search.dispose();
-    _scroll.dispose();
     super.dispose();
   }
 
@@ -379,224 +371,231 @@ class _UserProgressTabState extends State<UserProgressTab>
     final visible = visibleMediaTypes(viewer);
     final sections = _sections(_type);
     final hasQuery = _search.text.trim().isNotEmpty;
-    return RefreshIndicator(
-      onRefresh: _load,
-      child: CustomScrollView(
-        controller: _scroll,
-        physics: const AlwaysScrollableScrollPhysics(),
-        slivers: [
-          SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: 40,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: MediaType.values.length,
-                    separatorBuilder: (_, _) => const SizedBox(width: 8),
-                    itemBuilder: (context, index) {
-                      final type = MediaType.values[index];
-                      if (!visible.contains(type)) {
-                        return const SizedBox.shrink();
-                      }
-                      return ChoiceChip(
-                        label: Text(
-                          context.t('common:types.${type.name}_other'),
-                        ),
-                        selected: _type == type,
-                        onSelected: (_) => widget.onContentTypeChange(type),
-                      );
-                    },
+    return NotificationListener<ScrollNotification>(
+      onNotification: (n) {
+        if (n.metrics.pixels > n.metrics.maxScrollExtent - 300) {
+          _loadMore();
+        }
+        return false;
+      },
+      child: RefreshIndicator(
+        onRefresh: _load,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 40,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: MediaType.values.length,
+                      separatorBuilder: (_, _) => const SizedBox(width: 8),
+                      itemBuilder: (context, index) {
+                        final type = MediaType.values[index];
+                        if (!visible.contains(type)) {
+                          return const SizedBox.shrink();
+                        }
+                        return ChoiceChip(
+                          label: Text(
+                            context.t('common:types.${type.name}_other'),
+                          ),
+                          selected: _type == type,
+                          onSelected: (_) => widget.onContentTypeChange(type),
+                        );
+                      },
+                    ),
                   ),
-                ),
-                SizedBox(
-                  height: 40,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: sections.length,
-                    separatorBuilder: (_, _) => const SizedBox(width: 8),
-                    itemBuilder: (context, index) {
-                      final section = sections[index];
-                      final count = _statusCounts[section.status] ?? 0;
-                      return ChoiceChip(
-                        avatar: HugeIcon(
-                          icon:
-                              _statusIcons[section.status] ??
-                              HugeIcons.strokeRoundedListView,
-                          size: 14,
-                        ),
-                        label: Text(
-                          count > 0
-                              ? '${context.t(section.labelKey)}, $count'
-                              : context.t(section.labelKey),
-                        ),
-                        selected: _status == section.status,
-                        onSelected: (_) {
-                          setState(() {
-                            _status = section.status;
-                            if (_status != 'Completed' &&
-                                _status != 'Dropped') {
-                              _completion = const [];
-                            }
-                          });
-                          _load();
-                        },
-                      );
-                    },
+                  SizedBox(
+                    height: 40,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: sections.length,
+                      separatorBuilder: (_, _) => const SizedBox(width: 8),
+                      itemBuilder: (context, index) {
+                        final section = sections[index];
+                        final count = _statusCounts[section.status] ?? 0;
+                        return ChoiceChip(
+                          avatar: HugeIcon(
+                            icon:
+                                _statusIcons[section.status] ??
+                                HugeIcons.strokeRoundedListView,
+                            size: 14,
+                          ),
+                          label: Text(
+                            count > 0
+                                ? '${context.t(section.labelKey)}, $count'
+                                : context.t(section.labelKey),
+                          ),
+                          selected: _status == section.status,
+                          onSelected: (_) {
+                            setState(() {
+                              _status = section.status;
+                              if (_status != 'Completed' &&
+                                  _status != 'Dropped') {
+                                _completion = const [];
+                              }
+                            });
+                            _load();
+                          },
+                        );
+                      },
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _search,
-                          onChanged: (_) => _onSearchChanged(),
-                          decoration: InputDecoration(
-                            hintText: context.t('common:search'),
-                            prefixIcon: const HugeIcon(
-                              icon: HugeIcons.strokeRoundedSearch01,
-                              size: 18,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _search,
+                            onChanged: (_) => _onSearchChanged(),
+                            decoration: InputDecoration(
+                              hintText: context.t('common:search'),
+                              prefixIcon: const HugeIcon(
+                                icon: HugeIcons.strokeRoundedSearch01,
+                                size: 18,
+                              ),
+                              border: const OutlineInputBorder(),
+                              isDense: true,
                             ),
-                            border: const OutlineInputBorder(),
-                            isDense: true,
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton.filledTonal(
-                        icon: _randomizing
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
+                        const SizedBox(width: 8),
+                        IconButton.filledTonal(
+                          icon: _randomizing
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const HugeIcon(
+                                  icon: HugeIcons.strokeRoundedShuffle,
+                                  size: 16,
                                 ),
-                              )
-                            : const HugeIcon(
-                                icon: HugeIcons.strokeRoundedShuffle,
-                                size: 16,
-                              ),
-                        tooltip: context.t('user:random'),
-                        onPressed: _random,
-                      ),
-                      const SizedBox(width: 4),
-                      IconButton.filledTonal(
-                        icon: Badge(
-                          isLabelVisible: _activeFilterCount > 0,
-                          label: Text('$_activeFilterCount'),
-                          child: const HugeIcon(
-                            icon: HugeIcons.strokeRoundedFilterHorizontal,
+                          tooltip: context.t('user:random'),
+                          onPressed: _random,
+                        ),
+                        const SizedBox(width: 4),
+                        IconButton.filledTonal(
+                          icon: Badge(
+                            isLabelVisible: _activeFilterCount > 0,
+                            label: Text('$_activeFilterCount'),
+                            child: const HugeIcon(
+                              icon: HugeIcons.strokeRoundedFilterHorizontal,
+                              size: 16,
+                            ),
+                          ),
+                          tooltip: context.t('user:filter'),
+                          onPressed: _openFilters,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField<String>(
+                            initialValue: _sortBy,
+                            isExpanded: true,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              isDense: true,
+                            ),
+                            items: [
+                              for (final (value, key) in _sortOptions)
+                                if (value != 'releaseDate' ||
+                                    _type != MediaType.manga)
+                                  DropdownMenuItem(
+                                    value: value,
+                                    child: Text(context.t(key)),
+                                  ),
+                            ],
+                            onChanged: (value) {
+                              if (value == null || value == _sortBy) return;
+                              setState(() => _sortBy = value);
+                              _load();
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton.filledTonal(
+                          icon: HugeIcon(
+                            icon: _sortOrder == 'asc'
+                                ? HugeIcons.strokeRoundedSortByUp02
+                                : HugeIcons.strokeRoundedSortByDown02,
                             size: 16,
                           ),
-                        ),
-                        tooltip: context.t('user:filter'),
-                        onPressed: _openFilters,
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: DropdownButtonFormField<String>(
-                          initialValue: _sortBy,
-                          isExpanded: true,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            isDense: true,
-                          ),
-                          items: [
-                            for (final (value, key) in _sortOptions)
-                              if (value != 'releaseDate' ||
-                                  _type != MediaType.manga)
-                                DropdownMenuItem(
-                                  value: value,
-                                  child: Text(context.t(key)),
-                                ),
-                          ],
-                          onChanged: (value) {
-                            if (value == null || value == _sortBy) return;
-                            setState(() => _sortBy = value);
+                          tooltip: _sortOrder == 'asc'
+                              ? context.t('common:ascending')
+                              : context.t('common:descending'),
+                          onPressed: () {
+                            setState(
+                              () => _sortOrder = _sortOrder == 'asc'
+                                  ? 'desc'
+                                  : 'asc',
+                            );
                             _load();
                           },
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton.filledTonal(
-                        icon: HugeIcon(
-                          icon: _sortOrder == 'asc'
-                              ? HugeIcons.strokeRoundedSortByUp02
-                              : HugeIcons.strokeRoundedSortByDown02,
-                          size: 16,
-                        ),
-                        tooltip: _sortOrder == 'asc'
-                            ? context.t('common:ascending')
-                            : context.t('common:descending'),
-                        onPressed: () {
-                          setState(
-                            () => _sortOrder = _sortOrder == 'asc'
-                                ? 'desc'
-                                : 'asc',
-                          );
-                          _load();
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (_loading && _items.isEmpty)
-            const SliverFillRemaining(
-              child: Center(child: CircularProgressIndicator()),
-            )
-          else if (_error != null && _items.isEmpty)
-            SliverFillRemaining(child: UserError(onRetry: _load))
-          else if (_items.isEmpty)
-            SliverFillRemaining(
-              child: hasQuery || _activeFilterCount > 0
-                  ? UserEmpty(
-                      icon: HugeIcons.strokeRoundedSearch01,
-                      title: context.t('common:noResults'),
-                      description: context.t('common:noResultsDescription'),
-                    )
-                  : UserEmpty(
-                      icon: HugeIcons.strokeRoundedChartLine,
-                      title: context.t('user:noProgress'),
-                      description: context.t('user:noProgressDescription'),
+                      ],
                     ),
-            )
-          else
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-              sliver: SliverPosterGrid(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  if (index >= _items.length) {
-                    return const Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    );
-                  }
-                  final item = _items[index];
-                  return MediaCard(
-                    title: item.title,
-                    image: item.imageUrl ?? '',
-                    year: item.year,
-                    item: item,
-                    onTap: () =>
-                        widget.onOpenMedia?.call(item.type, item.detailId),
-                  );
-                }, childCount: _items.length + (_loadingMore ? 1 : 0)),
+                  ),
+                ],
               ),
             ),
-        ],
+            if (_loading && _items.isEmpty)
+              const SliverFillRemaining(
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else if (_error != null && _items.isEmpty)
+              SliverFillRemaining(child: UserError(onRetry: _load))
+            else if (_items.isEmpty)
+              SliverFillRemaining(
+                child: hasQuery || _activeFilterCount > 0
+                    ? UserEmpty(
+                        icon: HugeIcons.strokeRoundedSearch01,
+                        title: context.t('common:noResults'),
+                        description: context.t('common:noResultsDescription'),
+                      )
+                    : UserEmpty(
+                        icon: HugeIcons.strokeRoundedChartLine,
+                        title: context.t('user:noProgress'),
+                        description: context.t('user:noProgressDescription'),
+                      ),
+              )
+            else
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                sliver: SliverPosterGrid(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    if (index >= _items.length) {
+                      return const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      );
+                    }
+                    final item = _items[index];
+                    return MediaCard(
+                      title: item.title,
+                      image: item.imageUrl ?? '',
+                      year: item.year,
+                      item: item,
+                      onTap: () =>
+                          widget.onOpenMedia?.call(item.type, item.detailId),
+                    );
+                  }, childCount: _items.length + (_loadingMore ? 1 : 0)),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

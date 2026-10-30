@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 
@@ -76,12 +78,19 @@ class _ProgressCardState extends State<ProgressCard> {
                               icon: HugeIcons.strokeRoundedImage01,
                             ),
                           )
-                        : Image.network(
-                            item.imageUrl!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => const Center(
-                              child: HugeIcon(
-                                icon: HugeIcons.strokeRoundedImage01,
+                        : ImageFiltered(
+                            enabled: item.isAdult,
+                            imageFilter: ImageFilter.blur(
+                              sigmaX: 10,
+                              sigmaY: 10,
+                            ),
+                            child: Image.network(
+                              item.imageUrl!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, _, _) => const Center(
+                                child: HugeIcon(
+                                  icon: HugeIcons.strokeRoundedImage01,
+                                ),
                               ),
                             ),
                           ),
@@ -114,7 +123,7 @@ class _ProgressCardState extends State<ProgressCard> {
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 6,
-                                    vertical: 4,
+                                    vertical: 2,
                                   ),
                                   child: Text(
                                     '${item.current}/${item.total ?? '?'}',
@@ -131,11 +140,18 @@ class _ProgressCardState extends State<ProgressCard> {
                                     onPressed: !_busy && item.canIncrement
                                         ? _increment
                                         : null,
+                                    visualDensity: VisualDensity.compact,
                                     constraints: const BoxConstraints(
-                                      minWidth: 48,
-                                      minHeight: 48,
+                                      minWidth: 24,
+                                      minHeight: 24,
                                     ),
-                                    padding: EdgeInsets.zero,
+                                    style: IconButton.styleFrom(
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      minimumSize: const Size(24, 24),
+                                      maximumSize: const Size(24, 24),
+                                    ),
+                                    padding: EdgeInsets.only(right: 4),
                                     color: Colors.white,
                                     disabledColor: Colors.white54,
                                     icon: _busy

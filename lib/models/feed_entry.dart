@@ -106,6 +106,7 @@ class FeedEntry {
     this.postId,
     this.authorId,
     this.isSpoiler = false,
+    this.isAdult = false,
     this.screenshots = const [],
   }) : reactions = reactions ?? [];
 
@@ -127,5 +128,6 @@ class FeedEntry {
   final String? postId;
   final String? authorId;
   final bool isSpoiler;
+  final bool isAdult;
   final List<FeedScreenshot> screenshots;
 }

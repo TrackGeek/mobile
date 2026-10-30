@@ -106,7 +106,7 @@ class _ScreenshotCardState extends State<ScreenshotCard> {
                             screenshot: previews[i],
                             title: entry.mediaTitle ?? '',
                             revealed:
-                                !previews[i].isSpoiler ||
+                                !(previews[i].isSpoiler || entry.isAdult) ||
                                 _revealed.contains(previews[i].id),
                             overlayCount:
                                 i == previews.length - 1 && remaining > 0

@@ -47,6 +47,7 @@ class FeedItemCard extends StatelessWidget {
               coverUrl: entry.coverUrl,
               mediaTitle: entry.mediaTitle,
               activityType: entry.activityType,
+              isAdult: entry.isAdult,
               onTap: onMediaTap,
             ),
             Expanded(
@@ -140,6 +141,7 @@ class FeedCover extends StatelessWidget {
     required this.coverUrl,
     this.mediaTitle,
     required this.activityType,
+    this.isAdult = false,
     this.onTap,
     this.width = 84,
   });
@@ -147,6 +149,7 @@ class FeedCover extends StatelessWidget {
   final String coverUrl;
   final String? mediaTitle;
   final String activityType;
+  final bool isAdult;
   final VoidCallback? onTap;
   final double width;
 
@@ -211,6 +214,19 @@ class FeedCover extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (isAdult)
+                  BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: Container(
+                      color: Colors.black.withValues(alpha: 0.35),
+                      alignment: Alignment.center,
+                      child: const HugeIcon(
+                        icon: HugeIcons.strokeRoundedViewOff,
+                        size: 20,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
               ],
             ),
     );

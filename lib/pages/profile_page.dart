@@ -12,7 +12,6 @@ import '../components/user/overview_tab.dart';
 import '../components/user/profile_header.dart';
 import '../components/user/profile_tabs.dart';
 import '../components/user/profile_error.dart';
-import '../components/layout/content_frame.dart';
 import '../components/user/progress_tab.dart';
 import '../components/user/reviews_tab.dart';
 import '../components/user/screenshots_tab.dart';
@@ -352,69 +351,48 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
         ],
       ),
-      body: ContentFrame(
-        child: SafeArea(
-          child: _loading && user == null
-              ? const Center(child: CircularProgressIndicator())
-              : _error != null && user == null
-              ? ProfileError(
-                  notFound:
-                      _error is ApiException &&
-                      (_error as ApiException).failure == ApiFailure.notFound,
-                  onRetry: _load,
-                )
-              : user == null
-              ? const SizedBox.shrink()
-              : LayoutBuilder(
-                  builder: (context, constraints) {
-                    final wide = constraints.maxWidth >= 960;
-                    return Flex(
-                      direction: wide ? Axis.horizontal : Axis.vertical,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: SafeArea(
+        child: _loading && user == null
+            ? const Center(child: CircularProgressIndicator())
+            : _error != null && user == null
+            ? ProfileError(
+                notFound:
+                    _error is ApiException &&
+                    (_error as ApiException).failure == ApiFailure.notFound,
+                onRetry: _load,
+              )
+            : user == null
+            ? const SizedBox.shrink()
+            : NestedScrollView(
+                headerSliverBuilder: (context, _) => [
+                  SliverToBoxAdapter(
+                    child: Column(
                       children: [
-                        SizedBox(
-                          width: wide ? 300 : null,
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxHeight: wide
-                                  ? constraints.maxHeight
-                                  : constraints.maxHeight * 0.48,
-                            ),
-                            child: SingleChildScrollView(
-                              child: ProfileHeader(
-                                user: user,
-                                isOwner: _isOwner,
-                                isAuthenticated: widget.session.user != null,
-                                isFollowing: _followStatus?.isFollowing == true,
-                                followsYou: _followStatus?.followsYou == true,
-                                followBusy: _followBusy,
-                                onFollow: _toggleFollow,
-                                onEdit: widget.onOpenSettings,
-                                onOpenFollowers: () => _setTab('followers'),
-                                onOpenFollowing: () => _setTab('following'),
-                              ),
-                            ),
-                          ),
+                        ProfileHeader(
+                          user: user,
+                          isOwner: _isOwner,
+                          isAuthenticated: widget.session.user != null,
+                          isFollowing: _followStatus?.isFollowing == true,
+                          followsYou: _followStatus?.followsYou == true,
+                          followBusy: _followBusy,
+                          onFollow: _toggleFollow,
+                          onEdit: widget.onOpenSettings,
+                          onOpenFollowers: () => _setTab('followers'),
+                          onOpenFollowing: () => _setTab('following'),
                         ),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 12),
-                              ProfileTabs(
-                                tabs: _tabs(user),
-                                active: _tab,
-                                onSelect: _setTab,
-                              ),
-                              const SizedBox(height: 8),
-                              Expanded(child: _tabBody(user)),
-                            ],
-                          ),
+                        const SizedBox(height: 12),
+                        ProfileTabs(
+                          tabs: _tabs(user),
+                          active: _tab,
+                          onSelect: _setTab,
                         ),
+                        const SizedBox(height: 8),
                       ],
-                    );
-                  },
-                ),
-        ),
+                    ),
+                  ),
+                ],
+                body: _tabBody(user),
+              ),
       ),
     );
   }

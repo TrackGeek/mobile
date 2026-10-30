@@ -14,6 +14,12 @@ class L10nScope extends InheritedNotifier<TrackGeekLocalizations> {
     assert(scope != null, 'L10nScope missing');
     return scope!.notifier!;
   }
+
+  static TrackGeekLocalizations read(BuildContext context) {
+    final scope = context.getInheritedWidgetOfExactType<L10nScope>();
+    assert(scope != null, 'L10nScope missing');
+    return scope!.notifier!;
+  }
 }
 
 extension TrackGeekL10n on BuildContext {

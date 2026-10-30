@@ -15,6 +15,7 @@ class ProgressItem {
     this.updatedAt,
     this.completion,
     this.hoursPlayed,
+    this.isAdult = false,
   });
 
   final MediaType type;
@@ -30,6 +31,7 @@ class ProgressItem {
   final DateTime? updatedAt;
   final String? completion;
   final double? hoursPlayed;
+  final bool isAdult;
 
   bool get canIncrement {
     if (mediaId == null || current == null) return false;
@@ -101,6 +103,7 @@ class ProgressItem {
       updatedAt: DateTime.tryParse('${json['updatedAt']}'),
       completion: json['completion'] as String?,
       hoursPlayed: (json['hoursPlayed'] as num?)?.toDouble(),
+      isAdult: media['isAdult'] as bool? ?? false,
     );
   }
 }

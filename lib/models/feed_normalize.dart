@@ -8,6 +8,7 @@ class _ResolvedMedia {
     required this.slug,
     this.type,
     this.person = false,
+    this.isAdult = false,
   });
 
   final String title;
@@ -15,6 +16,7 @@ class _ResolvedMedia {
   final String slug;
   final MediaType? type;
   final bool person;
+  final bool isAdult;
 }
 
 num _toNum(Object? value) => switch (value) {
@@ -28,42 +30,49 @@ String? _slugOf(Object? preferred, Map<String, dynamic> media) =>
 
 _ResolvedMedia? _mediaOf(MediaType type, Object? raw) {
   if (raw is! Map<String, dynamic>) return null;
+  final isAdult = raw['isAdult'] as bool? ?? false;
   return switch (type) {
     MediaType.anime => _ResolvedMedia(
       title: raw['title'] as String? ?? '',
       cover: raw['imageUrl'] as String? ?? '',
       slug: _slugOf(raw['malId'], raw)!,
       type: type,
+      isAdult: isAdult,
     ),
     MediaType.manga => _ResolvedMedia(
       title: raw['title'] as String? ?? '',
       cover: raw['imageUrl'] as String? ?? '',
       slug: _slugOf(raw['anilistId'] ?? raw['malId'], raw)!,
       type: type,
+      isAdult: isAdult,
     ),
     MediaType.tv => _ResolvedMedia(
       title: raw['name'] as String? ?? '',
       cover: raw['posterUrl'] as String? ?? '',
       slug: _slugOf(raw['tmdbId'], raw)!,
       type: type,
+      isAdult: isAdult,
     ),
     MediaType.movie => _ResolvedMedia(
       title: raw['title'] as String? ?? '',
       cover: raw['posterUrl'] as String? ?? '',
       slug: _slugOf(raw['tmdbId'], raw)!,
       type: type,
+      isAdult: isAdult,
     ),
     MediaType.game => _ResolvedMedia(
       title: raw['name'] as String? ?? '',
       cover: raw['coverUrl'] as String? ?? '',
       slug: _slugOf(raw['igdbId'], raw)!,
       type: type,
+      isAdult: isAdult,
     ),
     MediaType.book => _ResolvedMedia(
       title: raw['title'] as String? ?? '',
       cover: raw['imageUrl'] as String? ?? '',
       slug: _slugOf(raw['hardcoverId'], raw)!,
       type: type,
+      isAdult: isAdult,
     ),
   };
 }
@@ -85,6 +94,7 @@ _ResolvedMedia? _resolveMedia(Map<String, dynamic>? refs) {
       cover: person['imageUrl'] as String? ?? '',
       slug: _slugOf(person['slug'], person)!,
       person: true,
+      isAdult: person['isAdult'] as bool? ?? false,
     );
   }
   return null;
@@ -199,6 +209,7 @@ FeedEntry? normalizeActivityGroup(Map<String, dynamic> group) {
     postId: postId,
     authorId: authorId,
     isSpoiler: isSpoiler,
+    isAdult: media?.isAdult ?? false,
     screenshots: screenshots,
   );
 

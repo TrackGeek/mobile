@@ -37,7 +37,6 @@ class _UserListsTabState extends State<UserListsTab>
     with AutomaticKeepAliveClientMixin {
   final _groups = <UserListGroup>[];
   final _search = TextEditingController();
-  final _scroll = ScrollController();
   Timer? _debounce;
   bool _loading = false;
   bool _loadingMore = false;
@@ -52,12 +51,6 @@ class _UserListsTabState extends State<UserListsTab>
   @override
   void initState() {
     super.initState();
-    _scroll.addListener(() {
-      if (_scroll.hasClients &&
-          _scroll.position.pixels > _scroll.position.maxScrollExtent - 300) {
-        _loadMore();
-      }
-    });
     _load();
   }
 
@@ -65,7 +58,6 @@ class _UserListsTabState extends State<UserListsTab>
   void dispose() {
     _debounce?.cancel();
     _search.dispose();
-    _scroll.dispose();
     super.dispose();
   }
 
@@ -180,92 +172,99 @@ class _UserListsTabState extends State<UserListsTab>
     final filtered = _groups;
     final hasAny = filtered.any((g) => g.lists.isNotEmpty);
     final hasQuery = _search.text.trim().isNotEmpty;
-    return RefreshIndicator(
-      onRefresh: _load,
-      child: CustomScrollView(
-        controller: _scroll,
-        physics: const AlwaysScrollableScrollPhysics(),
-        slivers: [
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-              child: TextField(
-                controller: _search,
-                onChanged: (_) => _onSearchChanged(),
-                decoration: InputDecoration(
-                  hintText: context.t('common:search'),
-                  prefixIcon: const HugeIcon(
-                    icon: HugeIcons.strokeRoundedSearch01,
-                    size: 18,
+    return NotificationListener<ScrollNotification>(
+      onNotification: (n) {
+        if (n.metrics.pixels > n.metrics.maxScrollExtent - 300) {
+          _loadMore();
+        }
+        return false;
+      },
+      child: RefreshIndicator(
+        onRefresh: _load,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                child: TextField(
+                  controller: _search,
+                  onChanged: (_) => _onSearchChanged(),
+                  decoration: InputDecoration(
+                    hintText: context.t('common:search'),
+                    prefixIcon: const HugeIcon(
+                      icon: HugeIcons.strokeRoundedSearch01,
+                      size: 18,
+                    ),
+                    border: const OutlineInputBorder(),
+                    isDense: true,
                   ),
-                  border: const OutlineInputBorder(),
-                  isDense: true,
                 ),
               ),
             ),
-          ),
-          if (_loading && _groups.isEmpty)
-            const SliverFillRemaining(
-              child: Center(child: CircularProgressIndicator()),
-            )
-          else if (_error != null && _groups.isEmpty)
-            SliverFillRemaining(child: UserError(onRetry: _load))
-          else if (_loaded && !hasAny)
-            SliverFillRemaining(
-              child: hasQuery
-                  ? UserEmpty(
-                      icon: HugeIcons.strokeRoundedSearch01,
-                      title: context.t('common:noResults'),
-                      description: context.t('common:noResultsDescription'),
-                    )
-                  : UserEmpty(
-                      icon: HugeIcons.strokeRoundedListView,
-                      title: context.t('common:lists'),
-                    ),
-            )
-          else
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-              sliver: SliverList.separated(
-                itemCount: filtered.length + (_loadingMore ? 1 : 0),
-                separatorBuilder: (_, _) => const SizedBox(height: 20),
-                itemBuilder: (context, index) {
-                  if (index >= filtered.length) {
-                    return const Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    );
-                  }
-                  final group = filtered[index];
-                  if (group.lists.isEmpty) return const SizedBox.shrink();
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Text(
-                          group.name,
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+            if (_loading && _groups.isEmpty)
+              const SliverFillRemaining(
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else if (_error != null && _groups.isEmpty)
+              SliverFillRemaining(child: UserError(onRetry: _load))
+            else if (_loaded && !hasAny)
+              SliverFillRemaining(
+                child: hasQuery
+                    ? UserEmpty(
+                        icon: HugeIcons.strokeRoundedSearch01,
+                        title: context.t('common:noResults'),
+                        description: context.t('common:noResultsDescription'),
+                      )
+                    : UserEmpty(
+                        icon: HugeIcons.strokeRoundedListView,
+                        title: context.t('common:lists'),
                       ),
-                      for (final list in group.lists)
+              )
+            else
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                sliver: SliverList.separated(
+                  itemCount: filtered.length + (_loadingMore ? 1 : 0),
+                  separatorBuilder: (_, _) => const SizedBox(height: 20),
+                  itemBuilder: (context, index) {
+                    if (index >= filtered.length) {
+                      return const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      );
+                    }
+                    final group = filtered[index];
+                    if (group.lists.isEmpty) return const SizedBox.shrink();
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Padding(
                           padding: const EdgeInsets.only(bottom: 8),
-                          child: _ListCard(
-                            list: list,
-                            isOwner: widget.isOwner,
-                            onTap: () => _open(list),
-                            onEdit: () => _edit(list),
-                            onDelete: () => _delete(list),
+                          child: Text(
+                            group.name,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                    ],
-                  );
-                },
+                        for (final list in group.lists)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: _ListCard(
+                              list: list,
+                              isOwner: widget.isOwner,
+                              onTap: () => _open(list),
+                              onEdit: () => _edit(list),
+                              onDelete: () => _delete(list),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

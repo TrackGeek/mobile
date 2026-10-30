@@ -40,7 +40,6 @@ class _UserReviewsTabState extends State<UserReviewsTab>
     with AutomaticKeepAliveClientMixin {
   final _items = <UserReview>[];
   final _search = TextEditingController();
-  final _scroll = ScrollController();
   final _reacting = <String>{};
   Timer? _debounce;
   MediaType _type = MediaType.game;
@@ -58,12 +57,6 @@ class _UserReviewsTabState extends State<UserReviewsTab>
   void initState() {
     super.initState();
     _type = widget.initialType ?? MediaType.game;
-    _scroll.addListener(() {
-      if (_scroll.hasClients &&
-          _scroll.position.pixels > _scroll.position.maxScrollExtent - 300) {
-        _loadMore();
-      }
-    });
     _load();
   }
 
@@ -71,7 +64,6 @@ class _UserReviewsTabState extends State<UserReviewsTab>
   void dispose() {
     _debounce?.cancel();
     _search.dispose();
-    _scroll.dispose();
     super.dispose();
   }
 
@@ -207,115 +199,122 @@ class _UserReviewsTabState extends State<UserReviewsTab>
     ];
     if (!types.contains(_type)) _type = types.firstOrNull ?? MediaType.game;
     final hasQuery = _search.text.trim().isNotEmpty;
-    return RefreshIndicator(
-      onRefresh: _load,
-      child: CustomScrollView(
-        controller: _scroll,
-        physics: const AlwaysScrollableScrollPhysics(),
-        slivers: [
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Column(
-                children: [
-                  DropdownButtonFormField<MediaType>(
-                    initialValue: _type,
-                    isExpanded: true,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      isDense: true,
-                    ),
-                    items: [
-                      for (final t in types)
-                        DropdownMenuItem(
-                          value: t,
-                          child: Text(
-                            context.t('common:types.${t.name}_other'),
+    return NotificationListener<ScrollNotification>(
+      onNotification: (n) {
+        if (n.metrics.pixels > n.metrics.maxScrollExtent - 300) {
+          _loadMore();
+        }
+        return false;
+      },
+      child: RefreshIndicator(
+        onRefresh: _load,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: Column(
+                  children: [
+                    DropdownButtonFormField<MediaType>(
+                      initialValue: _type,
+                      isExpanded: true,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      items: [
+                        for (final t in types)
+                          DropdownMenuItem(
+                            value: t,
+                            child: Text(
+                              context.t('common:types.${t.name}_other'),
+                            ),
                           ),
+                      ],
+                      onChanged: (value) {
+                        if (value == null || value == _type) return;
+                        setState(() {
+                          _type = value;
+                          _search.clear();
+                        });
+                        _load();
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _search,
+                      onChanged: (_) => _onSearchChanged(),
+                      decoration: InputDecoration(
+                        hintText: context.t('common:search'),
+                        prefixIcon: const HugeIcon(
+                          icon: HugeIcons.strokeRoundedSearch01,
+                          size: 18,
                         ),
-                    ],
-                    onChanged: (value) {
-                      if (value == null || value == _type) return;
-                      setState(() {
-                        _type = value;
-                        _search.clear();
-                      });
-                      _load();
-                    },
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _search,
-                    onChanged: (_) => _onSearchChanged(),
-                    decoration: InputDecoration(
-                      hintText: context.t('common:search'),
-                      prefixIcon: const HugeIcon(
+                        border: const OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (_loading && _items.isEmpty)
+              const SliverFillRemaining(
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else if (_error != null && _items.isEmpty)
+              SliverFillRemaining(child: UserError(onRetry: _load))
+            else if (_loaded && _items.isEmpty)
+              SliverFillRemaining(
+                child: hasQuery
+                    ? UserEmpty(
                         icon: HugeIcons.strokeRoundedSearch01,
-                        size: 18,
+                        title: context.t('common:noResults'),
+                        description: context.t('common:noResultsDescription'),
+                      )
+                    : UserEmpty(
+                        icon: HugeIcons.strokeRoundedEdit01,
+                        title: context.t('library:noReviews'),
+                        description: context.t('library:noReviewsDescription'),
                       ),
-                      border: const OutlineInputBorder(),
-                      isDense: true,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          if (_loading && _items.isEmpty)
-            const SliverFillRemaining(
-              child: Center(child: CircularProgressIndicator()),
-            )
-          else if (_error != null && _items.isEmpty)
-            SliverFillRemaining(child: UserError(onRetry: _load))
-          else if (_loaded && _items.isEmpty)
-            SliverFillRemaining(
-              child: hasQuery
-                  ? UserEmpty(
-                      icon: HugeIcons.strokeRoundedSearch01,
-                      title: context.t('common:noResults'),
-                      description: context.t('common:noResultsDescription'),
-                    )
-                  : UserEmpty(
-                      icon: HugeIcons.strokeRoundedEdit01,
-                      title: context.t('library:noReviews'),
-                      description: context.t('library:noReviewsDescription'),
-                    ),
-            )
-          else
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-              sliver: SliverList.separated(
-                itemCount: _items.length + (_loadingMore ? 1 : 0),
-                separatorBuilder: (_, _) => const SizedBox(height: 10),
-                itemBuilder: (context, index) {
-                  if (index >= _items.length) {
-                    return const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(8),
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
+              )
+            else
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                sliver: SliverList.separated(
+                  itemCount: _items.length + (_loadingMore ? 1 : 0),
+                  separatorBuilder: (_, _) => const SizedBox(height: 10),
+                  itemBuilder: (context, index) {
+                    if (index >= _items.length) {
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(8),
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      );
+                    }
+                    final review = _items[index];
+                    return ReviewItem(
+                      review: review,
+                      currentUserId: viewer?.id ?? '',
+                      isOwner: isOwner,
+                      onMediaTap: review.mediaEntityId == null
+                          ? null
+                          : () => widget.onOpenMedia?.call(
+                              review.type,
+                              review.mediaEntityId!,
+                            ),
+                      onEdit: () => _edit(review),
+                      onDelete: () => _delete(review),
+                      onReact: (emoji, current) => _react(review, emoji),
+                      reacting: _reacting.contains(review.id),
                     );
-                  }
-                  final review = _items[index];
-                  return ReviewItem(
-                    review: review,
-                    currentUserId: viewer?.id ?? '',
-                    isOwner: isOwner,
-                    onMediaTap: review.mediaEntityId == null
-                        ? null
-                        : () => widget.onOpenMedia?.call(
-                            review.type,
-                            review.mediaEntityId!,
-                          ),
-                    onEdit: () => _edit(review),
-                    onDelete: () => _delete(review),
-                    onReact: (emoji, current) => _react(review, emoji),
-                    reacting: _reacting.contains(review.id),
-                  );
-                },
+                  },
+                ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

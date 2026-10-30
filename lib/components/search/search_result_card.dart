@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 
@@ -40,10 +42,7 @@ class SearchResultCard extends StatelessWidget {
                   item.imageUrl != null
                       ? ImageFiltered(
                           enabled: item.isAdult,
-                          imageFilter: const ColorFilter.mode(
-                            Colors.transparent,
-                            BlendMode.srcOver,
-                          ),
+                          imageFilter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                           child: Image.network(
                             item.imageUrl!,
                             fit: BoxFit.cover,

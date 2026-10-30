@@ -43,7 +43,6 @@ class _UserFollowsTabState extends State<UserFollowsTab>
   Object? _error;
   int _page = 0;
   bool _hasNext = false;
-  final _scroll = ScrollController();
 
   @override
   bool get wantKeepAlive => true;
@@ -53,13 +52,11 @@ class _UserFollowsTabState extends State<UserFollowsTab>
   @override
   void initState() {
     super.initState();
-    _scroll.addListener(_maybeLoadMore);
     _load();
   }
 
   @override
   void dispose() {
-    _scroll.dispose();
     super.dispose();
   }
 
@@ -89,14 +86,6 @@ class _UserFollowsTabState extends State<UserFollowsTab>
       widget.kind == 'followers'
       ? widget.users.followers(widget.userId, page: page, language: _language)
       : widget.users.following(widget.userId, page: page, language: _language);
-
-  void _maybeLoadMore() {
-    if (!_scroll.hasClients ||
-        _scroll.position.pixels < _scroll.position.maxScrollExtent - 200) {
-      return;
-    }
-    _loadMore();
-  }
 
   Future<void> _loadMore() async {
     if (_loading || _loadingMore || !_hasNext) return;
@@ -194,75 +183,82 @@ class _UserFollowsTabState extends State<UserFollowsTab>
             );
     }
     final viewer = widget.session.user;
-    return RefreshIndicator(
-      onRefresh: _load,
-      child: ListView.separated(
-        controller: _scroll,
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(16),
-        itemCount: users.length + (_loadingMore ? 1 : 0),
-        separatorBuilder: (_, _) => const SizedBox(height: 8),
-        itemBuilder: (context, index) {
-          if (index >= users.length) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(8),
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-            );
-          }
-          final user = users[index];
-          final isSelf = viewer?.id == user.id;
-          return InkWell(
-            onTap: () => widget.onOpenUser?.call(user.username),
-            borderRadius: BorderRadius.circular(10),
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.outlineVariant,
+    return NotificationListener<ScrollNotification>(
+      onNotification: (n) {
+        if (n.metrics.pixels > n.metrics.maxScrollExtent - 200) {
+          _loadMore();
+        }
+        return false;
+      },
+      child: RefreshIndicator(
+        onRefresh: _load,
+        child: ListView.separated(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(16),
+          itemCount: users.length + (_loadingMore ? 1 : 0),
+          separatorBuilder: (_, _) => const SizedBox(height: 8),
+          itemBuilder: (context, index) {
+            if (index >= users.length) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(8),
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              );
+            }
+            final user = users[index];
+            final isSelf = viewer?.id == user.id;
+            return InkWell(
+              onTap: () => widget.onOpenUser?.call(user.username),
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    UserAvatar(name: user.name, avatarUrl: user.avatarUrl),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          Text(
+                            '@${user.username}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.labelSmall
+                                ?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (!isSelf && viewer != null)
+                      FollowButton(
+                        isFollowing: _statuses[user.id] ?? false,
+                        busy: _busy.contains(user.id),
+                        onPressed: () => _toggle(user),
+                      ),
+                  ],
                 ),
               ),
-              child: Row(
-                children: [
-                  UserAvatar(name: user.name, avatarUrl: user.avatarUrl),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          user.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        Text(
-                          '@${user.username}',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.labelSmall
-                              ?.copyWith(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (!isSelf && viewer != null)
-                    FollowButton(
-                      isFollowing: _statuses[user.id] ?? false,
-                      busy: _busy.contains(user.id),
-                      onPressed: () => _toggle(user),
-                    ),
-                ],
-              ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

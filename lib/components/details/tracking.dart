@@ -75,7 +75,7 @@ class _StatusButton extends StatelessWidget {
           duration: MediaQuery.disableAnimationsOf(context)
               ? Duration.zero
               : const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 6),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
@@ -86,16 +86,16 @@ class _StatusButton extends StatelessWidget {
           child: Column(
             children: [
               Container(
-                width: 38,
-                height: 38,
+                width: 32,
+                height: 32,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: color.withValues(alpha: 0.15),
                   border: Border.all(color: color.withValues(alpha: 0.35)),
                 ),
-                child: HugeIcon(icon: config.icon, size: 20, color: color),
+                child: HugeIcon(icon: config.icon, size: 15, color: color),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               Text(
                 config.label,
                 textAlign: TextAlign.center,

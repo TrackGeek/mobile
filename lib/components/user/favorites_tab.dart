@@ -49,7 +49,6 @@ class _UserFavoritesTabState extends State<UserFavoritesTab>
     with AutomaticKeepAliveClientMixin {
   final _items = <Favorite>[];
   final _search = TextEditingController();
-  final _scroll = ScrollController();
   Timer? _debounce;
   String _type = 'Anime';
   bool _loading = false;
@@ -73,7 +72,6 @@ class _UserFavoritesTabState extends State<UserFavoritesTab>
   void dispose() {
     _debounce?.cancel();
     _search.dispose();
-    _scroll.dispose();
     super.dispose();
   }
 
@@ -154,7 +152,6 @@ class _UserFavoritesTabState extends State<UserFavoritesTab>
     return RefreshIndicator(
       onRefresh: _load,
       child: CustomScrollView(
-        controller: _scroll,
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
           SliverToBoxAdapter(

@@ -6,8 +6,6 @@ import 'package:hugeicons/hugeicons.dart';
 import '../components/feed/feed_list.dart';
 import '../components/feed/feed_tabs.dart';
 import '../components/feed/tracking_header.dart';
-import '../components/layout/content_frame.dart';
-import '../styles/tg_layout.dart';
 import '../controllers/feed_controller.dart';
 import '../controllers/session_controller.dart';
 import '../l10n/l10n_context.dart';
@@ -205,23 +203,7 @@ class _HomePageState extends State<HomePage> {
       ),
     };
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('TrackGeek'),
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(
-            64 + (MediaQuery.textScalerOf(context).scale(14) - 14),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: ContentFrame(
-              maxWidth: TgLayout.readingWidth,
-              child: FeedTabs(active: _tab, onChanged: _setTab),
-            ),
-          ),
-        ),
-      ),
-      body: ContentFrame(
-        maxWidth: TgLayout.readingWidth,
+      body: SafeArea(
         child: FeedList(
           key: ValueKey(_tab),
           controller: controller,
@@ -229,12 +211,21 @@ class _HomePageState extends State<HomePage> {
           emptyTitle: emptyTitle,
           emptyDescription: emptyDescription,
           onRefresh: _refresh,
-          header: TrackingHeader(
-            userId: userId,
-            progress: widget.progress,
-            details: widget.details,
-            env: _env,
-            onViewAll: widget.onOpenProfile,
+          header: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                child: FeedTabs(active: _tab, onChanged: _setTab),
+              ),
+              TrackingHeader(
+                userId: userId,
+                progress: widget.progress,
+                details: widget.details,
+                env: _env,
+                onViewAll: widget.onOpenProfile,
+              ),
+            ],
           ),
           onOpenMedia: _openMedia,
           onOpenUser: _openUser,

@@ -220,6 +220,7 @@ class _CompanyPageState extends State<CompanyPage> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
       child: Container(
+        width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: theme.colorScheme.outlineVariant),

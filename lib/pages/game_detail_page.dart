@@ -117,7 +117,7 @@ class _GameDetailPageState extends State<GameDetailPage> {
   }
 
   Future<void> _load() async {
-    final language = L10nScope.of(context).language;
+    final language = L10nScope.read(context).language;
     setState(() {
       _loading = true;
       _error = null;

@@ -35,6 +35,28 @@ String? formatDateRange(
   return '$start – ${end ?? presentLabel}';
 }
 
+String formatRelativeTime(
+  DateTime value,
+  String Function(String key, [Map<String, Object?> params]) t,
+) {
+  var seconds = DateTime.now().difference(value).inSeconds;
+  if (seconds < 0) seconds = 0;
+  if (seconds < 60) return t('common:timeAgo.justNow');
+  const units = [
+    ('years', 365 * 24 * 3600),
+    ('months', 30 * 24 * 3600),
+    ('weeks', 7 * 24 * 3600),
+    ('days', 24 * 3600),
+    ('hours', 3600),
+    ('minutes', 60),
+  ];
+  for (final (name, size) in units) {
+    final count = seconds ~/ size;
+    if (count > 0) return t('common:timeAgo.$name', {'count': count});
+  }
+  return t('common:timeAgo.justNow');
+}
+
 int? ageFrom(String? birthday, String? deathday) {
   if (birthday == null || birthday.isEmpty) return null;
   final born = DateTime.tryParse(birthday);
