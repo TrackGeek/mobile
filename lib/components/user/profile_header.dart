@@ -140,7 +140,7 @@ class ProfileHeader extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 11,
+                          fontSize: 12,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -215,7 +215,7 @@ class ProfileHeader extends StatelessWidget {
                       child: Text(
                         context.t('user:followsYou'),
                         style: const TextStyle(
-                          fontSize: 10,
+                          fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -244,7 +244,7 @@ class ProfileHeader extends StatelessWidget {
                     icon: HugeIcons.strokeRoundedCrown,
                     text: user.tierStartedAt == null
                         ? context.t('common:tiers.${user.tier}')
-                        : '${context.t('common:tierStartedAt')} ${DateFormat.yMd(locale).format(DateTime.tryParse(user.tierStartedAt!) ?? createdAt ?? DateTime.now())} · ${context.t('common:tiers.${user.tier}')}',
+                        : '${context.t('common:tierStartedAt')} ${DateFormat.yMd(locale).format(DateTime.tryParse(user.tierStartedAt!) ?? createdAt ?? DateTime.now())}, ${context.t('common:tiers.${user.tier}')}',
                   ),
               ],
             ),
@@ -275,6 +275,7 @@ class ProfileHeader extends StatelessWidget {
             ],
           ),
         ),
+
         if (isOwner || isAuthenticated)
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
@@ -366,35 +367,43 @@ class _StatPill extends StatelessWidget {
     return Expanded(
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: theme.colorScheme.outlineVariant),
+            color: theme.colorScheme.surfaceContainerHigh,
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
             children: [
-              HugeIcon(
-                icon: icon,
-                size: 14,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(height: 2),
               Text(
                 '$count',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
                 ),
               ),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                  fontSize: 10,
-                ),
+              const SizedBox(height: 2),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  HugeIcon(
+                    icon: icon,
+                    size: 13,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

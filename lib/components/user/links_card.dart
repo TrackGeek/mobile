@@ -139,7 +139,7 @@ class LinksCard extends StatelessWidget {
                             ),
                             label: Text(
                               linkPlatform(link.url),
-                              style: const TextStyle(fontSize: 11),
+                              style: const TextStyle(fontSize: 12),
                             ),
                             onPressed: () => launchUrl(
                               Uri.parse(link.url),

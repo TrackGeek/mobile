@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../styles/tg_theme.dart';
 import '../media/sliver_poster_grid.dart';
 
 import 'package:hugeicons/hugeicons.dart';
@@ -252,7 +253,7 @@ class _UserFavoritesTabState extends State<UserFavoritesTab>
                             iconSize: 14,
                             visualDensity: VisualDensity.compact,
                             style: IconButton.styleFrom(
-                              backgroundColor: Colors.black54,
+                              backgroundColor: TgColors.scrim,
                               foregroundColor: Colors.white,
                               minimumSize: const Size(28, 28),
                             ),

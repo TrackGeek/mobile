@@ -57,7 +57,7 @@ class ShopItemTile extends StatelessWidget {
                     const HugeIcon(
                       icon: HugeIcons.strokeRoundedCoins01,
                       size: 14,
-                      color: Color(0xFFFBBF24),
+                      color: TgColors.gold,
                     ),
                     const SizedBox(width: 4),
                     Text(

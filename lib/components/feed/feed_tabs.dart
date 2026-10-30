@@ -30,7 +30,7 @@ class FeedTabs extends StatelessWidget {
       height: 52 + (MediaQuery.textScalerOf(context).scale(14) - 14),
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        color: theme.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -60,7 +60,7 @@ class FeedTabs extends StatelessWidget {
                           icon: icon,
                           size: 16,
                           color: active == kind
-                              ? theme.colorScheme.onSurface
+                              ? theme.colorScheme.onPrimaryContainer
                               : theme.colorScheme.onSurfaceVariant,
                         ),
                         const SizedBox(width: 6),
@@ -71,11 +71,11 @@ class FeedTabs extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.labelLarge?.copyWith(
                               color: active == kind
-                                  ? theme.colorScheme.onSurface
+                                  ? theme.colorScheme.onPrimaryContainer
                                   : theme.colorScheme.onSurfaceVariant,
                               fontWeight: active == kind
-                                  ? FontWeight.w600
-                                  : FontWeight.w400,
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
                             ),
                           ),
                         ),

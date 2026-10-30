@@ -240,7 +240,7 @@ class _ShopPageState extends State<ShopPage> {
                     const HugeIcon(
                       icon: HugeIcons.strokeRoundedCoins01,
                       size: 16,
-                      color: Color(0xFFFBBF24),
+                      color: TgColors.gold,
                     ),
                     const SizedBox(width: 6),
                     Text(

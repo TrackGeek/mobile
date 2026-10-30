@@ -244,7 +244,7 @@ class _SpotifyProgress extends StatelessWidget {
                 formatElapsed(elapsed),
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
-                  fontSize: 10,
+                  fontSize: 12,
                 ),
               ),
               const Spacer(),
@@ -252,7 +252,7 @@ class _SpotifyProgress extends StatelessWidget {
                 '-${formatElapsed(remaining)}',
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
-                  fontSize: 10,
+                  fontSize: 12,
                 ),
               ),
             ],
@@ -390,7 +390,7 @@ class _DiscordCard extends StatelessWidget {
                                   }),
                                   style: theme.textTheme.labelSmall?.copyWith(
                                     color: theme.colorScheme.onSurfaceVariant,
-                                    fontSize: 10,
+                                    fontSize: 12,
                                   ),
                                 ),
                             ],

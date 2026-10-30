@@ -174,8 +174,7 @@ class _CompanyPageState extends State<CompanyPage> {
                                 decoration: BoxDecoration(
                                   color: Theme.of(context)
                                       .colorScheme
-                                      .surfaceContainerHighest
-                                      .withValues(alpha: 0.5),
+                                      .surfaceContainerHigh,
                                   borderRadius: BorderRadius.circular(999),
                                   border: Border.all(
                                     color: Theme.of(context)

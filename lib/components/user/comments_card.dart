@@ -401,14 +401,16 @@ class _CommentItemState extends State<_CommentItem> {
                             'level': '${comment.user.level}',
                           }),
                           style: theme.textTheme.labelSmall?.copyWith(
-                            fontSize: 10,
+                            fontSize: 12,
                           ),
                         ),
                       ),
                     ],
                     const SizedBox(width: 6),
                     Text(
-                      '· ${comment.createdAt == null ? '' : DateFormat.yMd(L10nScope.of(context).language).add_jm().format(comment.createdAt!.toLocal())}',
+                      comment.createdAt == null
+                          ? ''
+                          : ', ${DateFormat.yMd(L10nScope.of(context).language).add_jm().format(comment.createdAt!.toLocal())}',
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -454,8 +456,7 @@ class _CommentItemState extends State<_CommentItem> {
                         border: Border.all(
                           color: theme.colorScheme.outlineVariant,
                         ),
-                        color: theme.colorScheme.surfaceContainerHighest
-                            .withValues(alpha: 0.4),
+                        color: theme.colorScheme.surfaceContainerHigh,
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,

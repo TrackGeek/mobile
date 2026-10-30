@@ -47,7 +47,7 @@ class InfoCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+        color: theme.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: theme.colorScheme.outlineVariant),
       ),
@@ -101,7 +101,7 @@ class MetaStatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+        color: theme.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: theme.colorScheme.outlineVariant),
       ),
@@ -197,13 +197,16 @@ class _ListWithMoreState extends State<ListWithMore> {
     if (widget.entries.isEmpty) return const SizedBox.shrink();
     if (widget.entries.length == 1 || _expanded) {
       return Wrap(
-        spacing: 4,
+        spacing: 8,
         runSpacing: 2,
         children: [
-          for (var i = 0; i < widget.entries.length; i++) ...[
-            if (i > 0) const Text('·'),
-            _entry(context, widget.entries[i]),
-          ],
+          for (var i = 0; i < widget.entries.length; i++)
+            Wrap(
+              children: [
+                _entry(context, widget.entries[i]),
+                if (i < widget.entries.length - 1) const Text(','),
+              ],
+            ),
         ],
       );
     }

@@ -153,7 +153,7 @@ class PersonHero extends StatelessWidget {
                           text:
                               birthday +
                               (age != null
-                                  ? ' · ${context.t('library:yearsOld', {'count': age})}'
+                                  ? ', ${context.t('library:yearsOld', {'count': age})}'
                                   : ''),
                         ),
                       if (formatLongDate(person.deathday, language)

@@ -301,7 +301,7 @@ class _MovieFranchisePageState extends State<MovieFranchisePage> {
                   child: Text(
                     part.releaseDate!.split('-').first,
                     style: theme.textTheme.labelSmall?.copyWith(
-                      fontSize: 10,
+                      fontSize: 12,
                       fontWeight: FontWeight.w500,
                       color: theme.colorScheme.onSurfaceVariant,
                     ),

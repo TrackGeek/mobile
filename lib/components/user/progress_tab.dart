@@ -430,7 +430,7 @@ class _UserProgressTabState extends State<UserProgressTab>
                         ),
                         label: Text(
                           count > 0
-                              ? '${context.t(section.labelKey)} · $count'
+                              ? '${context.t(section.labelKey)}, $count'
                               : context.t(section.labelKey),
                         ),
                         selected: _status == section.status,

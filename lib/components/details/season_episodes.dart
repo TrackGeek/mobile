@@ -197,9 +197,7 @@ class _EpisodeSkeleton extends StatelessWidget {
         for (var i = 0; i < 6; i++)
           Container(
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest.withValues(
-                alpha: 0.5,
-              ),
+              color: theme.colorScheme.surfaceContainerHigh,
               borderRadius: BorderRadius.circular(12),
             ),
           ),

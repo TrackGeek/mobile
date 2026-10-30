@@ -66,7 +66,7 @@ class _StatusButton extends StatelessWidget {
     return Material(
       color: config.isActive
           ? color.withValues(alpha: 0.18)
-          : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+          : theme.colorScheme.surfaceContainerHigh,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: config.disabled ? null : config.onTap,
@@ -137,7 +137,7 @@ class EpisodeProgressGrid extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+        color: theme.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: theme.colorScheme.outlineVariant),
       ),

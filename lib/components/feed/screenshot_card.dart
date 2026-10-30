@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import '../../styles/tg_theme.dart';
 import '../../models/gallery_item.dart';
 import '../../pages/media_gallery_page.dart';
 
@@ -89,9 +90,7 @@ class _ScreenshotCardState extends State<ScreenshotCard> {
             ),
           ),
           Container(
-            color: theme.colorScheme.surfaceContainerHighest.withValues(
-              alpha: 0.3,
-            ),
+            color: theme.colorScheme.surfaceContainerHigh,
             child: Column(
               children: [
                 for (var row = 0; row < _rows(previews.length); row++)
@@ -232,7 +231,7 @@ class _ScreenshotTile extends StatelessWidget {
       child: AspectRatio(
         aspectRatio: 16 / 9,
         child: Container(
-          color: const Color(0xFF0A0A0A),
+          color: TgColors.background,
           child: Stack(
             fit: StackFit.expand,
             children: [

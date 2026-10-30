@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 
-import '../../l10n/l10n_context.dart';
+import '../../styles/tg_theme.dart';
+import '../../../l10n/l10n_context.dart';
 import '../../models/progress_item.dart';
 
 class MediaCard extends StatelessWidget {
@@ -61,7 +62,7 @@ class MediaCard extends StatelessWidget {
                       right: 0,
                       bottom: 0,
                       child: Container(
-                        color: Colors.black54,
+                        color: TgColors.scrim,
                         padding: const EdgeInsets.all(6),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,7 +80,7 @@ class MediaCard extends StatelessWidget {
                               '${progress.current}/${progress.total}',
                               style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: 10,
+                                fontSize: 12,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -122,7 +123,7 @@ class MediaCard extends StatelessWidget {
                         ),
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
-                    fontSize: 10,
+                    fontSize: 12,
                   ),
                 ),
               if ((progress?.hoursPlayed ?? 0) > 0)
@@ -130,7 +131,7 @@ class MediaCard extends StatelessWidget {
                   '${progress!.hoursPlayed!.toStringAsFixed(0)}h',
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
-                    fontSize: 10,
+                    fontSize: 12,
                   ),
                 ),
             ],
@@ -145,11 +146,11 @@ class _Fallback extends StatelessWidget {
   const _Fallback();
 
   @override
-  Widget build(BuildContext context) => const Center(
+  Widget build(BuildContext context) => Center(
     child: HugeIcon(
       icon: HugeIcons.strokeRoundedImage01,
       size: 28,
-      color: Colors.white38,
+      color: Theme.of(context).colorScheme.onSurfaceVariant,
     ),
   );
 }

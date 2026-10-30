@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../styles/tg_theme.dart';
 import '../../controllers/session_controller.dart';
 import '../../l10n/l10n_context.dart';
 import '../../models/cosmetic.dart';
@@ -511,12 +512,12 @@ class _AppearanceSectionState extends State<AppearanceSection> {
     final style = avatarFrameStyles[key];
     if (style == null) {
       return const BoxDecoration(
-        color: Color(0xFF27272A),
+        color: TgColors.raised,
         shape: BoxShape.circle,
       );
     }
     return BoxDecoration(
-      color: const Color(0xFF27272A),
+      color: TgColors.raised,
       shape: BoxShape.circle,
       border: Border.all(color: style.color, width: style.width),
       boxShadow: style.glow,
@@ -592,7 +593,7 @@ class _UploadableImage extends StatelessWidget {
         if (hasImage && pending)
           Container(
             decoration: BoxDecoration(
-              color: Colors.black54,
+              color: TgColors.scrim,
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Center(child: CircularProgressIndicator()),
@@ -632,7 +633,7 @@ class _ImageAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.black54,
+      color: TgColors.scrim,
       shape: const CircleBorder(),
       child: InkWell(
         customBorder: const CircleBorder(),
@@ -853,7 +854,7 @@ class _BannerEffectSwatch extends StatelessWidget {
             width: 80,
             height: 48,
             decoration: BoxDecoration(
-              color: const Color(0xFF27272A),
+              color: TgColors.raised,
               borderRadius: BorderRadius.circular(6),
               border: Border.all(
                 color: equipped ? scheme.tertiary : Colors.transparent,

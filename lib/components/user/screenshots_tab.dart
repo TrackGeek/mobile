@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import '../../styles/tg_theme.dart';
 import '../../models/gallery_item.dart';
 import '../../pages/media_gallery_page.dart';
 
@@ -239,7 +240,7 @@ class _UserScreenshotsTabState extends State<UserScreenshotsTab>
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(8),
                               child: Container(
-                                color: const Color(0xFF0A0A0A),
+                                color: TgColors.background,
                                 child: Stack(
                                   fit: StackFit.expand,
                                   children: [
@@ -267,7 +268,7 @@ class _UserScreenshotsTabState extends State<UserScreenshotsTab>
                                             context.t('comments:spoilerReveal'),
                                             style: const TextStyle(
                                               color: Colors.white,
-                                              fontSize: 11,
+                                              fontSize: 12,
                                             ),
                                           ),
                                         ),

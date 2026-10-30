@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../styles/tg_theme.dart';
 import '../components/details/community_stats.dart';
 import '../components/details/detail_overview.dart';
 import '../components/details/detail_review_card.dart';
@@ -39,9 +40,9 @@ import 'media_detail_page.dart';
 import 'person_page.dart';
 
 const _siteUrl = 'https://trackgeek.net';
-const _planningColor = Color(0xFF9C4EDD);
-const _readingColor = Color(0xFF10B981);
-const _completedColor = Color(0xFFE3A008);
+const _planningColor = TgStatus.planning;
+const _readingColor = TgStatus.active;
+const _completedColor = TgStatus.completed;
 
 const _relationLabelKeys = {
   'sequel': 'sequel',
@@ -615,9 +616,7 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest.withValues(
-                alpha: 0.4,
-              ),
+              color: theme.colorScheme.surfaceContainerHigh,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(color: theme.colorScheme.outlineVariant),
             ),

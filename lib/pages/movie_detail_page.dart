@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../styles/tg_theme.dart';
 import '../components/details/community_stats.dart';
 import '../components/details/detail_overview.dart';
 import '../components/details/detail_review_card.dart';
@@ -52,9 +53,9 @@ import 'movie_franchise_page.dart';
 import 'person_page.dart';
 
 const _siteUrl = 'https://trackgeek.net';
-const _planningColor = Color(0xFF9C4EDD);
-const _completedColor = Color(0xFFE3A008);
-const _chartFiveColor = Color(0xFFE5484D);
+const _planningColor = TgStatus.planning;
+const _completedColor = TgStatus.completed;
+const _chartFiveColor = TgStatus.danger;
 
 class MovieDetailPage extends StatefulWidget {
   const MovieDetailPage({super.key, required this.tmdbId, required this.env});

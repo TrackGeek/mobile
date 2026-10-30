@@ -239,7 +239,7 @@ class _StatisticsCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
-                              fontSize: 10,
+                              fontSize: 12,
                             ),
                           ),
                           Text(
@@ -637,7 +637,7 @@ class _XpCard extends StatelessWidget {
                             context.t(_xpTypeConfig[entry.contentType]!.$1),
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
-                              fontSize: 9,
+                              fontSize: 12,
                             ),
                           ),
                         ],
@@ -695,7 +695,7 @@ class _MiniStat extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
-              fontSize: 10,
+              fontSize: 12,
             ),
           ),
         ],

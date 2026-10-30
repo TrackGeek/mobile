@@ -92,14 +92,14 @@ class _EditionCard extends StatelessWidget {
       edition.editionFormat,
       edition.language,
       edition.releaseYear?.toString(),
-    ].whereType<String>().join(' · ');
+    ].whereType<String>().join(', ');
     final metaStyle = theme.textTheme.labelSmall?.copyWith(
       color: theme.colorScheme.onSurfaceVariant,
     );
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+        color: theme.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: theme.colorScheme.outlineVariant),
       ),

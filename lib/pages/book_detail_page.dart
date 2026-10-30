@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../styles/tg_theme.dart';
 import '../components/details/book_tracking_sheet.dart';
 import '../components/details/community_stats.dart';
 import '../components/details/detail_overview.dart';
@@ -38,9 +39,9 @@ import 'book_franchise_page.dart';
 import 'media_detail_page.dart';
 
 const _siteUrl = 'https://trackgeek.net';
-const _planningColor = Color(0xFF9C4EDD);
-const _readingColor = Color(0xFF10B981);
-const _completedColor = Color(0xFFE3A008);
+const _planningColor = TgStatus.planning;
+const _readingColor = TgStatus.active;
+const _completedColor = TgStatus.completed;
 
 class BookDetailPage extends StatefulWidget {
   const BookDetailPage({

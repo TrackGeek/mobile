@@ -297,7 +297,7 @@ class WorkCard extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            [if (work.year != null) '${work.year}', ...work.roles].join(' · '),
+            [if (work.year != null) '${work.year}', ...work.roles].join(', '),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.labelSmall?.copyWith(

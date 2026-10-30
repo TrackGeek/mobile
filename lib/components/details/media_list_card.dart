@@ -57,9 +57,7 @@ class MediaListCard extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                theme.colorScheme.surfaceContainerHighest.withValues(
-                  alpha: 0.5,
-                ),
+                theme.colorScheme.surfaceContainerHigh,
                 theme.colorScheme.surfaceContainerHighest,
               ],
             ),

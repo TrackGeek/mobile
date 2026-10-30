@@ -89,9 +89,7 @@ class _SeasonEpisodeProgressState extends State<SeasonEpisodeProgress> {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest.withValues(
-                alpha: 0.3,
-              ),
+              color: theme.colorScheme.surfaceContainerHigh,
               border: Border(
                 bottom: BorderSide(color: theme.colorScheme.outlineVariant),
               ),
@@ -161,14 +159,11 @@ class _SeasonEpisodeProgressState extends State<SeasonEpisodeProgress> {
                       ),
                     if (widget.onToggleSeason != null &&
                         widget.onToggleAll != null)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Text(
-                          '•',
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            color: theme.colorScheme.outlineVariant,
-                          ),
-                        ),
+                      Container(
+                        width: 1,
+                        height: 14,
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
+                        color: theme.colorScheme.outlineVariant,
                       ),
                     if (widget.onToggleAll != null)
                       InkWell(

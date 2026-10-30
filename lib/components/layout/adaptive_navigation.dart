@@ -23,6 +23,18 @@ class AdaptiveNavigation extends StatefulWidget {
 
 class _AdaptiveNavigationState extends State<AdaptiveNavigation>
     with SingleTickerProviderStateMixin {
+  static const _tabKeys = [
+    LogicalKeyboardKey.digit1,
+    LogicalKeyboardKey.digit2,
+    LogicalKeyboardKey.digit3,
+    LogicalKeyboardKey.digit4,
+    LogicalKeyboardKey.digit5,
+    LogicalKeyboardKey.digit6,
+    LogicalKeyboardKey.digit7,
+    LogicalKeyboardKey.digit8,
+    LogicalKeyboardKey.digit9,
+  ];
+
   late final _fade = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 180),
@@ -54,16 +66,8 @@ class _AdaptiveNavigationState extends State<AdaptiveNavigation>
       final extended = constraints.maxWidth >= 1400;
       return CallbackShortcuts(
         bindings: {
-          const SingleActivator(LogicalKeyboardKey.digit1, alt: true): () =>
-              widget.onSelected(0),
-          const SingleActivator(LogicalKeyboardKey.digit2, alt: true): () =>
-              widget.onSelected(1),
-          const SingleActivator(LogicalKeyboardKey.digit3, alt: true): () =>
-              widget.onSelected(2),
-          const SingleActivator(LogicalKeyboardKey.digit4, alt: true): () =>
-              widget.onSelected(3),
-          const SingleActivator(LogicalKeyboardKey.digit5, alt: true): () =>
-              widget.onSelected(4),
+          for (var i = 0; i < widget.destinations.length && i < 9; i++)
+            SingleActivator(_tabKeys[i], alt: true): () => widget.onSelected(i),
         },
         child: Focus(
           autofocus: true,
@@ -151,10 +155,19 @@ class _AdaptiveNavigationState extends State<AdaptiveNavigation>
             ),
             bottomNavigationBar: rail
                 ? null
-                : NavigationBar(
-                    selectedIndex: widget.selectedIndex,
-                    onDestinationSelected: widget.onSelected,
-                    destinations: widget.destinations,
+                : DecoratedBox(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        top: BorderSide(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                        ),
+                      ),
+                    ),
+                    child: NavigationBar(
+                      selectedIndex: widget.selectedIndex,
+                      onDestinationSelected: widget.onSelected,
+                      destinations: widget.destinations,
+                    ),
                   ),
           ),
         ),

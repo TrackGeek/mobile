@@ -134,10 +134,6 @@ class _PostCardState extends State<PostCard> {
     return Card(
       clipBehavior: Clip.antiAlias,
       margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-        side: BorderSide(color: theme.colorScheme.outlineVariant),
-      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -298,8 +294,7 @@ class _PostCardState extends State<PostCard> {
                         color: theme.colorScheme.outlineVariant,
                       ),
                       borderRadius: BorderRadius.circular(8),
-                      color: theme.colorScheme.surfaceContainerHighest
-                          .withValues(alpha: 0.3),
+                      color: theme.colorScheme.surfaceContainerHigh,
                     ),
                     child: Row(
                       children: [
@@ -406,9 +401,7 @@ class _SpoilerBox extends StatelessWidget {
                   style: BorderStyle.solid,
                 ),
                 borderRadius: BorderRadius.circular(8),
-                color: theme.colorScheme.surfaceContainerHighest.withValues(
-                  alpha: 0.4,
-                ),
+                color: theme.colorScheme.surfaceContainerHigh,
               ),
               child: Center(
                 child: Row(

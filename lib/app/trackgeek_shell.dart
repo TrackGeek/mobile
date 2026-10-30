@@ -79,7 +79,6 @@ class TrackGeekShell extends StatefulWidget {
 class _TrackGeekShellState extends State<TrackGeekShell>
     with WidgetsBindingObserver {
   static const _profileTab = 3;
-  static const _settingsTab = 4;
 
   int _tab = 0;
   int _unread = 0;
@@ -126,7 +125,20 @@ class _TrackGeekShellState extends State<TrackGeekShell>
         builder: (_) => ShopPage(
           shop: widget.shop,
           session: widget.session,
-          onOpenSettings: () => setState(() => _tab = _settingsTab),
+          onOpenSettings: _openSettings,
+        ),
+      ),
+    );
+  }
+
+  void _openSettings() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => SettingsPage(
+          session: widget.session,
+          settings: widget.settings,
+          auth: widget.session.authService,
+          passkeySource: widget.session.passkeySource,
         ),
       ),
     );
@@ -153,7 +165,7 @@ class _TrackGeekShellState extends State<TrackGeekShell>
           people: widget.people,
           api: widget.api,
           username: username,
-          onOpenSettings: () => setState(() => _tab = _settingsTab),
+          onOpenSettings: _openSettings,
         ),
       ),
     );
@@ -175,7 +187,7 @@ class _TrackGeekShellState extends State<TrackGeekShell>
             progress: widget.progress,
             onOpenUser: _openUser,
             onOpenGenre: _openGenre,
-            onOpenSettings: () => setState(() => _tab = _settingsTab),
+            onOpenSettings: _openSettings,
           ),
         ),
       ),
@@ -197,7 +209,7 @@ class _TrackGeekShellState extends State<TrackGeekShell>
           initialKind: MediaSearchKind(type),
           initialFilters: {'genres': genre},
           onOpenUser: _openUser,
-          onOpenSettings: () => setState(() => _tab = _settingsTab),
+          onOpenSettings: _openSettings,
         ),
       ),
     );
@@ -222,7 +234,7 @@ class _TrackGeekShellState extends State<TrackGeekShell>
             onOpenProfile: () => setState(() => _tab = _profileTab),
             onOpenUserProfile: _openUser,
             onOpenGenre: _openGenre,
-            onOpenSettings: () => setState(() => _tab = _settingsTab),
+            onOpenSettings: _openSettings,
           ),
           SearchPage(
             search: widget.search,
@@ -234,7 +246,7 @@ class _TrackGeekShellState extends State<TrackGeekShell>
             genres: widget.genres,
             api: widget.api,
             onOpenUser: _openUser,
-            onOpenSettings: () => setState(() => _tab = _settingsTab),
+            onOpenSettings: _openSettings,
           ),
           NotificationsPage(
             notifications: widget.notifications,
@@ -259,13 +271,7 @@ class _TrackGeekShellState extends State<TrackGeekShell>
             people: widget.people,
             api: widget.api,
             onOpenShop: _openShop,
-            onOpenSettings: () => setState(() => _tab = _settingsTab),
-          ),
-          SettingsPage(
-            session: widget.session,
-            settings: widget.settings,
-            auth: widget.session.authService,
-            passkeySource: widget.session.passkeySource,
+            onOpenSettings: _openSettings,
           ),
         ],
       ),
@@ -289,10 +295,6 @@ class _TrackGeekShellState extends State<TrackGeekShell>
         NavigationDestination(
           icon: const HugeIcon(icon: HugeIcons.strokeRoundedUser),
           label: context.t('common:profile'),
-        ),
-        NavigationDestination(
-          icon: const HugeIcon(icon: HugeIcons.strokeRoundedSettings01),
-          label: context.t('app:tabs.settings'),
         ),
       ],
     );

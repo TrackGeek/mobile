@@ -5,6 +5,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../styles/tg_theme.dart';
 import '../components/details/community_stats.dart';
 import '../components/details/detail_overview.dart';
 import '../components/details/detail_review_card.dart';
@@ -53,8 +54,8 @@ import 'media_detail_page.dart';
 import 'person_page.dart';
 
 const _siteUrl = 'https://trackgeek.net';
-const _planningColor = Color(0xFF9C4EDD);
-const _completedColor = Color(0xFFE3A008);
+const _planningColor = TgStatus.planning;
+const _completedColor = TgStatus.completed;
 
 class TvDetailPage extends StatefulWidget {
   const TvDetailPage({super.key, required this.tmdbId, required this.env});

@@ -23,9 +23,7 @@ class PersonActionButton extends StatelessWidget {
     return Tooltip(
       message: tooltip,
       child: Material(
-        color: theme.colorScheme.surfaceContainerHighest.withValues(
-          alpha: 0.65,
-        ),
+        color: theme.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(10),
         child: InkWell(
           onTap: disabled ? null : onPressed,

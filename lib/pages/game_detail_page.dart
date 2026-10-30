@@ -6,6 +6,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../styles/tg_theme.dart';
 import '../components/details/community_stats.dart';
 import '../components/details/detail_overview.dart';
 import '../components/details/detail_review_card.dart';
@@ -45,8 +46,8 @@ import 'game_franchise_page.dart';
 import 'media_detail_page.dart';
 
 const _siteUrl = 'https://trackgeek.net';
-const _planningColor = Color(0xFF9C4EDD);
-const _completedColor = Color(0xFFE3A008);
+const _planningColor = TgStatus.planning;
+const _completedColor = TgStatus.completed;
 
 class GameDetailPage extends StatefulWidget {
   const GameDetailPage({super.key, required this.igdbId, required this.env});
@@ -1080,7 +1081,7 @@ class _GameDetailPageState extends State<GameDetailPage> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Container(
-                  color: const Color(0xFF0A0A0A),
+                  color: TgColors.background,
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
@@ -1103,7 +1104,7 @@ class _GameDetailPageState extends State<GameDetailPage> {
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: 11,
+                                fontSize: 12,
                               ),
                             ),
                           ),

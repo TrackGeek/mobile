@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 
-import '../../models/person.dart';
+import '../../styles/tg_theme.dart';
+import '../../../models/person.dart';
 
 class PersonImage extends StatelessWidget {
   const PersonImage({super.key, required this.person});
@@ -16,7 +17,7 @@ class PersonImage extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: theme.colorScheme.outlineVariant),
-        boxShadow: const [BoxShadow(color: Colors.black45, blurRadius: 24)],
+        boxShadow: const [BoxShadow(color: TgColors.scrim, blurRadius: 24)],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(11),

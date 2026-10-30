@@ -60,7 +60,7 @@ class MediaDetail {
         .where((t) => t['type'] != 'Default' && t['title'] is String)
         .map((t) => t['title'] as String)
         .toSet();
-    return others.isEmpty ? null : others.join(' · ');
+    return others.isEmpty ? null : others.join(', ');
   }
 
   static String? _year(Object? iso) {
