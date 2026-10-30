@@ -213,7 +213,7 @@ class _FeedSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: Column(
         children: [
           for (var i = 0; i < 4; i++)
