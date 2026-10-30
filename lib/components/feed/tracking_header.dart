@@ -8,6 +8,7 @@ import '../../services/progress_service.dart';
 import '../../services/media_detail_service.dart';
 import '../../pages/media_detail_page.dart';
 import '../media/progress_card.dart';
+import '../layout/edgy.dart';
 
 class TrackingHeader extends StatelessWidget {
   const TrackingHeader({
@@ -144,24 +145,27 @@ class _TrackingSection extends StatelessWidget {
               return SizedBox(
                 height:
                     222 + (MediaQuery.textScalerOf(context).scale(14) - 14) * 3,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: items.length,
-                  separatorBuilder: (_, _) => const SizedBox(width: 12),
-                  itemBuilder: (context, i) => SizedBox(
-                    width: 116,
-                    child: ProgressCard(
-                      key: ValueKey('${items[i].type}:${items[i].mediaId}'),
-                      item: items[i],
-                      progress: progress,
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => mediaDetailPage(
-                            type: items[i].type,
-                            id: items[i].detailId,
-                            details: details,
-                            env: env,
+                child: Edgy(
+                  axis: .horizontal,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: items.length,
+                    separatorBuilder: (_, _) => const SizedBox(width: 12),
+                    itemBuilder: (context, i) => SizedBox(
+                      width: 116,
+                      child: ProgressCard(
+                        key: ValueKey('${items[i].type}:${items[i].mediaId}'),
+                        item: items[i],
+                        progress: progress,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => mediaDetailPage(
+                              type: items[i].type,
+                              id: items[i].detailId,
+                              details: details,
+                              env: env,
+                            ),
                           ),
                         ),
                       ),

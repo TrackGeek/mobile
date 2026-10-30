@@ -10,6 +10,8 @@ import '../../services/anime_service.dart';
 import '../../services/list_service.dart';
 import '../../services/review_service.dart';
 import '../user/star_rating.dart';
+import '../media/smooth_image.dart';
+import '../../utils/haptics.dart';
 
 const _statusOptions = [
   'planning',
@@ -278,8 +280,10 @@ class _TrackingSheetState extends State<TrackingSheet> {
         }
       }
       widget.onChanged?.call();
+      HapticsHelper.success();
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
+      HapticsHelper.error();
       if (mounted) {
         setState(() {
           _saving = false;
@@ -357,13 +361,7 @@ class _TrackingSheetState extends State<TrackingSheet> {
                         ? Container(
                             color: theme.colorScheme.surfaceContainerHighest,
                           )
-                        : Image.network(
-                            widget.anime.imageUrl!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => Container(
-                              color: theme.colorScheme.surfaceContainerHighest,
-                            ),
-                          ),
+                        : SmoothImage(url: widget.anime.imageUrl!),
                   ),
                 ),
                 const SizedBox(width: 12),

@@ -9,7 +9,11 @@ import '../../models/media_type.dart';
 import '../../models/paginated_page.dart';
 import '../../models/user_list.dart';
 import '../../services/list_service.dart';
+import '../../utils/strings.dart';
 import 'user_widgets.dart';
+import '../media/smooth_image.dart';
+import '../layout/tg_refresh_indicator.dart';
+import '../../utils/haptics.dart';
 
 class UserListsTab extends StatefulWidget {
   const UserListsTab({
@@ -179,7 +183,7 @@ class _UserListsTabState extends State<UserListsTab>
         }
         return false;
       },
-      child: RefreshIndicator(
+      child: TgRefreshIndicator(
         onRefresh: _load,
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -368,14 +372,10 @@ class _ListCard extends StatelessWidget {
                           padding: const EdgeInsets.only(right: 4),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(6),
-                            child: Image.network(
-                              '${item.media['imageUrl'] ?? item.media['coverUrl'] ?? item.media['posterUrl'] ?? ''}',
-                              fit: BoxFit.cover,
+                            child: SmoothImage(
+                              url:
+                                  '${item.media['imageUrl'] ?? item.media['coverUrl'] ?? item.media['posterUrl'] ?? ''}',
                               height: 60,
-                              errorBuilder: (_, _, _) => Container(
-                                color:
-                                    theme.colorScheme.surfaceContainerHighest,
-                              ),
                             ),
                           ),
                         ),
@@ -430,6 +430,7 @@ class _ListEditDialogState extends State<_ListEditDialog> {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(context.t('user:listUpdated'))));
+        HapticsHelper.success();
         Navigator.pop(context, true);
       }
     } catch (_) {
@@ -613,18 +614,10 @@ class _ListItemsSheetState extends State<_ListItemsSheet> {
                             children: [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(6),
-                                child: Image.network(
-                                  link?.image ?? '',
+                                child: SmoothImage(
+                                  url: link?.image ?? '',
                                   width: 40,
                                   height: 56,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, _, _) => Container(
-                                    width: 40,
-                                    height: 56,
-                                    color: theme
-                                        .colorScheme
-                                        .surfaceContainerHighest,
-                                  ),
                                 ),
                               ),
                               const SizedBox(width: 10),
@@ -637,7 +630,7 @@ class _ListItemsSheetState extends State<_ListItemsSheet> {
                                           link.slug,
                                         ),
                                   child: Text(
-                                    link?.title ?? '',
+                                    (link?.title).orPlaceholder(),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(

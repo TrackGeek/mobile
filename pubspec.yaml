@@ -52,6 +52,8 @@ dependencies:
   http_parser: ^4.1.2
   workmanager: ^0.10.10
   flutter_local_notifications: 22.3.2
+  image_fade: ^0.6.2
+  haptic_feedback: ^0.8.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

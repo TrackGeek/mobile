@@ -15,6 +15,7 @@ import '../models/cosmetic.dart';
 import '../models/wallet.dart';
 import '../services/shop_service.dart';
 import '../styles/tg_theme.dart';
+import '../utils/haptics.dart';
 
 class ShopPage extends StatefulWidget {
   const ShopPage({
@@ -129,7 +130,8 @@ class _ShopPageState extends State<ShopPage> {
     return context.t('api:INTERNAL_SERVER_ERROR');
   }
 
-  void _toast(String message) {
+  void _toast(String message, {bool error = false}) {
+    error ? HapticsHelper.error() : HapticsHelper.success();
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text(message)));
@@ -205,7 +207,7 @@ class _ShopPageState extends State<ShopPage> {
       _toast(context.t('shop:purchase.success', {'name': name}));
       _refresh();
     } else {
-      _toast(_errorText(result));
+      _toast(_errorText(result), error: true);
     }
   }
 

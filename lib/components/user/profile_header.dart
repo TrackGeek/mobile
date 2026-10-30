@@ -7,6 +7,7 @@ import '../../l10n/l10n_context.dart';
 import '../../models/user_profile.dart';
 import '../../utils/profile_cosmetics.dart';
 import 'user_widgets.dart';
+import '../media/smooth_image.dart';
 
 class ProfileHeader extends StatelessWidget {
   const ProfileHeader({
@@ -58,10 +59,9 @@ class ProfileHeader extends StatelessWidget {
                   fit: StackFit.expand,
                   children: [
                     if (bannerUrl != null && bannerUrl.isNotEmpty)
-                      Image.network(
-                        bannerUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) => Container(
+                      SmoothImage(
+                        url: bannerUrl,
+                        error: Container(
                           decoration: profileColorDecoration(color, radius: 0),
                         ),
                       )

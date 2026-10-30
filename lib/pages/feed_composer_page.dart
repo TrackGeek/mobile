@@ -14,6 +14,7 @@ import '../l10n/l10n_context.dart';
 import '../models/attached_media.dart';
 import '../services/activity_service.dart';
 import '../services/api_client.dart';
+import '../utils/haptics.dart';
 
 class FeedComposerPage extends StatefulWidget {
   const FeedComposerPage({
@@ -77,7 +78,10 @@ class _FeedComposerPageState extends State<FeedComposerPage> {
         mediaType: _media?.type,
         mediaExternalId: _media?.externalId,
       );
-      if (mounted) Navigator.of(context).pop(true);
+      if (mounted) {
+        HapticsHelper.success();
+        Navigator.of(context).pop(true);
+      }
     } catch (_) {
       if (mounted) {
         setState(() {

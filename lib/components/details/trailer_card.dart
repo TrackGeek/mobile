@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 import '../../utils/video_links.dart';
+import '../media/smooth_image.dart';
 
 class TrailerCard extends StatelessWidget {
   const TrailerCard({super.key, required this.video, required this.onTap});
@@ -24,13 +25,7 @@ class TrailerCard extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               if (thumb != null)
-                Image.network(
-                  thumb,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) => Container(
-                    color: theme.colorScheme.surfaceContainerHighest,
-                  ),
-                )
+                SmoothImage(url: thumb)
               else
                 Container(color: theme.colorScheme.surfaceContainerHighest),
               Container(color: Colors.black.withValues(alpha: 0.35)),

@@ -9,6 +9,7 @@ import '../../models/paginated_page.dart';
 import '../../services/user_service.dart';
 import 'follow_button.dart';
 import 'user_widgets.dart';
+import '../layout/tg_refresh_indicator.dart';
 
 class UserFollowsTab extends StatefulWidget {
   const UserFollowsTab({
@@ -190,7 +191,7 @@ class _UserFollowsTabState extends State<UserFollowsTab>
         }
         return false;
       },
-      child: RefreshIndicator(
+      child: TgRefreshIndicator(
         onRefresh: _load,
         child: ListView.separated(
           physics: const AlwaysScrollableScrollPhysics(),

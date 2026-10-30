@@ -13,6 +13,8 @@ import '../../utils/content_types.dart';
 import 'review_item.dart';
 import 'star_rating.dart';
 import 'user_widgets.dart';
+import '../layout/tg_refresh_indicator.dart';
+import '../../utils/haptics.dart';
 
 class UserReviewsTab extends StatefulWidget {
   const UserReviewsTab({
@@ -206,7 +208,7 @@ class _UserReviewsTabState extends State<UserReviewsTab>
         }
         return false;
       },
-      child: RefreshIndicator(
+      child: TgRefreshIndicator(
         onRefresh: _load,
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -365,6 +367,7 @@ class _ReviewEditSheetState extends State<_ReviewEditSheet> {
             if (_fields[field] != null) field: _fields[field],
         },
       );
+      HapticsHelper.success();
       if (mounted) Navigator.pop(context, true);
     } catch (_) {
       if (mounted) setState(() => _saving = false);

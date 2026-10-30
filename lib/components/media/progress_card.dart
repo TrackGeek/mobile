@@ -7,6 +7,8 @@ import '../../l10n/l10n_context.dart';
 import '../../models/media_type.dart';
 import '../../models/progress_item.dart';
 import '../../services/progress_service.dart';
+import 'smooth_image.dart';
+import '../../utils/haptics.dart';
 
 class ProgressCard extends StatefulWidget {
   const ProgressCard({
@@ -34,6 +36,7 @@ class _ProgressCardState extends State<ProgressCard> {
       await widget.progress.increment(widget.item);
     } catch (_) {
       if (mounted) {
+        HapticsHelper.error();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.t('api:INTERNAL_SERVER_ERROR'))),
         );
@@ -84,10 +87,9 @@ class _ProgressCardState extends State<ProgressCard> {
                               sigmaX: 10,
                               sigmaY: 10,
                             ),
-                            child: Image.network(
-                              item.imageUrl!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, _, _) => const Center(
+                            child: SmoothImage(
+                              url: item.imageUrl!,
+                              error: const Center(
                                 child: HugeIcon(
                                   icon: HugeIcons.strokeRoundedImage01,
                                 ),

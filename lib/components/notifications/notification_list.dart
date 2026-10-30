@@ -6,6 +6,8 @@ import '../../models/media_type.dart';
 import '../../models/notification.dart';
 import '../../services/notification_service.dart';
 import 'notification_item.dart';
+import '../layout/tg_refresh_indicator.dart';
+import '../../utils/haptics.dart';
 
 class NotificationList extends StatefulWidget {
   const NotificationList({
@@ -120,6 +122,7 @@ class NotificationListState extends State<NotificationList> {
       await load();
     } catch (_) {
       if (mounted) {
+        HapticsHelper.error();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.t('common:somethingWentWrong'))),
         );
@@ -141,7 +144,7 @@ class NotificationListState extends State<NotificationList> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return RefreshIndicator(
+    return TgRefreshIndicator(
       onRefresh: load,
       child: Builder(
         builder: (context) {

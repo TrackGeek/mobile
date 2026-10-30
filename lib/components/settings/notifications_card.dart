@@ -4,6 +4,7 @@ import 'package:hugeicons/hugeicons.dart';
 import '../../l10n/l10n_context.dart';
 import '../../services/settings_service.dart';
 import 'settings_card.dart';
+import '../../utils/haptics.dart';
 
 const _categories = [
   'comment',
@@ -54,7 +55,11 @@ class _NotificationsCardState extends State<NotificationsCard> {
       if (mounted) setState(() => _preferences = prefs);
     } catch (_) {
       if (mounted) {
-        showSettingsToast(context, context.t('common:somethingWentWrong'));
+        showSettingsToast(
+          context,
+          context.t('common:somethingWentWrong'),
+          error: true,
+        );
       }
     } finally {
       if (mounted) setState(() => _pending = false);
@@ -104,7 +109,12 @@ class _NotificationsCardState extends State<NotificationsCard> {
                 else
                   Switch(
                     value: prefs[key],
-                    onChanged: _pending ? null : (value) => _toggle(key, value),
+                    onChanged: _pending
+                        ? null
+                        : (value) {
+                            HapticsHelper.light();
+                            _toggle(key, value);
+                          },
                   ),
               ],
             ),

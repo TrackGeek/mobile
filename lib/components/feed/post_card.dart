@@ -7,9 +7,12 @@ import 'package:intl/intl.dart';
 
 import '../../l10n/l10n_context.dart';
 import '../../models/feed_entry.dart';
+import '../../utils/strings.dart';
 import 'feed_item_card.dart';
 import 'feed_markdown.dart';
 import 'feed_reactions.dart';
+import '../media/smooth_image.dart';
+import '../../utils/haptics.dart';
 
 const postMaxLength = 20000;
 const _collapseLength = 900;
@@ -80,6 +83,7 @@ class _PostCardState extends State<PostCard> {
     try {
       await widget.onDelete!(postId);
       if (mounted) {
+        HapticsHelper.success();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.t('feed:postDeleteSuccess'))),
         );
@@ -87,6 +91,7 @@ class _PostCardState extends State<PostCard> {
     } catch (_) {
       if (mounted) {
         setState(() => _busy = false);
+        HapticsHelper.error();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.t('feed:postDeleteError'))),
         );
@@ -106,6 +111,7 @@ class _PostCardState extends State<PostCard> {
           _draft = null;
           _busy = false;
         });
+        HapticsHelper.success();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.t('feed:postUpdateSuccess'))),
         );
@@ -113,6 +119,7 @@ class _PostCardState extends State<PostCard> {
     } catch (_) {
       if (mounted) {
         setState(() => _busy = false);
+        HapticsHelper.error();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.t('feed:postUpdateError'))),
         );
@@ -214,7 +221,7 @@ class _PostCardState extends State<PostCard> {
                 child: InkWell(
                   onTap: widget.onTitleLinkTap,
                   child: Text(
-                    entry.mediaTitle ?? '',
+                    entry.mediaTitle.orPlaceholder(),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
@@ -310,11 +317,9 @@ class _PostCardState extends State<PostCard> {
                                       sigmaX: 8,
                                       sigmaY: 8,
                                     ),
-                                    child: Image.network(
-                                      entry.coverUrl,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, _, _) =>
-                                          const _MediaFallback(),
+                                    child: SmoothImage(
+                                      url: entry.coverUrl,
+                                      error: const _MediaFallback(),
                                     ),
                                   ),
                                 )
@@ -323,7 +328,7 @@ class _PostCardState extends State<PostCard> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            entry.mediaTitle ?? '',
+                            entry.mediaTitle.orPlaceholder(),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.bodyMedium?.copyWith(

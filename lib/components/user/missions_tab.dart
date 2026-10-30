@@ -6,6 +6,7 @@ import '../../l10n/l10n_context.dart';
 import '../../models/mission.dart';
 import '../../services/user_service.dart';
 import 'user_widgets.dart';
+import '../layout/tg_refresh_indicator.dart';
 
 const _tierOrder = ['Bronze', 'Silver', 'Gold', 'Platinum'];
 
@@ -79,7 +80,7 @@ class _UserMissionsTabState extends State<UserMissionsTab>
         final bi = _tierOrder.indexOf(b);
         return (ai == -1 ? 99 : ai).compareTo(bi == -1 ? 99 : bi);
       });
-    return RefreshIndicator(
+    return TgRefreshIndicator(
       onRefresh: _load,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),

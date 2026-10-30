@@ -6,6 +6,7 @@ import 'package:hugeicons/hugeicons.dart';
 import '../../styles/tg_theme.dart';
 import '../../models/gallery_item.dart';
 import '../../pages/media_gallery_page.dart';
+import '../media/smooth_image.dart';
 
 class MediaCarousel extends StatefulWidget {
   const MediaCarousel({
@@ -63,10 +64,9 @@ class _MediaCarouselState extends State<MediaCarousel> {
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
-                          Image.network(
-                            'https://i.ytimg.com/vi/$trailerId/hqdefault.jpg',
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                          SmoothImage(
+                            url:
+                                'https://i.ytimg.com/vi/$trailerId/hqdefault.jpg',
                           ),
                           const Center(
                             child: HugeIcon(
@@ -90,19 +90,10 @@ class _MediaCarouselState extends State<MediaCarousel> {
                           imageFilter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
                           child: Transform.scale(
                             scale: 1.1,
-                            child: Image.network(
-                              backdrop,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, _, _) =>
-                                  const SizedBox.shrink(),
-                            ),
+                            child: SmoothImage(url: backdrop),
                           ),
                         ),
-                        Image.network(
-                          backdrop,
-                          fit: BoxFit.contain,
-                          errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                        ),
+                        SmoothImage(url: backdrop, fit: BoxFit.contain),
                       ],
                     ),
                   );

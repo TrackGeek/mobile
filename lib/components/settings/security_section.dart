@@ -129,6 +129,7 @@ class _PasswordCardState extends State<PasswordCard> {
         showSettingsToast(
           context,
           settingsErrorText(context, e, 'settings:password.set.error'),
+          error: true,
         );
       }
     } finally {
@@ -159,6 +160,7 @@ class _PasswordCardState extends State<PasswordCard> {
         showSettingsToast(
           context,
           settingsErrorText(context, e, 'settings:password.change.error'),
+          error: true,
         );
       }
     } finally {
@@ -334,6 +336,7 @@ class _PasskeysCardState extends State<PasskeysCard> {
         showSettingsToast(
           context,
           settingsErrorText(context, e, 'settings:passkeys.add.error'),
+          error: true,
         );
       }
     } finally {
@@ -357,6 +360,7 @@ class _PasskeysCardState extends State<PasskeysCard> {
         showSettingsToast(
           context,
           settingsErrorText(context, e, 'settings:passkeys.delete.error'),
+          error: true,
         );
       }
     } finally {
@@ -569,7 +573,11 @@ class _TwoFactorCardState extends State<TwoFactorCard> {
           _TwoFactorPrompt.regenerate => 'settings:twoFactor.regenerate.error',
           _TwoFactorPrompt.none => 'common:somethingWentWrong',
         };
-        showSettingsToast(context, settingsErrorText(context, e, fallback));
+        showSettingsToast(
+          context,
+          settingsErrorText(context, e, fallback),
+          error: true,
+        );
       }
     } finally {
       if (mounted) setState(() => _pending = false);
@@ -594,6 +602,7 @@ class _TwoFactorCardState extends State<TwoFactorCard> {
         showSettingsToast(
           context,
           settingsErrorText(context, e, 'api:betterAuth.INVALID_CODE'),
+          error: true,
         );
       }
     } finally {

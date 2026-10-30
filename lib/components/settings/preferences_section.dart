@@ -10,6 +10,7 @@ import '../../l10n/trackgeek_localizations.dart';
 import '../../models/media_type.dart';
 import '../../services/settings_service.dart';
 import 'settings_card.dart';
+import '../../utils/haptics.dart';
 
 const _typeIcons = {
   MediaType.movie: HugeIcons.strokeRoundedClapperboard,
@@ -97,6 +98,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
         showSettingsToast(
           context,
           settingsErrorText(context, e, 'settings:save.error'),
+          error: true,
         );
       }
     } finally {
@@ -192,7 +194,10 @@ class _PreferencesSectionState extends State<PreferencesSection> {
                           _pending ||
                               (visible.contains(type) && visible.length == 1)
                           ? null
-                          : (value) => _toggleType(type, value),
+                          : (value) {
+                              HapticsHelper.light();
+                              _toggleType(type, value);
+                            },
                     ),
                   ],
                 ),
@@ -229,6 +234,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
                       )
                     : null,
                 onTap: () {
+                  HapticsHelper.selection();
                   Navigator.of(sheetContext).pop();
                   _setLanguage(lang);
                 },
@@ -280,6 +286,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
                             )
                           : null,
                       onTap: () {
+                        HapticsHelper.selection();
                         Navigator.of(sheetContext).pop();
                         setState(() => _timezone = zone);
                         _patch({'timezone': zone});

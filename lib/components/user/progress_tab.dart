@@ -16,6 +16,8 @@ import '../../utils/content_types.dart';
 import '../../utils/genres.dart';
 import 'media_card.dart';
 import 'user_widgets.dart';
+import '../layout/edgy.dart';
+import '../layout/tg_refresh_indicator.dart';
 
 class _ProgressContent {
   const _ProgressContent({
@@ -378,7 +380,7 @@ class _UserProgressTabState extends State<UserProgressTab>
         }
         return false;
       },
-      child: RefreshIndicator(
+      child: TgRefreshIndicator(
         onRefresh: _load,
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -389,61 +391,67 @@ class _UserProgressTabState extends State<UserProgressTab>
                 children: [
                   SizedBox(
                     height: 40,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: MediaType.values.length,
-                      separatorBuilder: (_, _) => const SizedBox(width: 8),
-                      itemBuilder: (context, index) {
-                        final type = MediaType.values[index];
-                        if (!visible.contains(type)) {
-                          return const SizedBox.shrink();
-                        }
-                        return ChoiceChip(
-                          label: Text(
-                            context.t('common:types.${type.name}_other'),
-                          ),
-                          selected: _type == type,
-                          onSelected: (_) => widget.onContentTypeChange(type),
-                        );
-                      },
+                    child: Edgy(
+                      axis: .horizontal,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: MediaType.values.length,
+                        separatorBuilder: (_, _) => const SizedBox(width: 8),
+                        itemBuilder: (context, index) {
+                          final type = MediaType.values[index];
+                          if (!visible.contains(type)) {
+                            return const SizedBox.shrink();
+                          }
+                          return ChoiceChip(
+                            label: Text(
+                              context.t('common:types.${type.name}_other'),
+                            ),
+                            selected: _type == type,
+                            onSelected: (_) => widget.onContentTypeChange(type),
+                          );
+                        },
+                      ),
                     ),
                   ),
                   SizedBox(
                     height: 40,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: sections.length,
-                      separatorBuilder: (_, _) => const SizedBox(width: 8),
-                      itemBuilder: (context, index) {
-                        final section = sections[index];
-                        final count = _statusCounts[section.status] ?? 0;
-                        return ChoiceChip(
-                          avatar: HugeIcon(
-                            icon:
-                                _statusIcons[section.status] ??
-                                HugeIcons.strokeRoundedListView,
-                            size: 14,
-                          ),
-                          label: Text(
-                            count > 0
-                                ? '${context.t(section.labelKey)}, $count'
-                                : context.t(section.labelKey),
-                          ),
-                          selected: _status == section.status,
-                          onSelected: (_) {
-                            setState(() {
-                              _status = section.status;
-                              if (_status != 'Completed' &&
-                                  _status != 'Dropped') {
-                                _completion = const [];
-                              }
-                            });
-                            _load();
-                          },
-                        );
-                      },
+                    child: Edgy(
+                      axis: .horizontal,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: sections.length,
+                        separatorBuilder: (_, _) => const SizedBox(width: 8),
+                        itemBuilder: (context, index) {
+                          final section = sections[index];
+                          final count = _statusCounts[section.status] ?? 0;
+                          return ChoiceChip(
+                            avatar: HugeIcon(
+                              icon:
+                                  _statusIcons[section.status] ??
+                                  HugeIcons.strokeRoundedListView,
+                              size: 14,
+                            ),
+                            label: Text(
+                              count > 0
+                                  ? '${context.t(section.labelKey)}, $count'
+                                  : context.t(section.labelKey),
+                            ),
+                            selected: _status == section.status,
+                            onSelected: (_) {
+                              setState(() {
+                                _status = section.status;
+                                if (_status != 'Completed' &&
+                                    _status != 'Dropped') {
+                                  _completion = const [];
+                                }
+                              });
+                              _load();
+                            },
+                          );
+                        },
+                      ),
                     ),
                   ),
                   Padding(

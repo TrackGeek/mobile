@@ -36,6 +36,7 @@
 - Service tests mirror `lib/services/` in `test/services/`; widget tests needing l10n use `test/helpers/test_l10n.dart`.
 - Reuse `lib/styles/` tokens instead of inline colors/spacing.
 - Do not edit `build/`, `.dart_tool/`, or generated platform files.
+- `flutter test` all-at-once may flake with `WebSocketException: Invalid WebSocket upgrade request` (env, not code); rerun with `-j 1` or per file.
 
 ## External References
 | Need | File |
@@ -46,3 +47,11 @@
 
 ## Commits
 - Format: `type(Scope): subject` per `.github/COMMIT_CONVENTION.md`.
+
+## UI Conventions
+- Network images: use `SmoothImage` (`lib/components/media/smooth_image.dart`, wraps `image_fade`); never `Image.network`/`NetworkImage`. Exception: `zoomable_image.dart`. Avatars: `CircleAvatar` + `ClipOval(SmoothImage)`, no `backgroundImage`.
+- Scrollbars: app-wide via `AlwaysScrollbarBehavior` in `MaterialApp.scrollBehavior`; do not add manual `Scrollbar` widgets (double-bar clash).
+- Small non-scrolling modal sheets: `showSpringBottomSheet` (`lib/components/layout/spring_sheet.dart`). Scrollable/`isScrollControlled` sheets stay on `showModalBottomSheet`; never put a scrollable inside the spring sheet.
+- API strings in `Text`: never `x ?? ''`; use `x.orPlaceholder()` / `x.isUsable` (`lib/utils/strings.dart`) so `null`, `""`, `"null"` show `-` or hide the widget. Parenthesize nullable chains: `(a?.b).orPlaceholder()`. Exception: AppBar titles while loading.
+- Horizontal scrollables (`scrollDirection: Axis.horizontal`): wrap in `Edgy(axis: .horizontal, child: ...)` (`lib/components/layout/edgy.dart`) for edge fade; not for `PageView` carousels.
+- Haptics: use `HapticsHelper` (`lib/utils/haptics.dart`), never `HapticFeedback`/`Haptics` directly. `light` tab/switch/like/favorite, `selection` list picks, `success`/`error` on submit and toast results, `heavy` account deletion. Pull-to-refresh: `TgRefreshIndicator` (`lib/components/layout/tg_refresh_indicator.dart`), never raw `RefreshIndicator`. Toast helpers take an `error` flag to pick haptic.

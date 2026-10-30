@@ -14,6 +14,7 @@ import '../../services/favorite_service.dart';
 import '../../utils/content_types.dart';
 import 'media_card.dart';
 import 'user_widgets.dart';
+import '../layout/tg_refresh_indicator.dart';
 
 const _favoriteTypes = [
   ('Anime', 'common:types.anime_other'),
@@ -149,7 +150,7 @@ class _UserFavoritesTabState extends State<UserFavoritesTab>
         if (favorite.type == _type) ?favoriteToItem(favorite),
     ];
     final hasQuery = _search.text.trim().isNotEmpty;
-    return RefreshIndicator(
+    return TgRefreshIndicator(
       onRefresh: _load,
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),

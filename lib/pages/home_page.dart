@@ -20,6 +20,7 @@ import '../services/progress_service.dart';
 import 'feed_composer_page.dart';
 import 'media_detail_page.dart';
 import 'person_page.dart';
+import '../utils/haptics.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({
@@ -172,6 +173,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
     if (published == true && mounted) {
+      HapticsHelper.success();
       for (final controller in _controllers.values) {
         unawaited(controller.refresh());
       }

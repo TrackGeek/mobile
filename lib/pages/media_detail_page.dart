@@ -19,6 +19,7 @@ import 'game_detail_page.dart';
 import 'manga_detail_page.dart';
 import 'movie_detail_page.dart';
 import 'tv_detail_page.dart';
+import '../components/media/smooth_image.dart';
 
 typedef MediaDetailEnv = ({
   ApiClient api,
@@ -92,11 +93,7 @@ class MediaDetailPage extends StatelessWidget {
                 if (media.backdropUrl != null)
                   AspectRatio(
                     aspectRatio: 16 / 5,
-                    child: Image.network(
-                      media.backdropUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                    ),
+                    child: SmoothImage(url: media.backdropUrl!),
                   ),
                 Padding(
                   padding: const EdgeInsets.all(20),

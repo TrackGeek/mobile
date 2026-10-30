@@ -11,6 +11,8 @@ import 'star_rating.dart';
 
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 
+import '../media/smooth_image.dart';
+
 class ReviewItem extends StatelessWidget {
   const ReviewItem({
     super.key,
@@ -69,13 +71,10 @@ class ReviewItem extends StatelessWidget {
                               color: Colors.white38,
                             ),
                           )
-                        : Image.network(
-                            review.mediaImage,
+                        : SmoothImage(
+                            url: review.mediaImage,
                             width: 40,
                             height: 56,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) =>
-                                const SizedBox(width: 40, height: 56),
                           ),
                   ),
                   const SizedBox(width: 10),

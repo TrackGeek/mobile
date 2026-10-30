@@ -6,6 +6,7 @@ import 'package:hugeicons/hugeicons.dart';
 import '../../l10n/l10n_context.dart';
 import '../../models/media_type.dart';
 import '../../models/person.dart';
+import '../media/smooth_image.dart';
 
 const _mediaIcons = {
   MediaType.movie: HugeIcons.strokeRoundedClapperboard,
@@ -108,10 +109,9 @@ class _CoverImage extends StatelessWidget {
               child: Icon(Icons.image_not_supported_outlined),
             ),
           )
-        : Image.network(
-            imageUrl,
-            fit: BoxFit.cover,
-            errorBuilder: (_, _, _) => Container(
+        : SmoothImage(
+            url: imageUrl,
+            error: Container(
               color: theme.colorScheme.surfaceContainerHighest,
               child: const Center(
                 child: Icon(Icons.image_not_supported_outlined),

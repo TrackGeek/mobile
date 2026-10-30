@@ -44,6 +44,10 @@ import '../utils/video_links.dart';
 import 'company_page.dart';
 import 'game_franchise_page.dart';
 import 'media_detail_page.dart';
+import '../components/media/smooth_image.dart';
+import '../components/layout/edgy.dart';
+import '../components/layout/tg_refresh_indicator.dart';
+import '../utils/haptics.dart';
 
 const _siteUrl = 'https://trackgeek.net';
 const _planningColor = TgStatus.planning;
@@ -332,6 +336,7 @@ class _GameDetailPageState extends State<GameDetailPage> {
   }
 
   Future<void> _toggleFavorite() async {
+    HapticsHelper.light();
     final game = _game;
     if (game == null || _favoriteBusy || !_loggedIn) return;
     setState(() => _favoriteBusy = true);
@@ -479,6 +484,9 @@ class _GameDetailPageState extends State<GameDetailPage> {
   }
 
   void _toast(String key) {
+    key == 'api:INTERNAL_SERVER_ERROR'
+        ? HapticsHelper.error()
+        : HapticsHelper.success();
     if (!mounted) return;
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(context.t(key))));
@@ -517,7 +525,7 @@ class _GameDetailPageState extends State<GameDetailPage> {
           ? const Center(child: CircularProgressIndicator())
           : _error != null || game == null
           ? DetailErrorState(onRetry: _load)
-          : RefreshIndicator(
+          : TgRefreshIndicator(
               onRefresh: _load,
               child: ContentFrame(
                 child: LayoutBuilder(
@@ -755,20 +763,23 @@ class _GameDetailPageState extends State<GameDetailPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              for (var i = 0; i < tabs.length; i++)
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: ChoiceChip(
-                    selected: _tab == i,
-                    label: Text(tabs[i].$2),
-                    onSelected: (_) => setState(() => _tab = i),
+        Edgy(
+          axis: .horizontal,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (var i = 0; i < tabs.length; i++)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ChoiceChip(
+                      selected: _tab == i,
+                      label: Text(tabs[i].$2),
+                      onSelected: (_) => setState(() => _tab = i),
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 16),
@@ -1089,11 +1100,7 @@ class _GameDetailPageState extends State<GameDetailPage> {
                         ImageFiltered(
                           enabled: !revealed,
                           imageFilter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                          child: Image.network(
-                            source,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                          ),
+                          child: SmoothImage(url: source),
                         ),
                       if (!revealed)
                         Container(

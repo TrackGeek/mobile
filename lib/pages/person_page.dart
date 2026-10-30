@@ -21,6 +21,7 @@ import '../services/person_service.dart';
 import '../utils/dates.dart';
 import '../utils/markdown_utils.dart';
 import 'media_detail_page.dart';
+import '../utils/haptics.dart';
 
 const _pageSize = 24;
 const _siteUrl = 'https://trackgeek.net';
@@ -132,6 +133,7 @@ class _PersonPageState extends State<PersonPage> {
   }
 
   Future<void> _toggleFavorite(Person person) async {
+    HapticsHelper.light();
     final isFavorited = _favorited ?? false;
     setState(() => _favoriteBusy = true);
     try {
@@ -143,6 +145,7 @@ class _PersonPageState extends State<PersonPage> {
       if (mounted) setState(() => _favorited = !isFavorited);
     } catch (_) {
       if (mounted) {
+        HapticsHelper.error();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.t('api:INTERNAL_SERVER_ERROR'))),
         );
@@ -172,6 +175,7 @@ class _PersonPageState extends State<PersonPage> {
     } catch (_) {}
     await Clipboard.setData(ClipboardData(text: url));
     if (mounted) {
+      HapticsHelper.success();
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(context.t('common:linkCopied'))));

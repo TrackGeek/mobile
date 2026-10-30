@@ -100,6 +100,7 @@ class _ProfileFormCardState extends State<ProfileFormCard> {
         showSettingsToast(
           context,
           settingsErrorText(context, e, 'settings:save.error'),
+          error: true,
         );
       }
     } finally {

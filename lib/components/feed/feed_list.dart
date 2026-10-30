@@ -8,6 +8,8 @@ import '../../models/feed_entry.dart';
 import 'feed_item_card.dart';
 import 'post_card.dart';
 import 'screenshot_card.dart';
+import '../layout/tg_refresh_indicator.dart';
+import '../../utils/haptics.dart';
 
 class FeedList extends StatefulWidget {
   const FeedList({
@@ -56,6 +58,7 @@ class _FeedListState extends State<FeedList> {
       );
     } catch (_) {
       if (mounted) {
+        HapticsHelper.error();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.t('feed:reactionError'))),
         );
@@ -73,7 +76,7 @@ class _FeedListState extends State<FeedList> {
         }
         return false;
       },
-      child: RefreshIndicator(
+      child: TgRefreshIndicator(
         onRefresh: widget.onRefresh ?? controller.refresh,
         child: ListenableBuilder(
           listenable: controller,

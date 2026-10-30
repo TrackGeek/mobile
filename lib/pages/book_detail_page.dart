@@ -37,6 +37,9 @@ import '../utils/release.dart';
 import '../utils/slug.dart';
 import 'book_franchise_page.dart';
 import 'media_detail_page.dart';
+import '../components/layout/edgy.dart';
+import '../components/layout/tg_refresh_indicator.dart';
+import '../utils/haptics.dart';
 
 const _siteUrl = 'https://trackgeek.net';
 const _planningColor = TgStatus.planning;
@@ -262,6 +265,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
   }
 
   Future<void> _toggleFavorite() async {
+    HapticsHelper.light();
     final book = _book;
     if (book == null || _favoriteBusy || !_loggedIn) return;
     setState(() => _favoriteBusy = true);
@@ -420,6 +424,9 @@ class _BookDetailPageState extends State<BookDetailPage> {
   }
 
   void _toast(String key) {
+    key == 'api:INTERNAL_SERVER_ERROR'
+        ? HapticsHelper.error()
+        : HapticsHelper.success();
     if (!mounted) return;
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(context.t(key))));
@@ -452,7 +459,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
           ? const Center(child: CircularProgressIndicator())
           : _error != null || book == null
           ? DetailErrorState(onRetry: _load)
-          : RefreshIndicator(
+          : TgRefreshIndicator(
               onRefresh: _load,
               child: ContentFrame(
                 child: LayoutBuilder(
@@ -713,20 +720,23 @@ class _BookDetailPageState extends State<BookDetailPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              for (var i = 0; i < tabs.length; i++)
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: ChoiceChip(
-                    selected: _tab == i,
-                    label: Text(tabs[i].$2),
-                    onSelected: (_) => setState(() => _tab = i),
+        Edgy(
+          axis: .horizontal,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (var i = 0; i < tabs.length; i++)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ChoiceChip(
+                      selected: _tab == i,
+                      label: Text(tabs[i].$2),
+                      onSelected: (_) => setState(() => _tab = i),
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 16),

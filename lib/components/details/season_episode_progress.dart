@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/l10n_context.dart';
 import '../../utils/episode_backfill.dart';
+import '../layout/edgy.dart';
 
 class SeasonEpisodeProgress extends StatefulWidget {
   const SeasonEpisodeProgress({
@@ -94,22 +95,26 @@ class _SeasonEpisodeProgressState extends State<SeasonEpisodeProgress> {
                 bottom: BorderSide(color: theme.colorScheme.outlineVariant),
               ),
             ),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  for (final s in widget.seasons)
-                    _SeasonTab(
-                      label: _seasonLabel(s.seasonNumber),
-                      watched: s.watchedEpisodes.length,
-                      total: s.totalEpisodes,
-                      active: s.seasonNumber == active,
-                      onTap: widget.busy
-                          ? null
-                          : () =>
-                                setState(() => _activeSeason = s.seasonNumber),
-                    ),
-                ],
+            child: Edgy(
+              axis: .horizontal,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    for (final s in widget.seasons)
+                      _SeasonTab(
+                        label: _seasonLabel(s.seasonNumber),
+                        watched: s.watchedEpisodes.length,
+                        total: s.totalEpisodes,
+                        active: s.seasonNumber == active,
+                        onTap: widget.busy
+                            ? null
+                            : () => setState(
+                                () => _activeSeason = s.seasonNumber,
+                              ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),

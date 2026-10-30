@@ -7,6 +7,7 @@ import 'package:hugeicons/hugeicons.dart';
 import '../../l10n/l10n_context.dart';
 import '../../models/tv_detail.dart';
 import 'detail_widgets.dart';
+import '../media/smooth_image.dart';
 
 class SeasonEpisodesSection extends StatefulWidget {
   const SeasonEpisodesSection({
@@ -225,12 +226,7 @@ class TvEpisodeCard extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             if (episode.stillUrl?.isNotEmpty == true)
-              Image.network(
-                episode.stillUrl!,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) =>
-                    Container(color: theme.colorScheme.surfaceContainerHighest),
-              )
+              SmoothImage(url: episode.stillUrl!)
             else
               Container(color: theme.colorScheme.surfaceContainerHighest),
             DecoratedBox(

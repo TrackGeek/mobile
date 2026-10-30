@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 import '../../models/anime_detail.dart';
+import '../media/smooth_image.dart';
+import '../layout/edgy.dart';
 
 const _relationLabelKeys = {
   'sequel': 'sequel',
@@ -127,33 +129,36 @@ class RelationsView extends StatelessWidget {
             const SizedBox(height: 8),
             SizedBox(
               height: 126 + MediaQuery.textScalerOf(context).scale(11) * 3,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: group.value.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 10),
-                itemBuilder: (context, index) {
-                  final node = group.value[index];
-                  return SizedBox(
-                    width: 88,
-                    child: InkWell(
-                      onTap: onOpen == null ? null : () => onOpen!(node.id),
-                      borderRadius: BorderRadius.circular(8),
-                      child: Column(
-                        children: [
-                          _Cover(url: node.imageUrl, size: 80),
-                          const SizedBox(height: 6),
-                          Text(
-                            node.title,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.labelSmall,
-                          ),
-                        ],
+              child: Edgy(
+                axis: .horizontal,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: group.value.length,
+                  separatorBuilder: (_, _) => const SizedBox(width: 10),
+                  itemBuilder: (context, index) {
+                    final node = group.value[index];
+                    return SizedBox(
+                      width: 88,
+                      child: InkWell(
+                        onTap: onOpen == null ? null : () => onOpen!(node.id),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Column(
+                          children: [
+                            _Cover(url: node.imageUrl, size: 80),
+                            const SizedBox(height: 6),
+                            Text(
+                              node.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                              style: theme.textTheme.labelSmall,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
           ],
@@ -185,12 +190,11 @@ class _Cover extends StatelessWidget {
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             )
-          : Image.network(
-              url!,
+          : SmoothImage(
+              url: url!,
               width: size,
               height: size * 1.4,
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => Container(
+              error: Container(
                 width: size,
                 height: size * 1.4,
                 color: theme.colorScheme.surface,

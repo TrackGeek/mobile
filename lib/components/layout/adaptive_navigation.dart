@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../styles/tg_layout.dart';
+import '../../utils/haptics.dart';
 
 class AdaptiveNavigation extends StatefulWidget {
   const AdaptiveNavigation({
@@ -59,6 +60,11 @@ class _AdaptiveNavigationState extends State<AdaptiveNavigation>
     super.dispose();
   }
 
+  void _select(int index) {
+    HapticsHelper.light();
+    widget.onSelected(index);
+  }
+
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
@@ -67,7 +73,7 @@ class _AdaptiveNavigationState extends State<AdaptiveNavigation>
       return CallbackShortcuts(
         bindings: {
           for (var i = 0; i < widget.destinations.length && i < 9; i++)
-            SingleActivator(_tabKeys[i], alt: true): () => widget.onSelected(i),
+            SingleActivator(_tabKeys[i], alt: true): () => _select(i),
         },
         child: Focus(
           autofocus: true,
@@ -97,7 +103,7 @@ class _AdaptiveNavigationState extends State<AdaptiveNavigation>
                               extended: extended,
                               minExtendedWidth: 224,
                               selectedIndex: widget.selectedIndex,
-                              onDestinationSelected: widget.onSelected,
+                              onDestinationSelected: _select,
                               labelType: extended
                                   ? NavigationRailLabelType.none
                                   : NavigationRailLabelType.all,
@@ -165,7 +171,7 @@ class _AdaptiveNavigationState extends State<AdaptiveNavigation>
                     ),
                     child: NavigationBar(
                       selectedIndex: widget.selectedIndex,
-                      onDestinationSelected: widget.onSelected,
+                      onDestinationSelected: _select,
                       destinations: widget.destinations,
                     ),
                   ),

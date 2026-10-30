@@ -6,6 +6,7 @@ import '../../l10n/l10n_context.dart';
 import '../../models/media_type.dart';
 import '../../models/notification.dart';
 import '../user/user_widgets.dart';
+import '../media/smooth_image.dart';
 
 class NotificationItem extends StatelessWidget {
   const NotificationItem({
@@ -165,10 +166,9 @@ class NotificationItem extends StatelessWidget {
                     aspectRatio: 3 / 4,
                     child:
                         media?.coverUrl != null && media!.coverUrl!.isNotEmpty
-                        ? Image.network(
-                            media.coverUrl!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => Center(
+                        ? SmoothImage(
+                            url: media.coverUrl!,
+                            error: Center(
                               child: HugeIcon(
                                 icon: _releaseIcon,
                                 size: 20,

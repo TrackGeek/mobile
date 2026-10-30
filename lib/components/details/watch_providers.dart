@@ -12,6 +12,8 @@ import '../../models/watch_providers.dart';
 import '../../services/api_client.dart';
 import '../../services/settings_service.dart';
 import 'detail_widgets.dart';
+import '../media/smooth_image.dart';
+import '../../utils/haptics.dart';
 
 typedef WatchProvidersLoader = Future<WatchProviders> Function(
   int tmdbId, {
@@ -201,6 +203,7 @@ class _WatchProvidersSectionState extends State<WatchProvidersSection> {
         fallback: _providers?.availableRegions ?? const [],
         nameOf: _regionName,
         onSelect: (code) {
+          HapticsHelper.selection();
           Navigator.of(sheetContext).pop();
           _selectRegion(code);
         },
@@ -413,11 +416,7 @@ class _ProviderTile extends StatelessWidget {
                         ),
                       ),
                     )
-                  : Image.network(
-                      logo,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                    ),
+                  : SmoothImage(url: logo),
             ),
           ),
           const SizedBox(height: 6),

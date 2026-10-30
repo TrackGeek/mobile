@@ -3,6 +3,7 @@ import 'package:hugeicons/hugeicons.dart';
 
 import '../../l10n/l10n_context.dart';
 import '../../models/book_detail.dart';
+import '../media/smooth_image.dart';
 
 class EditionsSection extends StatelessWidget {
   const EditionsSection({
@@ -120,18 +121,7 @@ class _EditionCard extends StatelessWidget {
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
                     )
-                  : Image.network(
-                      edition.imageUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => Container(
-                        color: theme.colorScheme.surfaceContainerHighest,
-                        child: HugeIcon(
-                          icon: HugeIcons.strokeRoundedImage01,
-                          size: 20,
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
+                  : SmoothImage(url: edition.imageUrl!),
             ),
           ),
           const SizedBox(width: 10),

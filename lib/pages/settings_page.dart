@@ -20,6 +20,7 @@ import '../l10n/l10n_context.dart';
 import '../services/auth_service.dart';
 import '../services/external_sign_in.dart';
 import '../services/settings_service.dart';
+import '../utils/haptics.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({
@@ -89,6 +90,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             )
                           : null,
                       onTap: () {
+                        HapticsHelper.selection();
                         Navigator.of(sheetContext).pop();
                         setState(() => _tab = section.id);
                       },

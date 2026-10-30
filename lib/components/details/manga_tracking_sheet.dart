@@ -11,6 +11,8 @@ import '../../services/manga_service.dart';
 import '../../services/review_service.dart';
 import '../user/star_rating.dart';
 import 'tracking_sheet.dart';
+import '../media/smooth_image.dart';
+import '../../utils/haptics.dart';
 
 const _statusOptions = [
   'planning',
@@ -273,8 +275,10 @@ class _MangaTrackingSheetState extends State<MangaTrackingSheet> {
         }
       }
       widget.onChanged?.call();
+      HapticsHelper.success();
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
+      HapticsHelper.error();
       if (mounted) {
         setState(() {
           _saving = false;
@@ -353,13 +357,7 @@ class _MangaTrackingSheetState extends State<MangaTrackingSheet> {
                         ? Container(
                             color: theme.colorScheme.surfaceContainerHighest,
                           )
-                        : Image.network(
-                            widget.manga.imageUrl!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => Container(
-                              color: theme.colorScheme.surfaceContainerHighest,
-                            ),
-                          ),
+                        : SmoothImage(url: widget.manga.imageUrl!),
                   ),
                 ),
                 const SizedBox(width: 12),

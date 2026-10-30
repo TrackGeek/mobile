@@ -8,6 +8,8 @@ import 'package:hugeicons/hugeicons.dart';
 
 import '../../l10n/l10n_context.dart';
 import '../../models/company.dart';
+import '../media/smooth_image.dart';
+import '../layout/edgy.dart';
 
 const _pageSize = 24;
 
@@ -119,67 +121,73 @@ class _CompanyWorksSectionState extends State<CompanyWorksSection> {
           ),
         ),
         const SizedBox(height: 10),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: ChoiceChip(
-                  selected: _role == null,
-                  label: Text(
-                    '${context.t('common:all')} (${widget.works.length})',
-                  ),
-                  onSelected: (_) => setState(() {
-                    _role = null;
-                    _visible = _pageSize;
-                  }),
-                ),
-              ),
-              for (final role in roles)
+        Edgy(
+          axis: .horizontal,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: ChoiceChip(
-                    selected: _role == role.key,
-                    label: Text('${role.key} (${role.value})'),
+                    selected: _role == null,
+                    label: Text(
+                      '${context.t('common:all')} (${widget.works.length})',
+                    ),
                     onSelected: (_) => setState(() {
-                      _role = role.key;
+                      _role = null;
                       _visible = _pageSize;
                     }),
                   ),
                 ),
-            ],
+                for (final role in roles)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ChoiceChip(
+                      selected: _role == role.key,
+                      label: Text('${role.key} (${role.value})'),
+                      onSelected: (_) => setState(() {
+                        _role = role.key;
+                        _visible = _pageSize;
+                      }),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 10),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              Text(
-                '${context.t('library:sortBy')}:',
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(width: 8),
-              for (final (sort, label) in [
-                (_Sort.newest, context.t('library:newestFirst')),
-                (_Sort.oldest, context.t('library:oldestFirst')),
-                (_Sort.topRated, context.t('library:topRated')),
-              ])
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: ChoiceChip(
-                    selected: _sort == sort,
-                    label: Text(label),
-                    onSelected: (_) => setState(() {
-                      _sort = sort;
-                      _visible = _pageSize;
-                    }),
+        Edgy(
+          axis: .horizontal,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                Text(
+                  '${context.t('library:sortBy')}:',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
-            ],
+                const SizedBox(width: 8),
+                for (final (sort, label) in [
+                  (_Sort.newest, context.t('library:newestFirst')),
+                  (_Sort.oldest, context.t('library:oldestFirst')),
+                  (_Sort.topRated, context.t('library:topRated')),
+                ])
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ChoiceChip(
+                      selected: _sort == sort,
+                      label: Text(label),
+                      onSelected: (_) => setState(() {
+                        _sort = sort;
+                        _visible = _pageSize;
+                      }),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 14),
@@ -324,11 +332,6 @@ class WorkCard extends StatelessWidget {
         ),
       );
     }
-    return Image.network(
-      url,
-      fit: BoxFit.cover,
-      errorBuilder: (_, _, _) =>
-          Container(color: theme.colorScheme.surfaceContainerHighest),
-    );
+    return SmoothImage(url: url);
   }
 }

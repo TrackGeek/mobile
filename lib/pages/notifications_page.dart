@@ -12,6 +12,7 @@ import '../components/notifications/notification_list.dart';
 import '../l10n/l10n_context.dart';
 import '../models/media_type.dart';
 import '../services/notification_service.dart';
+import '../utils/haptics.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({
@@ -65,6 +66,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
       await _refreshUnread();
     } catch (_) {
       if (mounted) {
+        HapticsHelper.error();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.t('common:somethingWentWrong'))),
         );

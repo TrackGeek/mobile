@@ -19,6 +19,7 @@ import '../services/genre_service.dart';
 import '../services/shop_service.dart';
 import '../services/user_service.dart';
 import '../styles/tg_theme.dart';
+import 'always_scrollbar_behavior.dart';
 import 'server_config.dart';
 import 'trackgeek_shell.dart';
 
@@ -69,6 +70,7 @@ class TrackGeekApp extends StatelessWidget {
     return MaterialApp(
       title: 'TrackGeek',
       theme: trackGeekTheme(),
+      scrollBehavior: const AlwaysScrollbarBehavior(),
       home: ListenableBuilder(
         listenable: session,
         builder: (context, _) {

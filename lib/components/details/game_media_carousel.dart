@@ -6,6 +6,7 @@ import '../../models/game_detail.dart';
 import '../../models/gallery_item.dart';
 import '../../pages/media_gallery_page.dart';
 import '../../utils/video_links.dart';
+import '../media/smooth_image.dart';
 
 class GameMediaCarousel extends StatefulWidget {
   const GameMediaCarousel({
@@ -62,13 +63,7 @@ class _GameMediaCarouselState extends State<GameMediaCarousel> {
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
-                          if (thumb.isNotEmpty)
-                            Image.network(
-                              thumb,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, _, _) =>
-                                  const SizedBox.shrink(),
-                            ),
+                          if (thumb.isNotEmpty) SmoothImage(url: thumb),
                           Container(
                             color: Colors.black26,
                             child: const Center(
@@ -98,10 +93,10 @@ class _GameMediaCarouselState extends State<GameMediaCarousel> {
                         ),
                       ),
                     ),
-                    child: Image.network(
-                      shot.imageUrl,
+                    child: SmoothImage(
+                      url: shot.imageUrl,
                       fit: BoxFit.contain,
-                      errorBuilder: (_, _, _) => const Center(
+                      error: const Center(
                         child: HugeIcon(
                           icon: HugeIcons.strokeRoundedImage01,
                           size: 40,

@@ -5,6 +5,7 @@ import '../../controllers/session_controller.dart';
 import '../../l10n/l10n_context.dart';
 import '../../services/auth_service.dart';
 import 'settings_card.dart';
+import '../../utils/haptics.dart';
 
 class DeleteAccountCard extends StatefulWidget {
   const DeleteAccountCard({
@@ -119,6 +120,7 @@ class _DeleteAccountCardState extends State<DeleteAccountCard> {
     if (confirmed != true || !mounted) return;
     setState(() => _pending = true);
     try {
+      HapticsHelper.heavy();
       await widget.auth.deleteUser();
       if (mounted) {
         showSettingsToast(context, context.t('settings:deleteAccount.success'));
@@ -128,6 +130,7 @@ class _DeleteAccountCardState extends State<DeleteAccountCard> {
         showSettingsToast(
           context,
           settingsErrorText(context, e, 'settings:deleteAccount.error'),
+          error: true,
         );
       }
     } finally {

@@ -16,6 +16,8 @@ import '../models/media_type.dart';
 import '../services/company_service.dart';
 import '../utils/social_links.dart';
 import 'media_detail_page.dart';
+import '../components/media/smooth_image.dart';
+import '../components/layout/tg_refresh_indicator.dart';
 
 const _siteUrl = 'https://trackgeek.net';
 const _clampLength = 480;
@@ -146,7 +148,7 @@ class _CompanyPageState extends State<CompanyPage> {
                 ],
               ),
             )
-          : RefreshIndicator(
+          : TgRefreshIndicator(
               onRefresh: _load,
               child: ContentFrame(
                 child: ListView(
@@ -236,11 +238,7 @@ class _CompanyPageState extends State<CompanyPage> {
                           Colors.black.withValues(alpha: 0.45),
                           BlendMode.darken,
                         ),
-                        child: Image.network(
-                          company.bannerUrl!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                        ),
+                        child: SmoothImage(url: company.bannerUrl!),
                       ),
                     )
                   : DecoratedBox(
@@ -271,11 +269,11 @@ class _CompanyPageState extends State<CompanyPage> {
                       color: theme.colorScheme.surface.withValues(alpha: 0.8),
                     ),
                     child: company.logoUrl?.isNotEmpty == true
-                        ? Image.network(
-                            company.logoUrl!,
+                        ? SmoothImage(
+                            url: company.logoUrl!,
                             height: 80,
                             fit: BoxFit.contain,
-                            errorBuilder: (_, _, _) => HugeIcon(
+                            error: HugeIcon(
                               icon: HugeIcons.strokeRoundedBuilding03,
                               size: 48,
                               color: theme.colorScheme.onSurfaceVariant,

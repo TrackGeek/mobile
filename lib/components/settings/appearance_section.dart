@@ -9,6 +9,7 @@ import '../../models/cosmetic.dart';
 import '../../services/settings_service.dart';
 import '../../utils/profile_cosmetics.dart';
 import 'settings_card.dart';
+import '../media/smooth_image.dart';
 
 const _defaultColor = '#10b981';
 
@@ -79,6 +80,7 @@ class _AppearanceSectionState extends State<AppearanceSection> {
         showSettingsToast(
           context,
           settingsErrorText(context, e, 'settings:save.error'),
+          error: true,
         );
       }
     }
@@ -100,6 +102,7 @@ class _AppearanceSectionState extends State<AppearanceSection> {
         showSettingsToast(
           context,
           settingsErrorText(context, e, 'settings:save.error'),
+          error: true,
         );
       }
     } finally {
@@ -147,6 +150,7 @@ class _AppearanceSectionState extends State<AppearanceSection> {
         showSettingsToast(
           context,
           settingsErrorText(context, e, 'settings:$kind.upload.error'),
+          error: true,
         );
       }
     } finally {
@@ -172,6 +176,7 @@ class _AppearanceSectionState extends State<AppearanceSection> {
         showSettingsToast(
           context,
           settingsErrorText(context, e, 'settings:$kind.delete.error'),
+          error: true,
         );
       }
     } finally {
@@ -554,10 +559,9 @@ class _UploadableImage extends StatelessWidget {
         if (hasImage && imageUrl != null)
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: Image.network(
-              imageUrl!,
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => Container(decoration: fallback),
+            child: SmoothImage(
+              url: imageUrl!,
+              error: Container(decoration: fallback),
             ),
           )
         else

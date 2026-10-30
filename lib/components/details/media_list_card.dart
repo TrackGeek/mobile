@@ -5,6 +5,8 @@ import '../../l10n/l10n_context.dart';
 import '../../models/media_type.dart';
 import '../../models/user_list.dart';
 import '../../services/list_service.dart';
+import '../../utils/strings.dart';
+import '../media/smooth_image.dart';
 
 const _previewCount = 3;
 
@@ -78,15 +80,17 @@ class MediaListCard extends StatelessWidget {
                             width: 48,
                             height: 72,
                             child: preview.link?.image.isNotEmpty == true
-                                ? Image.network(
-                                    preview.link!.image,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, _, _) => _fallback(
+                                ? SmoothImage(
+                                    url: preview.link!.image,
+                                    error: _fallback(
                                       context,
-                                      preview.link?.title ?? '',
+                                      (preview.link?.title).orPlaceholder(),
                                     ),
                                   )
-                                : _fallback(context, preview.link?.title ?? ''),
+                                : _fallback(
+                                    context,
+                                    (preview.link?.title).orPlaceholder(),
+                                  ),
                           ),
                         ),
                       ),
@@ -127,18 +131,28 @@ class MediaListCard extends StatelessWidget {
                   CircleAvatar(
                     radius: 10,
                     backgroundColor: theme.colorScheme.surface,
-                    backgroundImage: list.user.avatarUrl?.isNotEmpty == true
-                        ? NetworkImage(list.user.avatarUrl!)
-                        : null,
-                    child: list.user.avatarUrl?.isNotEmpty != true
-                        ? Text(
+                    child: list.user.avatarUrl?.isNotEmpty == true
+                        ? ClipOval(
+                            child: SmoothImage(
+                              url: list.user.avatarUrl!,
+                              width: 20,
+                              height: 20,
+                              error: Text(
+                                (list.user.name.isNotEmpty
+                                        ? list.user.name
+                                        : '?')[0]
+                                    .toUpperCase(),
+                                style: theme.textTheme.labelSmall,
+                              ),
+                            ),
+                          )
+                        : Text(
                             (list.user.name.isNotEmpty
                                     ? list.user.name
                                     : '?')[0]
                                 .toUpperCase(),
                             style: theme.textTheme.labelSmall,
-                          )
-                        : null,
+                          ),
                   ),
                   const SizedBox(width: 6),
                   Expanded(
@@ -296,19 +310,28 @@ class _ListItemsSheetState extends State<ListItemsSheet> {
                           radius: 11,
                           backgroundColor:
                               theme.colorScheme.surfaceContainerHighest,
-                          backgroundImage:
-                              widget.list.user.avatarUrl?.isNotEmpty == true
-                              ? NetworkImage(widget.list.user.avatarUrl!)
-                              : null,
-                          child: widget.list.user.avatarUrl?.isNotEmpty != true
-                              ? Text(
+                          child: widget.list.user.avatarUrl?.isNotEmpty == true
+                              ? ClipOval(
+                                  child: SmoothImage(
+                                    url: widget.list.user.avatarUrl!,
+                                    width: 22,
+                                    height: 22,
+                                    error: Text(
+                                      (widget.list.user.name.isNotEmpty
+                                              ? widget.list.user.name
+                                              : '?')[0]
+                                          .toUpperCase(),
+                                      style: theme.textTheme.labelSmall,
+                                    ),
+                                  ),
+                                )
+                              : Text(
                                   (widget.list.user.name.isNotEmpty
                                           ? widget.list.user.name
                                           : '?')[0]
                                       .toUpperCase(),
                                   style: theme.textTheme.labelSmall,
-                                )
-                              : null,
+                                ),
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -406,18 +429,12 @@ class _SheetItem extends StatelessWidget {
                         ),
                       ),
                     )
-                  : Image.network(
-                      link!.image,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => Container(
-                        color: theme.colorScheme.surfaceContainerHighest,
-                      ),
-                    ),
+                  : SmoothImage(url: link!.image),
             ),
           ),
           const SizedBox(height: 6),
           Text(
-            link?.title ?? '',
+            (link?.title).orPlaceholder(),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.labelSmall?.copyWith(

@@ -3,6 +3,7 @@ import 'package:hugeicons/hugeicons.dart';
 
 import '../../l10n/l10n_context.dart';
 import '../../utils/profile_cosmetics.dart';
+import '../media/smooth_image.dart';
 
 class UserCard extends StatelessWidget {
   const UserCard({
@@ -184,11 +185,7 @@ class UserAvatar extends StatelessWidget {
       ),
       child: ClipOval(
         child: url != null && url.isNotEmpty
-            ? Image.network(
-                url,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => _fallback(theme, initial),
-              )
+            ? SmoothImage(url: url, error: _fallback(theme, initial))
             : _fallback(theme, initial),
       ),
     );

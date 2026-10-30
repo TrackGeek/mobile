@@ -3,6 +3,7 @@ import 'package:hugeicons/hugeicons.dart';
 
 import '../../l10n/l10n_context.dart';
 import '../../models/api_exception.dart';
+import '../../utils/haptics.dart';
 
 class SettingsCard extends StatelessWidget {
   const SettingsCard({
@@ -96,7 +97,16 @@ class SettingsFieldError extends StatelessWidget {
   }
 }
 
-void showSettingsToast(BuildContext context, String message) {
+void showSettingsToast(
+  BuildContext context,
+  String message, {
+  bool error = false,
+}) {
+  if (error) {
+    HapticsHelper.error();
+  } else {
+    HapticsHelper.success();
+  }
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
     ..showSnackBar(SnackBar(content: Text(message)));

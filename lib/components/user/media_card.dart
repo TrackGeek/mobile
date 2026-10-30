@@ -4,6 +4,7 @@ import 'package:hugeicons/hugeicons.dart';
 import '../../styles/tg_theme.dart';
 import '../../../l10n/l10n_context.dart';
 import '../../models/progress_item.dart';
+import '../media/smooth_image.dart';
 
 class MediaCard extends StatelessWidget {
   const MediaCard({
@@ -49,11 +50,7 @@ class MediaCard extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   if (image.isNotEmpty)
-                    Image.network(
-                      image,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => const _Fallback(),
-                    )
+                    SmoothImage(url: image, error: const _Fallback())
                   else
                     const _Fallback(),
                   if (hasProgress)

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 import '../../l10n/l10n_context.dart';
+import '../media/smooth_image.dart';
 
 class DetailSection extends StatelessWidget {
   const DetailSection({super.key, required this.title, required this.child});
@@ -152,11 +153,7 @@ class CoverArt extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         child: url == null || url!.isEmpty
             ? placeholder
-            : Image.network(
-                url!,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => placeholder,
-              ),
+            : SmoothImage(url: url!, error: placeholder),
       ),
     );
   }

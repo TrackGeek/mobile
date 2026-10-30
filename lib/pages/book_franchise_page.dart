@@ -15,6 +15,7 @@ import '../models/book_detail.dart';
 import '../models/media_type.dart';
 import '../services/book_service.dart';
 import 'media_detail_page.dart';
+import '../components/layout/tg_refresh_indicator.dart';
 
 const _siteUrl = 'https://trackgeek.net';
 
@@ -106,7 +107,7 @@ class _BookFranchisePageState extends State<BookFranchisePage> {
           ? const Center(child: CircularProgressIndicator())
           : _error != null || franchise == null
           ? DetailErrorState(onRetry: _load)
-          : RefreshIndicator(
+          : TgRefreshIndicator(
               onRefresh: _load,
               child: ContentFrame(
                 child: ListView(

@@ -7,7 +7,10 @@ import '../../l10n/l10n_context.dart';
 import '../../models/user_profile.dart';
 import '../../services/game_service.dart';
 import '../../services/user_service.dart';
+import '../../utils/strings.dart';
 import 'user_widgets.dart';
+import '../media/smooth_image.dart';
+import '../layout/edgy.dart';
 
 class SetupCard extends StatelessWidget {
   const SetupCard({
@@ -73,21 +76,18 @@ class SetupCard extends StatelessWidget {
                 if (photos.isNotEmpty)
                   SizedBox(
                     height: 140,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: photos.length,
-                      separatorBuilder: (_, _) => const SizedBox(width: 8),
-                      itemBuilder: (context, index) => ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          photos[index].url,
-                          height: 140,
-                          width: 200,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => Container(
-                            height: 140,
+                    child: Edgy(
+                      axis: .horizontal,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: photos.length,
+                        separatorBuilder: (_, _) => const SizedBox(width: 8),
+                        itemBuilder: (context, index) => ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: SmoothImage(
+                            url: photos[index].url,
                             width: 200,
-                            color: theme.colorScheme.surfaceContainerHighest,
+                            height: 140,
                           ),
                         ),
                       ),
@@ -131,7 +131,7 @@ class _SetupItemTile extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.only(top: 8, bottom: 2),
         child: Text(
-          item.name ?? '',
+          item.name.orPlaceholder(),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: theme.textTheme.titleSmall?.copyWith(
@@ -156,14 +156,14 @@ class _SetupItemTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    item.name ?? '',
+                    item.name.orPlaceholder(),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.labelLarge?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  if (item.brand != null && item.brand!.isNotEmpty)
+                  if (item.brand.isUsable)
                     Text(
                       item.brand!,
                       maxLines: 1,
@@ -323,17 +323,7 @@ class _SetupEditSheetState extends State<_SetupEditSheet> {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(6),
-                    child: Image.network(
-                      photo.url,
-                      width: 64,
-                      height: 44,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => Container(
-                        width: 64,
-                        height: 44,
-                        color: theme.colorScheme.surfaceContainerHighest,
-                      ),
-                    ),
+                    child: SmoothImage(url: photo.url, width: 64, height: 44),
                   ),
                   const Spacer(),
                   IconButton(
@@ -390,7 +380,7 @@ class _SetupEditSheetState extends State<_SetupEditSheet> {
                             ),
                           )
                         : Text(
-                            _items[i].name ?? '',
+                            _items[i].name.orPlaceholder(),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(fontWeight: FontWeight.w600),

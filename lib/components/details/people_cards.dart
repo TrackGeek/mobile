@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 
+import '../../utils/strings.dart';
+import '../media/smooth_image.dart';
+
 class PersonTile extends StatelessWidget {
   const PersonTile({
     super.key,
@@ -57,10 +60,9 @@ class PersonTile extends StatelessWidget {
                             ),
                           ),
                         )
-                      : Image.network(
-                          image,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => Container(
+                      : SmoothImage(
+                          url: image,
+                          error: Container(
                             color: theme.colorScheme.surface,
                             child: Center(
                               child: HugeIcon(
@@ -75,7 +77,7 @@ class PersonTile extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                name,
+                name.orPlaceholder(),
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -83,7 +85,7 @@ class PersonTile extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              if (subtitle != null && subtitle!.isNotEmpty)
+              if (subtitle.isUsable)
                 Text(
                   subtitle!,
                   textAlign: TextAlign.center,
@@ -150,13 +152,7 @@ class EpisodeCard extends StatelessWidget {
                         ),
                       ),
                     )
-                  : Image.network(
-                      imageUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => Container(
-                        color: theme.colorScheme.surfaceContainerHighest,
-                      ),
-                    ),
+                  : SmoothImage(url: imageUrl!),
             ),
             Padding(
               padding: const EdgeInsets.all(10),
@@ -172,7 +168,7 @@ class EpisodeCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    title,
+                    title.orPlaceholder(),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(

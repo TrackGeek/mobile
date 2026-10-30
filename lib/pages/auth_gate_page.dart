@@ -6,6 +6,7 @@ import '../app/server_config.dart';
 import '../controllers/session_controller.dart';
 import '../l10n/l10n_context.dart';
 import 'social_sign_in_page.dart';
+import '../utils/haptics.dart';
 
 class AuthGatePage extends StatefulWidget {
   const AuthGatePage({super.key, required this.session, required this.server});
@@ -54,6 +55,7 @@ class _AuthGatePageState extends State<AuthGatePage> {
   }
 
   void _showError() {
+    HapticsHelper.error();
     if (!mounted) return;
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(context.t('auth:failedToLogin'))));
@@ -64,14 +66,20 @@ class _AuthGatePageState extends State<AuthGatePage> {
     final success = _register
         ? await widget.session.signUp(_name.text, _email.text, _password.text)
         : await widget.session.signIn(_email.text, _password.text);
-    if (success) TextInput.finishAutofillContext();
+    if (success) {
+      HapticsHelper.success();
+      TextInput.finishAutofillContext();
+    }
     if (mounted) setState(() => _busy = false);
   }
 
   Future<void> _verify() async {
     setState(() => _busy = true);
     final success = await widget.session.verifyTwoFactor(_code.text);
-    if (success) TextInput.finishAutofillContext();
+    if (success) {
+      HapticsHelper.success();
+      TextInput.finishAutofillContext();
+    }
     if (mounted) setState(() => _busy = false);
   }
 

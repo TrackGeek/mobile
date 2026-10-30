@@ -6,9 +6,11 @@ import 'package:intl/intl.dart';
 
 import '../../l10n/l10n_context.dart';
 import '../../models/feed_entry.dart';
+import '../../utils/strings.dart';
 import 'feed_icons.dart';
 import 'feed_reactions.dart';
 import 'feed_title.dart';
+import '../media/smooth_image.dart';
 
 class FeedItemCard extends StatelessWidget {
   const FeedItemCard({
@@ -76,7 +78,7 @@ class FeedItemCard extends StatelessWidget {
                             const SizedBox(width: 8),
                             Flexible(
                               child: Text(
-                                entry.profile.name,
+                                entry.profile.name.orPlaceholder(),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: theme.textTheme.bodyMedium?.copyWith(
@@ -178,11 +180,7 @@ class FeedCover extends StatelessWidget {
                     opacity: 0.6,
                     child: Transform.scale(
                       scale: 1.25,
-                      child: Image.network(
-                        coverUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                      ),
+                      child: SmoothImage(url: coverUrl),
                     ),
                   ),
                 ),
@@ -196,10 +194,9 @@ class FeedCover extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(4),
-                        child: Image.network(
-                          coverUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => Container(
+                        child: SmoothImage(
+                          url: coverUrl,
+                          error: Container(
                             color: theme.colorScheme.surfaceContainerHighest,
                             child: Center(
                               child: HugeIcon(
@@ -254,13 +251,22 @@ class FeedAvatar extends StatelessWidget {
     return CircleAvatar(
       radius: size / 2,
       backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-      backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
-      child: avatarUrl.isEmpty
-          ? Text(
+      child: avatarUrl.isNotEmpty
+          ? ClipOval(
+              child: SmoothImage(
+                url: avatarUrl,
+                width: size,
+                height: size,
+                error: Text(
+                  name.isEmpty ? '?' : name.characters.first.toUpperCase(),
+                  style: TextStyle(fontSize: size * 0.45),
+                ),
+              ),
+            )
+          : Text(
               name.isEmpty ? '?' : name.characters.first.toUpperCase(),
               style: TextStyle(fontSize: size * 0.45),
-            )
-          : null,
+            ),
     );
   }
 }

@@ -7,6 +7,7 @@ import '../../models/watch_link.dart';
 import '../../services/settings_service.dart';
 import '../../utils/watch_links.dart';
 import 'settings_card.dart';
+import '../../utils/haptics.dart';
 
 const _labelMaxLength = 40;
 
@@ -51,6 +52,7 @@ class _WatchLinksCardState extends State<WatchLinksCard> {
         showSettingsToast(
           context,
           settingsErrorText(context, e, 'common:somethingWentWrong'),
+          error: true,
         );
         setState(() => _links = const []);
       }
@@ -67,6 +69,7 @@ class _WatchLinksCardState extends State<WatchLinksCard> {
         showSettingsToast(
           context,
           settingsErrorText(context, e, 'common:somethingWentWrong'),
+          error: true,
         );
       }
     } finally {
@@ -248,7 +251,12 @@ class _WatchLinkRow extends StatelessWidget {
                 children: [
                   Switch(
                     value: link.enabled,
-                    onChanged: pending ? null : onToggle,
+                    onChanged: pending
+                        ? null
+                        : (value) {
+                            HapticsHelper.light();
+                            onToggle(value);
+                          },
                   ),
                 ],
               ),

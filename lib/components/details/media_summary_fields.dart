@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/l10n_context.dart';
 import '../../models/media_detail.dart';
+import '../../utils/strings.dart';
 
 class MediaSummaryFields extends StatelessWidget {
   const MediaSummaryFields({super.key, required this.media});
@@ -25,7 +26,7 @@ class MediaSummaryFields extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              Text(field.value),
+              Text(field.value.orPlaceholder()),
             ],
           ),
         ),

@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 
 import '../../l10n/l10n_context.dart';
 import '../../models/feed_entry.dart';
+import '../layout/spring_sheet.dart';
+import '../../utils/haptics.dart';
 
 const quickReactions = ['👍', '❤️', '🔥', '😂', '😮', '😢'];
 
@@ -152,9 +154,8 @@ class FeedReactions extends StatelessWidget {
   }
 
   void _openSheet(BuildContext context, FeedReaction? current) {
-    showModalBottomSheet<void>(
+    showSpringBottomSheet<void>(
       context: context,
-      showDragHandle: true,
       builder: (sheetContext) {
         final counts = <String, int>{};
         for (final r in reactions) {
@@ -175,6 +176,7 @@ class FeedReactions extends StatelessWidget {
                     onTap: onReact == null
                         ? null
                         : () {
+                            HapticsHelper.light();
                             Navigator.of(sheetContext).pop();
                             onReact!(emoji, current);
                           },

@@ -14,6 +14,8 @@ import '../models/media_type.dart';
 import '../models/movie_detail.dart';
 import '../services/movie_service.dart';
 import 'media_detail_page.dart';
+import '../components/media/smooth_image.dart';
+import '../components/layout/tg_refresh_indicator.dart';
 
 const _siteUrl = 'https://trackgeek.net';
 
@@ -94,7 +96,7 @@ class _MovieFranchisePageState extends State<MovieFranchisePage> {
           ? const Center(child: CircularProgressIndicator())
           : _error != null || franchise == null
           ? DetailErrorState(onRetry: _load)
-          : RefreshIndicator(
+          : TgRefreshIndicator(
               onRefresh: _load,
               child: ContentFrame(
                 child: ListView(
@@ -109,13 +111,11 @@ class _MovieFranchisePageState extends State<MovieFranchisePage> {
                             : Stack(
                                 fit: StackFit.expand,
                                 children: [
-                                  Image.network(
-                                    imageUrl,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, _, _) =>
-                                        FranchiseBannerPlaceholder(
-                                          theme: theme,
-                                        ),
+                                  SmoothImage(
+                                    url: imageUrl,
+                                    error: FranchiseBannerPlaceholder(
+                                      theme: theme,
+                                    ),
                                   ),
                                   Container(
                                     decoration: BoxDecoration(

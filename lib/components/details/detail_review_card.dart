@@ -5,11 +5,14 @@ import 'package:intl/intl.dart';
 import '../../l10n/l10n_context.dart';
 import '../../models/feed_entry.dart';
 import '../../models/review.dart';
+import '../../utils/strings.dart';
 import '../feed/feed_markdown.dart';
 import '../feed/feed_reactions.dart';
 import '../user/star_rating.dart';
 
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+
+import '../media/smooth_image.dart';
 
 class DetailReviewCard extends StatelessWidget {
   const DetailReviewCard({
@@ -54,17 +57,24 @@ class DetailReviewCard extends StatelessWidget {
                 CircleAvatar(
                   radius: 18,
                   backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                  backgroundImage:
-                      user?.avatarUrl != null && user!.avatarUrl!.isNotEmpty
-                      ? NetworkImage(user.avatarUrl!)
-                      : null,
-                  child: user?.avatarUrl == null || user!.avatarUrl!.isEmpty
-                      ? Text(
+                  child: user?.avatarUrl != null && user!.avatarUrl!.isNotEmpty
+                      ? ClipOval(
+                          child: SmoothImage(
+                            url: user.avatarUrl!,
+                            width: 36,
+                            height: 36,
+                            error: Text(
+                              (user.name.isNotEmpty ? user.name : '?')[0]
+                                  .toUpperCase(),
+                              style: theme.textTheme.labelLarge,
+                            ),
+                          ),
+                        )
+                      : Text(
                           (user?.name.isNotEmpty == true ? user!.name : '?')[0]
                               .toUpperCase(),
                           style: theme.textTheme.labelLarge,
-                        )
-                      : null,
+                        ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -72,7 +82,7 @@ class DetailReviewCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        user?.name ?? '',
+                        (user?.name).orPlaceholder(),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.bodyMedium?.copyWith(
@@ -80,7 +90,7 @@ class DetailReviewCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '@${user?.username ?? ''}',
+                        '@${(user?.username).orPlaceholder()}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.labelSmall?.copyWith(

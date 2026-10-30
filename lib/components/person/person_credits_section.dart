@@ -8,6 +8,7 @@ import '../../services/auth_service.dart';
 import '../../utils/content_types.dart';
 import '../layout/adaptive_grid_delegate.dart';
 import 'credit_card.dart';
+import '../layout/edgy.dart';
 
 enum _Role { all, cast, crew }
 
@@ -188,44 +189,47 @@ class _CreditsSectionState extends State<PersonCreditsSection> {
                 ),
               ),
               const SizedBox(height: 12),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    if (showMediaRow) ...[
-                      for (final filter in visibleMedia)
+              Edgy(
+                axis: .horizontal,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      if (showMediaRow) ...[
+                        for (final filter in visibleMedia)
+                          _FilterChip(
+                            label: filter.label,
+                            count: filter.count,
+                            active: _media == filter.value,
+                            onTap: () => setState(() {
+                              _media = filter.value;
+                              widget.onResetPaging();
+                            }),
+                          ),
+                        const SizedBox(width: 12),
+                      ],
+                      if (counts['cast']! > 0 && counts['crew']! > 0) ...[
+                        for (final filter in roleFilters)
+                          _FilterChip(
+                            label: filter.label,
+                            count: filter.count,
+                            active: _role == filter.value,
+                            onTap: () => setState(() {
+                              _role = filter.value;
+                              widget.onResetPaging();
+                            }),
+                          ),
+                        const SizedBox(width: 12),
+                      ],
+                      for (final option in sortOptions)
                         _FilterChip(
-                          label: filter.label,
-                          count: filter.count,
-                          active: _media == filter.value,
-                          onTap: () => setState(() {
-                            _media = filter.value;
-                            widget.onResetPaging();
-                          }),
+                          label: option.label,
+                          icon: option.icon,
+                          active: _sort == option.value,
+                          onTap: () => setState(() => _sort = option.value),
                         ),
-                      const SizedBox(width: 12),
                     ],
-                    if (counts['cast']! > 0 && counts['crew']! > 0) ...[
-                      for (final filter in roleFilters)
-                        _FilterChip(
-                          label: filter.label,
-                          count: filter.count,
-                          active: _role == filter.value,
-                          onTap: () => setState(() {
-                            _role = filter.value;
-                            widget.onResetPaging();
-                          }),
-                        ),
-                      const SizedBox(width: 12),
-                    ],
-                    for (final option in sortOptions)
-                      _FilterChip(
-                        label: option.label,
-                        icon: option.icon,
-                        active: _sort == option.value,
-                        onTap: () => setState(() => _sort = option.value),
-                      ),
-                  ],
+                  ),
                 ),
               ),
               const SizedBox(height: 16),

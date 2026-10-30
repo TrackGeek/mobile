@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/l10n_context.dart';
 import '../../models/game_detail.dart';
+import '../media/smooth_image.dart';
 
 class GameFranchiseBanner extends StatelessWidget {
   const GameFranchiseBanner({super.key, required this.franchise});
@@ -19,12 +20,9 @@ class GameFranchiseBanner extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             if (franchise.bannerUrl != null)
-              Image.network(
-                franchise.bannerUrl!,
-                fit: BoxFit.cover,
+              SmoothImage(
+                url: franchise.bannerUrl!,
                 alignment: Alignment.topCenter,
-                errorBuilder: (_, _, _) =>
-                    Container(color: theme.colorScheme.surfaceContainerHighest),
               )
             else
               Container(color: theme.colorScheme.surfaceContainerHighest),

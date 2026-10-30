@@ -8,6 +8,7 @@ import '../../l10n/l10n_context.dart';
 import '../../models/discord_presence.dart';
 import '../../services/user_service.dart';
 import 'user_widgets.dart';
+import '../media/smooth_image.dart';
 
 String formatElapsed(Duration d) {
   final seconds = d.inSeconds.clamp(0, 1 << 31);
@@ -140,12 +141,11 @@ class _SpotifyCard extends StatelessWidget {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: spotify.albumArtUrl != null
-                          ? Image.network(
-                              spotify.albumArtUrl!,
+                          ? SmoothImage(
+                              url: spotify.albumArtUrl!,
                               width: 56,
                               height: 56,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, _, _) => _albumFallback(theme),
+                              error: _albumFallback(theme),
                             )
                           : _albumFallback(theme),
                     ),
@@ -338,13 +338,11 @@ class _DiscordCard extends StatelessWidget {
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: activity.largeImageUrl != null
-                              ? Image.network(
-                                  activity.largeImageUrl!,
+                              ? SmoothImage(
+                                  url: activity.largeImageUrl!,
                                   width: 48,
                                   height: 48,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, _, _) =>
-                                      _activityFallback(theme),
+                                  error: _activityFallback(theme),
                                 )
                               : _activityFallback(theme),
                         ),

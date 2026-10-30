@@ -24,6 +24,7 @@ import '../services/user_service.dart';
 import '../utils/content_types.dart';
 import 'media_detail_page.dart';
 import 'person_page.dart';
+import '../components/layout/edgy.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({
@@ -264,19 +265,22 @@ class _SearchPageState extends State<SearchPage> {
                 height: 56 + (MediaQuery.textScalerOf(context).scale(14) - 14),
                 child: ListenableBuilder(
                   listenable: _controller,
-                  builder: (context, _) => ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: kinds.length,
-                    separatorBuilder: (_, _) => const SizedBox(width: 8),
-                    itemBuilder: (context, index) {
-                      final kind = kinds[index];
-                      return ChoiceChip(
-                        label: Text(_kindLabel(context, kind)),
-                        selected: kind.path == _controller.kind.path,
-                        onSelected: (_) => _selectKind(kind),
-                      );
-                    },
+                  builder: (context, _) => Edgy(
+                    axis: .horizontal,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: kinds.length,
+                      separatorBuilder: (_, _) => const SizedBox(width: 8),
+                      itemBuilder: (context, index) {
+                        final kind = kinds[index];
+                        return ChoiceChip(
+                          label: Text(_kindLabel(context, kind)),
+                          selected: kind.path == _controller.kind.path,
+                          onSelected: (_) => _selectKind(kind),
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),

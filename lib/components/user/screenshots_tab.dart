@@ -14,6 +14,8 @@ import '../../models/paginated_page.dart';
 import '../../services/game_service.dart';
 import '../../utils/video_links.dart';
 import 'user_widgets.dart';
+import '../media/smooth_image.dart';
+import '../layout/tg_refresh_indicator.dart';
 
 class UserScreenshotsTab extends StatefulWidget {
   const UserScreenshotsTab({
@@ -135,7 +137,7 @@ class _UserScreenshotsTabState extends State<UserScreenshotsTab>
         }
         return false;
       },
-      child: RefreshIndicator(
+      child: TgRefreshIndicator(
         onRefresh: _load,
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -181,18 +183,10 @@ class _UserScreenshotsTabState extends State<UserScreenshotsTab>
                             children: [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(4),
-                                child: Image.network(
-                                  first.gameCoverUrl ?? '',
+                                child: SmoothImage(
+                                  url: first.gameCoverUrl ?? '',
                                   width: 24,
                                   height: 32,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, _, _) => Container(
-                                    width: 24,
-                                    height: 32,
-                                    color: theme
-                                        .colorScheme
-                                        .surfaceContainerHighest,
-                                  ),
                                 ),
                               ),
                               const SizedBox(width: 8),
@@ -250,12 +244,7 @@ class _UserScreenshotsTabState extends State<UserScreenshotsTab>
                                             sigmaX: 16,
                                             sigmaY: 16,
                                           ),
-                                          child: Image.network(
-                                            source,
-                                            fit: BoxFit.cover,
-                                            errorBuilder: (_, _, _) =>
-                                                const SizedBox.shrink(),
-                                          ),
+                                          child: SmoothImage(url: source),
                                         ),
                                       if (!revealed)
                                         Container(

@@ -12,6 +12,8 @@ import '../../services/movie_service.dart';
 import '../../services/review_service.dart';
 import '../user/star_rating.dart';
 import 'tracking_sheet.dart';
+import '../media/smooth_image.dart';
+import '../../utils/haptics.dart';
 
 const _statusOptions = ['planning', 'completed', 'dropped', 'paused'];
 
@@ -193,8 +195,10 @@ class _MovieTrackingSheetState extends State<MovieTrackingSheet> {
         }
       }
       widget.onChanged?.call();
+      HapticsHelper.success();
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
+      HapticsHelper.error();
       if (mounted) {
         setState(() {
           _saving = false;
@@ -273,13 +277,7 @@ class _MovieTrackingSheetState extends State<MovieTrackingSheet> {
                         ? Container(
                             color: theme.colorScheme.surfaceContainerHighest,
                           )
-                        : Image.network(
-                            widget.movie.posterUrl!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => Container(
-                              color: theme.colorScheme.surfaceContainerHighest,
-                            ),
-                          ),
+                        : SmoothImage(url: widget.movie.posterUrl!),
                   ),
                 ),
                 const SizedBox(width: 12),

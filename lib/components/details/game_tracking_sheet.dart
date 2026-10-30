@@ -14,6 +14,8 @@ import '../../services/review_service.dart';
 import '../../utils/video_links.dart';
 import '../user/star_rating.dart';
 import 'tracking_sheet.dart';
+import '../media/smooth_image.dart';
+import '../../utils/haptics.dart';
 
 const _statusOptions = [
   'planning',
@@ -303,8 +305,10 @@ class _GameTrackingSheetState extends State<GameTrackingSheet> {
         }
       }
       widget.onChanged?.call();
+      HapticsHelper.success();
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
+      HapticsHelper.error();
       if (mounted) {
         setState(() {
           _saving = false;
@@ -378,13 +382,7 @@ class _GameTrackingSheetState extends State<GameTrackingSheet> {
                         ? Container(
                             color: theme.colorScheme.surfaceContainerHighest,
                           )
-                        : Image.network(
-                            widget.game.displayCoverUrl!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => Container(
-                              color: theme.colorScheme.surfaceContainerHighest,
-                            ),
-                          ),
+                        : SmoothImage(url: widget.game.displayCoverUrl!),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -1226,13 +1224,7 @@ class _ScreenshotRowState extends State<_ScreenshotRow> {
                 fit: StackFit.expand,
                 children: [
                   if (thumbnail != null && thumbnail.isNotEmpty)
-                    Image.network(
-                      thumbnail,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => Container(
-                        color: theme.colorScheme.surfaceContainerHighest,
-                      ),
-                    )
+                    SmoothImage(url: thumbnail)
                   else
                     Container(
                       color: theme.colorScheme.surfaceContainerHighest,

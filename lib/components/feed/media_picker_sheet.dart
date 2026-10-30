@@ -8,7 +8,9 @@ import '../../models/attached_media.dart';
 import '../../models/media_type.dart';
 import '../../services/api_client.dart';
 import '../../utils/content_types.dart';
+import '../../utils/strings.dart';
 import '../../controllers/session_controller.dart';
+import '../media/smooth_image.dart';
 
 const _typeIcons = <MediaType, List<List<dynamic>>>{
   MediaType.movie: HugeIcons.strokeRoundedClapperboard,
@@ -240,17 +242,15 @@ class _MediaPickerSheetState extends State<MediaPickerSheet> {
                           child: media.imageUrl != null
                               ? ClipRRect(
                                   borderRadius: BorderRadius.circular(4),
-                                  child: Image.network(
-                                    media.imageUrl!,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, _, _) =>
-                                        _typeIcon(theme, _type),
+                                  child: SmoothImage(
+                                    url: media.imageUrl!,
+                                    error: _typeIcon(theme, _type),
                                   ),
                                 )
                               : _typeIcon(theme, _type),
                         ),
                         title: Text(
-                          media.title,
+                          media.title.orPlaceholder(),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -308,10 +308,9 @@ class AttachedMediaChip extends StatelessWidget {
             child: media.imageUrl != null
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(4),
-                    child: Image.network(
-                      media.imageUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => _icon(theme),
+                    child: SmoothImage(
+                      url: media.imageUrl!,
+                      error: _icon(theme),
                     ),
                   )
                 : _icon(theme),
@@ -322,7 +321,7 @@ class AttachedMediaChip extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  media.title,
+                  media.title.orPlaceholder(),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodyMedium?.copyWith(

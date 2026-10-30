@@ -3,6 +3,7 @@ import 'package:hugeicons/hugeicons.dart';
 
 import '../../styles/tg_theme.dart';
 import '../../../models/person.dart';
+import '../media/smooth_image.dart';
 
 class PersonImage extends StatelessWidget {
   const PersonImage({super.key, required this.person});
@@ -24,11 +25,7 @@ class PersonImage extends StatelessWidget {
         child: AspectRatio(
           aspectRatio: 3 / 4,
           child: person.imageUrl != null
-              ? Image.network(
-                  person.imageUrl!,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) => _imageFallback(theme),
-                )
+              ? SmoothImage(url: person.imageUrl!, error: _imageFallback(theme))
               : _imageFallback(theme),
         ),
       ),

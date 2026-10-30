@@ -11,6 +11,8 @@ import '../../services/list_service.dart';
 import '../../services/review_service.dart';
 import '../user/star_rating.dart';
 import 'tracking_sheet.dart';
+import '../media/smooth_image.dart';
+import '../../utils/haptics.dart';
 
 const _statusOptions = [
   'planning',
@@ -330,8 +332,10 @@ class _BookTrackingSheetState extends State<BookTrackingSheet> {
         }
       }
       widget.onChanged?.call();
+      HapticsHelper.success();
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
+      HapticsHelper.error();
       if (mounted) {
         setState(() {
           _saving = false;
@@ -409,13 +413,7 @@ class _BookTrackingSheetState extends State<BookTrackingSheet> {
                         ? Container(
                             color: theme.colorScheme.surfaceContainerHighest,
                           )
-                        : Image.network(
-                            widget.book.imageUrl!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => Container(
-                              color: theme.colorScheme.surfaceContainerHighest,
-                            ),
-                          ),
+                        : SmoothImage(url: widget.book.imageUrl!),
                   ),
                 ),
                 const SizedBox(width: 12),

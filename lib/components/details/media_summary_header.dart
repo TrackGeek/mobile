@@ -3,6 +3,7 @@ import 'package:hugeicons/hugeicons.dart';
 
 import '../../models/media_detail.dart';
 import 'detail_overview.dart';
+import '../media/smooth_image.dart';
 
 class MediaSummaryHeader extends StatelessWidget {
   const MediaSummaryHeader({super.key, required this.media});
@@ -25,11 +26,7 @@ class MediaSummaryHeader extends StatelessWidget {
           aspectRatio: 2 / 3,
           child: media.imageUrl == null
               ? fallback
-              : Image.network(
-                  media.imageUrl!,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) => fallback,
-                ),
+              : SmoothImage(url: media.imageUrl!, error: fallback),
         ),
       ),
       children: [

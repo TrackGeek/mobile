@@ -11,6 +11,7 @@ import 'person_action_button.dart';
 import 'person_image.dart';
 import 'person_link_button.dart';
 import 'person_meta_item.dart';
+import '../media/smooth_image.dart';
 
 class PersonHero extends StatelessWidget {
   const PersonHero({
@@ -80,11 +81,7 @@ class PersonHero extends StatelessWidget {
                         ]),
                         child: Transform.scale(
                           scale: 1.1,
-                          child: Image.network(
-                            backdropUrl,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                          ),
+                          child: SmoothImage(url: backdropUrl),
                         ),
                       ),
                     )

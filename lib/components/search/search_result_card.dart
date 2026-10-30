@@ -5,6 +5,7 @@ import 'package:hugeicons/hugeicons.dart';
 
 import '../../models/search_item.dart';
 import '../../models/media_type.dart';
+import '../media/smooth_image.dart';
 
 class SearchResultCard extends StatelessWidget {
   const SearchResultCard({super.key, required this.item, this.onTap});
@@ -43,10 +44,9 @@ class SearchResultCard extends StatelessWidget {
                       ? ImageFiltered(
                           enabled: item.isAdult,
                           imageFilter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                          child: Image.network(
-                            item.imageUrl!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => const _CoverFallback(),
+                          child: SmoothImage(
+                            url: item.imageUrl!,
+                            error: const _CoverFallback(),
                           ),
                         )
                       : const _CoverFallback(),

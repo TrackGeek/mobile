@@ -46,6 +46,9 @@ import '../utils/watch_time.dart';
 import 'company_page.dart';
 import 'media_detail_page.dart';
 import 'person_page.dart';
+import '../components/layout/edgy.dart';
+import '../components/layout/tg_refresh_indicator.dart';
+import '../utils/haptics.dart';
 
 const _siteUrl = 'https://trackgeek.net';
 const _planningColor = TgStatus.planning;
@@ -426,6 +429,7 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
   }
 
   Future<void> _toggleFavorite() async {
+    HapticsHelper.light();
     final anime = _anime;
     if (anime == null || _favoriteBusy || !_loggedIn) return;
     setState(() => _favoriteBusy = true);
@@ -578,6 +582,9 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
   }
 
   void _toast(String key) {
+    key == 'api:INTERNAL_SERVER_ERROR'
+        ? HapticsHelper.error()
+        : HapticsHelper.success();
     if (!mounted) return;
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(context.t(key))));
@@ -616,7 +623,7 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
           ? const Center(child: CircularProgressIndicator())
           : _error != null || anime == null
           ? DetailErrorState(onRetry: _load)
-          : RefreshIndicator(
+          : TgRefreshIndicator(
               onRefresh: _load,
               child: ContentFrame(
                 child: LayoutBuilder(
@@ -869,20 +876,23 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              for (var i = 0; i < tabs.length; i++)
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: ChoiceChip(
-                    selected: _tab == i,
-                    label: Text(tabs[i].$2),
-                    onSelected: (_) => setState(() => _tab = i),
+        Edgy(
+          axis: .horizontal,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (var i = 0; i < tabs.length; i++)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ChoiceChip(
+                      selected: _tab == i,
+                      label: Text(tabs[i].$2),
+                      onSelected: (_) => setState(() => _tab = i),
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 16),

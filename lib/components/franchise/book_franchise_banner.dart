@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/l10n_context.dart';
 import '../../models/book_detail.dart';
+import '../media/smooth_image.dart';
 
 class BookFranchiseBanner extends StatelessWidget {
   const BookFranchiseBanner({super.key, required this.franchise});
@@ -19,12 +20,9 @@ class BookFranchiseBanner extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             if (franchise.imageUrl != null)
-              Image.network(
-                franchise.imageUrl!,
-                fit: BoxFit.cover,
+              SmoothImage(
+                url: franchise.imageUrl!,
                 alignment: Alignment.topCenter,
-                errorBuilder: (_, _, _) =>
-                    Container(color: theme.colorScheme.surfaceContainerHighest),
               )
             else
               Container(color: theme.colorScheme.surfaceContainerHighest),

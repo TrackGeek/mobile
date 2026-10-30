@@ -5,6 +5,9 @@ import '../../controllers/session_controller.dart';
 import '../../models/search_item.dart';
 import '../../models/api_exception.dart';
 import '../../services/user_service.dart';
+import '../../utils/strings.dart';
+import '../media/smooth_image.dart';
+import '../../utils/haptics.dart';
 
 class UserResultTile extends StatefulWidget {
   const UserResultTile({
@@ -56,9 +59,11 @@ class _UserResultTileState extends State<UserResultTile> {
       }
       if (!mounted) return;
       setState(() => _following = !following);
+      HapticsHelper.success();
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(context.t('user:followed'))));
     } on ApiException {
+      HapticsHelper.error();
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
@@ -77,12 +82,16 @@ class _UserResultTileState extends State<UserResultTile> {
         children: [
           CircleAvatar(
             radius: 18,
-            backgroundImage: item.imageUrl != null
-                ? NetworkImage(item.imageUrl!)
-                : null,
-            child: item.imageUrl == null
-                ? Text(item.title.characters.first.toUpperCase())
-                : null,
+            child: item.imageUrl != null
+                ? ClipOval(
+                    child: SmoothImage(
+                      url: item.imageUrl!,
+                      width: 36,
+                      height: 36,
+                      error: Text(item.title.characters.first.toUpperCase()),
+                    ),
+                  )
+                : Text(item.title.characters.first.toUpperCase()),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -90,7 +99,7 @@ class _UserResultTileState extends State<UserResultTile> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  item.title,
+                  item.title.orPlaceholder(),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.titleSmall,

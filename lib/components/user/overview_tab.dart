@@ -23,6 +23,8 @@ import 'media_card.dart';
 import 'presence_cards.dart';
 import 'setup_card.dart';
 import 'user_widgets.dart';
+import '../media/smooth_image.dart';
+import '../layout/edgy.dart';
 
 class UserOverviewTab extends StatefulWidget {
   const UserOverviewTab({
@@ -369,46 +371,49 @@ class _Heatmap extends StatelessWidget {
     final max = counts.values.fold(0, (m, c) => c > m ? c : m);
     return SizedBox(
       height: 7 * 11 + 12,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: _weeks + 1,
-        separatorBuilder: (_, _) => const SizedBox(width: 3),
-        itemBuilder: (context, week) {
-          final weekStart = start.add(Duration(days: week * 7));
-          return Column(
-            children: [
-              for (var day = 0; day < 7; day++) ...[
-                Builder(
-                  builder: (context) {
-                    final date = weekStart.add(Duration(days: day));
-                    if (date.isAfter(end)) {
-                      return const SizedBox(width: 10, height: 10);
-                    }
-                    final key = DateFormat('yyyy-MM-dd').format(date);
-                    final count = counts[key] ?? 0;
-                    final intensity = max == 0 ? 0.0 : (count / max);
-                    return GestureDetector(
-                      onTap: () => onTapDay(date, count),
-                      child: Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          color: count == 0
-                              ? theme.colorScheme.surfaceContainerHighest
-                              : accent.withValues(
-                                  alpha: 0.25 + intensity * 0.75,
-                                ),
-                          borderRadius: BorderRadius.circular(2),
+      child: Edgy(
+        axis: .horizontal,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          itemCount: _weeks + 1,
+          separatorBuilder: (_, _) => const SizedBox(width: 3),
+          itemBuilder: (context, week) {
+            final weekStart = start.add(Duration(days: week * 7));
+            return Column(
+              children: [
+                for (var day = 0; day < 7; day++) ...[
+                  Builder(
+                    builder: (context) {
+                      final date = weekStart.add(Duration(days: day));
+                      if (date.isAfter(end)) {
+                        return const SizedBox(width: 10, height: 10);
+                      }
+                      final key = DateFormat('yyyy-MM-dd').format(date);
+                      final count = counts[key] ?? 0;
+                      final intensity = max == 0 ? 0.0 : (count / max);
+                      return GestureDetector(
+                        onTap: () => onTapDay(date, count),
+                        child: Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: count == 0
+                                ? theme.colorScheme.surfaceContainerHighest
+                                : accent.withValues(
+                                    alpha: 0.25 + intensity * 0.75,
+                                  ),
+                            borderRadius: BorderRadius.circular(2),
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                ),
-                if (day < 6) const SizedBox(height: 3),
+                      );
+                    },
+                  ),
+                  if (day < 6) const SizedBox(height: 3),
+                ],
               ],
-            ],
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
@@ -484,21 +489,24 @@ class _FavoritesPreviewState extends State<_FavoritesPreview> {
             )
           : SizedBox(
               height: 190,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: _items.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 8),
-                itemBuilder: (context, index) {
-                  final item = _items[index];
-                  return SizedBox(
-                    width: 110,
-                    child: MediaCard(
-                      title: item.title,
-                      image: item.image,
-                      onTap: () => widget.onOpenItem?.call(item),
-                    ),
-                  );
-                },
+              child: Edgy(
+                axis: .horizontal,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _items.length,
+                  separatorBuilder: (_, _) => const SizedBox(width: 8),
+                  itemBuilder: (context, index) {
+                    final item = _items[index];
+                    return SizedBox(
+                      width: 110,
+                      child: MediaCard(
+                        title: item.title,
+                        image: item.image,
+                        onTap: () => widget.onOpenItem?.call(item),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
     );
@@ -714,39 +722,42 @@ class _MedalsCard extends StatelessWidget {
     title: context.t('user:medals'),
     child: SizedBox(
       height: 64,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: medals.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
-        itemBuilder: (context, index) {
-          final medal = medals[index];
-          final level = RegExp(r'^level-(\d+)$').firstMatch(medal.name)?[1];
-          final label = level != null
-              ? context.t('medals:level.name', {'level': level})
-              : context.t('medals:${medal.name}.name');
-          return Tooltip(
-            message: label,
-            child: Container(
-              width: 56,
-              height: 56,
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.outlineVariant,
+      child: Edgy(
+        axis: .horizontal,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          itemCount: medals.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 8),
+          itemBuilder: (context, index) {
+            final medal = medals[index];
+            final level = RegExp(r'^level-(\d+)$').firstMatch(medal.name)?[1];
+            final label = level != null
+                ? context.t('medals:level.name', {'level': level})
+                : context.t('medals:${medal.name}.name');
+            return Tooltip(
+              message: label,
+              child: Container(
+                width: 56,
+                height: 56,
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                  ),
+                ),
+                child: SmoothImage(
+                  url: medal.imageUrl,
+                  fit: BoxFit.contain,
+                  error: const HugeIcon(
+                    icon: HugeIcons.strokeRoundedAward01,
+                    size: 24,
+                  ),
                 ),
               ),
-              child: Image.network(
-                medal.imageUrl,
-                fit: BoxFit.contain,
-                errorBuilder: (_, _, _) => const HugeIcon(
-                  icon: HugeIcons.strokeRoundedAward01,
-                  size: 24,
-                ),
-              ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     ),
   );

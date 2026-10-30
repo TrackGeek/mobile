@@ -15,6 +15,7 @@ import '../../utils/video_links.dart';
 import 'feed_item_card.dart';
 import 'feed_reactions.dart';
 import 'feed_title.dart';
+import '../media/smooth_image.dart';
 
 const _previewLimit = 4;
 
@@ -239,11 +240,7 @@ class _ScreenshotTile extends StatelessWidget {
                 ImageFiltered(
                   enabled: !revealed,
                   imageFilter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                  child: Image.network(
-                    source,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                  ),
+                  child: SmoothImage(url: source),
                 )
               else
                 Center(

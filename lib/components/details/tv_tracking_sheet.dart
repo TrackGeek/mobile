@@ -12,6 +12,8 @@ import '../../services/review_service.dart';
 import '../../services/tv_show_service.dart';
 import '../user/star_rating.dart';
 import 'tracking_sheet.dart';
+import '../media/smooth_image.dart';
+import '../../utils/haptics.dart';
 
 const _statusOptions = [
   'planning',
@@ -323,8 +325,10 @@ class _TvTrackingSheetState extends State<TvTrackingSheet> {
         }
       }
       widget.onChanged?.call();
+      HapticsHelper.success();
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
+      HapticsHelper.error();
       if (mounted) {
         setState(() {
           _saving = false;
@@ -400,13 +404,7 @@ class _TvTrackingSheetState extends State<TvTrackingSheet> {
                         ? Container(
                             color: theme.colorScheme.surfaceContainerHighest,
                           )
-                        : Image.network(
-                            widget.tvShow.posterUrl!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => Container(
-                              color: theme.colorScheme.surfaceContainerHighest,
-                            ),
-                          ),
+                        : SmoothImage(url: widget.tvShow.posterUrl!),
                   ),
                 ),
                 const SizedBox(width: 12),
