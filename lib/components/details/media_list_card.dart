@@ -7,6 +7,7 @@ import '../../models/user_list.dart';
 import '../../services/list_service.dart';
 import '../../utils/strings.dart';
 import '../media/smooth_image.dart';
+import '../../utils/adaptive_sheet_route.dart';
 
 const _previewCount = 3;
 
@@ -40,16 +41,17 @@ class MediaListCard extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () => showModalBottomSheet<void>(
-          context: context,
-          isScrollControlled: true,
-          builder: (_) => ListItemsSheet(
-            list: list,
-            lists: lists,
-            onOpenMedia: onOpenMedia,
-            onOpenUser: onOpenUser,
-          ),
-        ),
+        onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+          Navigator.of(context).push<void>(
+            ListItemsSheet(
+              list: list,
+              lists: lists,
+              onOpenMedia: onOpenMedia,
+              onOpenUser: onOpenUser,
+            ).asAdaptiveSheetRoute<void>(),
+          );
+        },
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -264,136 +266,130 @@ class _ListItemsSheetState extends State<ListItemsSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final type = widget.list.mediaType;
-    return DraggableScrollableSheet(
-      expand: false,
-      initialChildSize: 0.7,
-      minChildSize: 0.4,
-      maxChildSize: 0.92,
-      builder: (context, _) => SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.list.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+    return SafeArea(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.list.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
                   ),
-                  if (widget.list.description?.isNotEmpty == true)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-                        widget.list.description!,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
+                ),
+                if (widget.list.description?.isNotEmpty == true)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      widget.list.description!,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
-                  const SizedBox(height: 8),
-                  InkWell(
-                    onTap: widget.onOpenUser == null
-                        ? null
-                        : () {
-                            Navigator.of(context).pop();
-                            widget.onOpenUser!(widget.list.user.username);
-                          },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CircleAvatar(
-                          radius: 11,
-                          backgroundColor:
-                              theme.colorScheme.surfaceContainerHighest,
-                          child: widget.list.user.avatarUrl?.isNotEmpty == true
-                              ? ClipOval(
-                                  child: SmoothImage(
-                                    url: widget.list.user.avatarUrl!,
-                                    width: 22,
-                                    height: 22,
-                                    error: Text(
-                                      (widget.list.user.name.isNotEmpty
-                                              ? widget.list.user.name
-                                              : '?')[0]
-                                          .toUpperCase(),
-                                      style: theme.textTheme.labelSmall,
-                                    ),
+                  ),
+                const SizedBox(height: 8),
+                InkWell(
+                  onTap: widget.onOpenUser == null
+                      ? null
+                      : () {
+                          Navigator.of(context).pop();
+                          widget.onOpenUser!(widget.list.user.username);
+                        },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircleAvatar(
+                        radius: 11,
+                        backgroundColor:
+                            theme.colorScheme.surfaceContainerHighest,
+                        child: widget.list.user.avatarUrl?.isNotEmpty == true
+                            ? ClipOval(
+                                child: SmoothImage(
+                                  url: widget.list.user.avatarUrl!,
+                                  width: 22,
+                                  height: 22,
+                                  error: Text(
+                                    (widget.list.user.name.isNotEmpty
+                                            ? widget.list.user.name
+                                            : '?')[0]
+                                        .toUpperCase(),
+                                    style: theme.textTheme.labelSmall,
                                   ),
-                                )
-                              : Text(
-                                  (widget.list.user.name.isNotEmpty
-                                          ? widget.list.user.name
-                                          : '?')[0]
-                                      .toUpperCase(),
-                                  style: theme.textTheme.labelSmall,
                                 ),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          widget.list.user.name,
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: _items.isEmpty && !_loading
-                  ? Center(
-                      child: Text(
-                        context.t('library:noItems'),
-                        style: theme.textTheme.bodySmall?.copyWith(
+                              )
+                            : Text(
+                                (widget.list.user.name.isNotEmpty
+                                        ? widget.list.user.name
+                                        : '?')[0]
+                                    .toUpperCase(),
+                                style: theme.textTheme.labelSmall,
+                              ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        widget.list.user.name,
+                        style: theme.textTheme.labelMedium?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
-                    )
-                  : GridView.builder(
-                      controller: _scroll,
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                      gridDelegate:
-                          const SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 130,
-                            childAspectRatio: 0.55,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 14,
-                          ),
-                      itemCount: _items.length + (_loading ? 4 : 0),
-                      itemBuilder: (context, index) {
-                        if (index >= _items.length) {
-                          return Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: theme.colorScheme.surfaceContainerHighest,
-                            ),
-                          );
-                        }
-                        final item = _items[index];
-                        final link = type == null
-                            ? null
-                            : listItemToLink(item, widget.list.type);
-                        return _SheetItem(
-                          link: link,
-                          onTap: link == null || widget.onOpenMedia == null
-                              ? null
-                              : () {
-                                  Navigator.of(context).pop();
-                                  widget.onOpenMedia!(link.type, link.slug);
-                                },
-                        );
-                      },
-                    ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          Expanded(
+            child: _items.isEmpty && !_loading
+                ? Center(
+                    child: Text(
+                      context.t('library:noItems'),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  )
+                : GridView.builder(
+                    controller: _scroll,
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                    gridDelegate:
+                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 130,
+                          childAspectRatio: 0.55,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 14,
+                        ),
+                    itemCount: _items.length + (_loading ? 4 : 0),
+                    itemBuilder: (context, index) {
+                      if (index >= _items.length) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: theme.colorScheme.surfaceContainerHighest,
+                          ),
+                        );
+                      }
+                      final item = _items[index];
+                      final link = type == null
+                          ? null
+                          : listItemToLink(item, widget.list.type);
+                      return _SheetItem(
+                        link: link,
+                        onTap: link == null || widget.onOpenMedia == null
+                            ? null
+                            : () {
+                                Navigator.of(context).pop();
+                                widget.onOpenMedia!(link.type, link.slug);
+                              },
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
     );
   }

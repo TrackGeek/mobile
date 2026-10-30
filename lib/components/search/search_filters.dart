@@ -576,6 +576,7 @@ class _MultiSelectState extends State<_MultiSelect> {
         ConstrainedBox(
           constraints: const BoxConstraints(maxHeight: 200),
           child: ListView.builder(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             shrinkWrap: true,
             itemCount: filtered.length,
             itemBuilder: (context, index) {

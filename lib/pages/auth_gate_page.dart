@@ -146,6 +146,8 @@ class _AuthGatePageState extends State<AuthGatePage> {
             child: AutofillGroup(
               onDisposeAction: AutofillContextAction.cancel,
               child: ListView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.all(24),
                 shrinkWrap: true,
                 children: [

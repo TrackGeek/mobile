@@ -21,6 +21,7 @@ import '../services/auth_service.dart';
 import '../services/external_sign_in.dart';
 import '../services/settings_service.dart';
 import '../utils/haptics.dart';
+import '../utils/adaptive_sheet_route.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({
@@ -57,17 +58,11 @@ class _SettingsPageState extends State<SettingsPage> {
   );
 
   void _selectSection(BuildContext context) {
-    showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      isScrollControlled: true,
-      builder: (sheetContext) {
-        return DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.6,
-          builder: (context, scrollController) {
-            return ListView(
-              controller: scrollController,
+    Navigator.of(context).push<void>(
+      Builder(
+        builder: (sheetContext) {
+          return SafeArea(
+            child: ListView(
               children: [
                 for (final group in settingsGroups) ...[
                   Padding(
@@ -113,10 +108,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                 ),
               ],
-            );
-          },
-        );
-      },
+            ),
+          );
+        },
+      ).asAdaptiveSheetRoute<void>(),
     );
   }
 

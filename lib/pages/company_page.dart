@@ -152,6 +152,8 @@ class _CompanyPageState extends State<CompanyPage> {
               onRefresh: _load,
               child: ContentFrame(
                 child: ListView(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
                   children: [
                     _hero(company),

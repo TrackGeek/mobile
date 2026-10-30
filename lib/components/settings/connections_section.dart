@@ -207,6 +207,7 @@ class _DeveloperAppsCardState extends State<DeveloperAppsCard> {
 
   Future<void> _delete(OAuthClientInfo client) async {
     final name = client.clientName ?? client.clientId;
+    FocusManager.instance.primaryFocus?.unfocus();
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(

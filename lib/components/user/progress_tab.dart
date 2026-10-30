@@ -18,6 +18,7 @@ import 'media_card.dart';
 import 'user_widgets.dart';
 import '../layout/edgy.dart';
 import '../layout/tg_refresh_indicator.dart';
+import '../../utils/adaptive_sheet_route.dart';
 
 class _ProgressContent {
   const _ProgressContent({
@@ -326,10 +327,9 @@ class _UserProgressTabState extends State<UserProgressTab>
       (_releaseStates.isNotEmpty ? 1 : 0);
 
   void _openFilters() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => _FiltersSheet(
+    FocusManager.instance.primaryFocus?.unfocus();
+    Navigator.of(context).push<void>(
+      _FiltersSheet(
         type: _type,
         status: _status,
         options: _options,
@@ -362,7 +362,7 @@ class _UserProgressTabState extends State<UserProgressTab>
               _debounce?.cancel();
               _debounce = Timer(const Duration(milliseconds: 500), _load);
             },
-      ),
+      ).asAdaptiveSheetRoute<void>(),
     );
   }
 
@@ -383,6 +383,7 @@ class _UserProgressTabState extends State<UserProgressTab>
       child: TgRefreshIndicator(
         onRefresh: _load,
         child: CustomScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(
@@ -730,11 +731,9 @@ class _FiltersSheetState extends State<_FiltersSheet> {
     final isGame = widget.type == MediaType.game;
     final showCompletion =
         isGame && (widget.status == 'Completed' || widget.status == 'Dropped');
-    return DraggableScrollableSheet(
-      expand: false,
-      initialChildSize: 0.65,
-      builder: (context, scroll) => ListView(
-        controller: scroll,
+    return SafeArea(
+      child: ListView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         padding: const EdgeInsets.all(16),
         children: [
           Row(

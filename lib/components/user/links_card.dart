@@ -6,6 +6,7 @@ import '../../l10n/l10n_context.dart';
 import '../../models/user_profile.dart';
 import '../../services/user_service.dart';
 import 'user_widgets.dart';
+import '../../utils/adaptive_sheet_route.dart';
 
 const _knownHosts = {
   'github.com': 'GitHub',
@@ -200,14 +201,13 @@ class LinksCard extends StatelessWidget {
   }
 
   void _openEdit(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => _LinksEditSheet(
+    FocusManager.instance.primaryFocus?.unfocus();
+    Navigator.of(context).push<void>(
+      _LinksEditSheet(
         links: user.profile.links,
         users: users,
         onChanged: onChanged,
-      ),
+      ).asAdaptiveSheetRoute<void>(),
     );
   }
 }
@@ -274,11 +274,8 @@ class _LinksEditSheetState extends State<_LinksEditSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return DraggableScrollableSheet(
-      expand: false,
-      initialChildSize: 0.6,
-      builder: (context, scroll) => ListView(
-        controller: scroll,
+    return SafeArea(
+      child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           Row(

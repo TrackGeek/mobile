@@ -95,6 +95,9 @@
     "translator": "Translator",
     "supporter": "Supporter"
   },
+  "errorView": {
+    "restart": "Restarting the app should fix it."
+  },
   "clipboard": {
     "paste": "Paste from clipboard"
   },

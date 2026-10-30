@@ -11,6 +11,7 @@ import '../../models/media_type.dart';
 import '../../services/settings_service.dart';
 import 'settings_card.dart';
 import '../../utils/haptics.dart';
+import '../../utils/adaptive_sheet_route.dart';
 
 const _typeIcons = {
   MediaType.movie: HugeIcons.strokeRoundedClapperboard,
@@ -215,6 +216,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
             .t('common:languages.${a.replaceAll('-', '')}')
             .compareTo(context.t('common:languages.${b.replaceAll('-', '')}')),
       );
+    FocusManager.instance.primaryFocus?.unfocus();
     showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
@@ -253,17 +255,12 @@ class _PreferencesSectionState extends State<PreferencesSection> {
       context.t('common:continents.Europe'): Timezones.europe,
       context.t('common:continents.Pacific'): Timezones.pacific,
     };
-    showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      isScrollControlled: true,
-      builder: (sheetContext) {
-        return DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.7,
-          builder: (context, scrollController) {
-            return ListView(
-              controller: scrollController,
+    FocusManager.instance.primaryFocus?.unfocus();
+    Navigator.of(context).push<void>(
+      Builder(
+        builder: (sheetContext) {
+          return SafeArea(
+            child: ListView(
               children: [
                 for (final entry in groups.entries) ...[
                   Padding(
@@ -294,10 +291,10 @@ class _PreferencesSectionState extends State<PreferencesSection> {
                     ),
                 ],
               ],
-            );
-          },
-        );
-      },
+            ),
+          );
+        },
+      ).asAdaptiveSheetRoute<void>(),
     );
   }
 }

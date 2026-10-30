@@ -1,3 +1,5 @@
+import '../app/scrollable_tab.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -82,7 +84,12 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends State<ProfilePage> implements ScrollableTab {
+  final _scrolls = <String, ScrollController>{};
+
+  ScrollController _scrollFor(String tab) =>
+      _scrolls.putIfAbsent(tab, ScrollController.new);
+
   UserProfile? _user;
   FollowStatus? _followStatus;
   bool _loading = true;
@@ -104,7 +111,24 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void dispose() {
     _activityController?.dispose();
+    for (final c in _scrolls.values) {
+      c.dispose();
+    }
     super.dispose();
+  }
+
+  @override
+  void scrollToTop() {
+    final scroller = _scrollFor(_tab);
+    final atTop = !scroller.hasClients || scroller.offset <= 0;
+    if (!atTop) {
+      scroller.animateTo(
+        0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+      );
+      return;
+    }
   }
 
   String? get _username => widget.username ?? widget.session.user?.username;
@@ -310,89 +334,94 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final user = _user;
     final isNested = widget.username != null;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          user == null ? context.t('common:profile') : '@${user.username}',
-        ),
-        actions: [
-          if (widget.onOpenShop != null && _isOwner)
-            IconButton(
-              onPressed: widget.onOpenShop,
-              tooltip: context.t('common:shop'),
-              icon: const HugeIcon(icon: HugeIcons.strokeRoundedShoppingBag03),
-            ),
-          if (_isOwner) ...[
-            IconButton(
-              onPressed: widget.onOpenSettings,
-              tooltip: context.t('app:tabs.settings'),
-              icon: const HugeIcon(icon: HugeIcons.strokeRoundedSettings01),
-            ),
-            PopupMenuButton<String>(
-              onSelected: (value) {
-                if (value == 'logout') {
-                  unawaited(widget.session.signOut());
-                  widget.onSignedOut?.call();
-                }
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 'logout',
-                  child: Text(context.t('auth:logout')),
+    return PrimaryScrollController(
+      controller: _scrollFor(_tab),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            user == null ? context.t('common:profile') : '@${user.username}',
+          ),
+          actions: [
+            if (widget.onOpenShop != null && _isOwner)
+              IconButton(
+                onPressed: widget.onOpenShop,
+                tooltip: context.t('common:shop'),
+                icon: const HugeIcon(
+                  icon: HugeIcons.strokeRoundedShoppingBag03,
                 ),
-              ],
-            ),
-          ],
-          if (isNested)
-            IconButton(
-              onPressed: _load,
-              tooltip: context.t('common:tryAgain'),
-              icon: const HugeIcon(icon: HugeIcons.strokeRoundedRefresh),
-            ),
-        ],
-      ),
-      body: SafeArea(
-        child: _loading && user == null
-            ? const Center(child: CircularProgressIndicator())
-            : _error != null && user == null
-            ? ProfileError(
-                notFound:
-                    _error is ApiException &&
-                    (_error as ApiException).failure == ApiFailure.notFound,
-                onRetry: _load,
-              )
-            : user == null
-            ? const SizedBox.shrink()
-            : NestedScrollView(
-                headerSliverBuilder: (context, _) => [
-                  SliverToBoxAdapter(
-                    child: Column(
-                      children: [
-                        ProfileHeader(
-                          user: user,
-                          isOwner: _isOwner,
-                          isAuthenticated: widget.session.user != null,
-                          isFollowing: _followStatus?.isFollowing == true,
-                          followsYou: _followStatus?.followsYou == true,
-                          followBusy: _followBusy,
-                          onFollow: _toggleFollow,
-                          onEdit: widget.onOpenSettings,
-                          onOpenFollowers: () => _setTab('followers'),
-                          onOpenFollowing: () => _setTab('following'),
-                        ),
-                        const SizedBox(height: 12),
-                        ProfileTabs(
-                          tabs: _tabs(user),
-                          active: _tab,
-                          onSelect: _setTab,
-                        ),
-                        const SizedBox(height: 8),
-                      ],
-                    ),
+              ),
+            if (_isOwner) ...[
+              IconButton(
+                onPressed: widget.onOpenSettings,
+                tooltip: context.t('app:tabs.settings'),
+                icon: const HugeIcon(icon: HugeIcons.strokeRoundedSettings01),
+              ),
+              PopupMenuButton<String>(
+                onSelected: (value) {
+                  if (value == 'logout') {
+                    unawaited(widget.session.signOut());
+                    widget.onSignedOut?.call();
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'logout',
+                    child: Text(context.t('auth:logout')),
                   ),
                 ],
-                body: _tabBody(user),
               ),
+            ],
+            if (isNested)
+              IconButton(
+                onPressed: _load,
+                tooltip: context.t('common:tryAgain'),
+                icon: const HugeIcon(icon: HugeIcons.strokeRoundedRefresh),
+              ),
+          ],
+        ),
+        body: SafeArea(
+          child: _loading && user == null
+              ? const Center(child: CircularProgressIndicator())
+              : _error != null && user == null
+              ? ProfileError(
+                  notFound:
+                      _error is ApiException &&
+                      (_error as ApiException).failure == ApiFailure.notFound,
+                  onRetry: _load,
+                )
+              : user == null
+              ? const SizedBox.shrink()
+              : NestedScrollView(
+                  headerSliverBuilder: (context, _) => [
+                    SliverToBoxAdapter(
+                      child: Column(
+                        children: [
+                          ProfileHeader(
+                            user: user,
+                            isOwner: _isOwner,
+                            isAuthenticated: widget.session.user != null,
+                            isFollowing: _followStatus?.isFollowing == true,
+                            followsYou: _followStatus?.followsYou == true,
+                            followBusy: _followBusy,
+                            onFollow: _toggleFollow,
+                            onEdit: widget.onOpenSettings,
+                            onOpenFollowers: () => _setTab('followers'),
+                            onOpenFollowing: () => _setTab('following'),
+                          ),
+                          const SizedBox(height: 12),
+                          ProfileTabs(
+                            tabs: _tabs(user),
+                            active: _tab,
+                            onSelect: _setTab,
+                          ),
+                          const SizedBox(height: 8),
+                        ],
+                      ),
+                    ),
+                  ],
+                  body: _tabBody(user),
+                ),
+        ),
       ),
     );
   }

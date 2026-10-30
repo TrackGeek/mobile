@@ -13,6 +13,7 @@ import '../user/star_rating.dart';
 import 'tracking_sheet.dart';
 import '../media/smooth_image.dart';
 import '../../utils/haptics.dart';
+import '../../utils/adaptive_sheet_route.dart';
 
 const _statusOptions = [
   'planning',
@@ -98,11 +99,9 @@ class BookTrackingSheet extends StatefulWidget {
     VoidCallback? onToggleFavorite,
     VoidCallback? onChanged,
   }) {
-    return showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (_) => Padding(
+    FocusManager.instance.primaryFocus?.unfocus();
+    return Navigator.of(context).push<void>(
+      Padding(
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
@@ -122,7 +121,7 @@ class BookTrackingSheet extends StatefulWidget {
           onToggleFavorite: onToggleFavorite,
           onChanged: onChanged,
         ),
-      ),
+      ).asAdaptiveSheetRoute<void>(),
     );
   }
 
@@ -239,6 +238,7 @@ class _BookTrackingSheetState extends State<BookTrackingSheet> {
     var initial = (start ? _startDate : _finishDate) ?? today;
     if (initial.isBefore(firstDate)) initial = firstDate;
     if (initial.isAfter(lastDate)) initial = lastDate;
+    FocusManager.instance.primaryFocus?.unfocus();
     final picked = await showDatePicker(
       context: context,
       initialDate: initial,
@@ -347,6 +347,7 @@ class _BookTrackingSheetState extends State<BookTrackingSheet> {
 
   Future<void> _delete() async {
     if (_deleting) return;
+    FocusManager.instance.primaryFocus?.unfocus();
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
@@ -392,329 +393,322 @@ class _BookTrackingSheetState extends State<BookTrackingSheet> {
     final showReview = _reviewStatuses.contains(_status);
     final canDelete = widget.progress != null || widget.ownReview != null;
     return SafeArea(
-      child: DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.85,
-        minChildSize: 0.5,
-        maxChildSize: 0.95,
-        builder: (context, scroll) => ListView(
-          controller: scroll,
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: SizedBox(
-                    width: 56,
-                    height: 84,
-                    child: widget.book.imageUrl == null
-                        ? Container(
-                            color: theme.colorScheme.surfaceContainerHighest,
-                          )
-                        : SmoothImage(url: widget.book.imageUrl!),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.book.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      Text(
-                        widget.book.releaseDate ??
-                            (widget.book.releaseYear?.toString() ?? ''),
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (widget.onToggleFavorite != null)
-                  IconButton(
-                    onPressed: widget.favoriteBusy
-                        ? null
-                        : widget.onToggleFavorite,
-                    icon: HugeIcon(
-                      icon: HugeIcons.strokeRoundedFavourite,
-                      size: 20,
-                      color: widget.isFavorited
-                          ? theme.colorScheme.error
-                          : theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            SheetSectionCard(
-              title: context.t('common:progress'),
-              icon: HugeIcons.strokeRoundedStar,
-              child: Column(
-                children: [
-                  SheetField(
-                    label: context.t('common:status'),
-                    child: DropdownMenu<String>(
-                      initialSelection: _status.isEmpty ? null : _status,
-                      expandedInsets: EdgeInsets.zero,
-                      hintText: context.t('feed:selectStatus'),
-                      onSelected: _onStatusChanged,
-                      dropdownMenuEntries: [
-                        for (final status in statuses)
-                          DropdownMenuEntry(
-                            value: status,
-                            label: context.t('feed:lists.$status'),
-                          ),
-                      ],
-                    ),
-                  ),
-                  if (!widget.unreleased) ...[
-                    SheetField(
-                      label: context.t('library:page_other'),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: TextField(
-                                  controller: _pagesRead,
-                                  keyboardType: TextInputType.number,
-                                  decoration: InputDecoration(
-                                    isDense: true,
-                                    border: const OutlineInputBorder(),
-                                    hintText: context.t('feed:pagesRead'),
-                                    errorText: _pagesError == null
-                                        ? null
-                                        : context.t(_pagesError!),
-                                  ),
-                                  onChanged: (_) => setState(() {}),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                ),
-                                child: Text(
-                                  '/',
-                                  style: theme.textTheme.titleMedium,
-                                ),
-                              ),
-                              SizedBox(
-                                width: 96,
-                                child: TextField(
-                                  controller: _totalPages,
-                                  keyboardType: TextInputType.number,
-                                  decoration: InputDecoration(
-                                    isDense: true,
-                                    border: const OutlineInputBorder(),
-                                    hintText: '?',
-                                    errorText: _totalPagesError == null
-                                        ? null
-                                        : context.t(_totalPagesError!),
-                                  ),
-                                  onChanged: _onTotalPagesChanged,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    SheetField(
-                      label: context.t('feed:totalRereads'),
-                      child: TextField(
-                        controller: _readCount,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          isDense: true,
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            if (!widget.unreleased) ...[
-              const SizedBox(height: 16),
-              SheetSectionCard(
-                title: context.t('feed:timeline'),
-                icon: HugeIcons.strokeRoundedCalendar01,
-                child: Column(
-                  children: [
-                    SheetField(
-                      label: context.t('feed:startDate'),
-                      child: SheetDateButton(
-                        label: _startDate,
-                        placeholder: context.t('feed:pickADate'),
-                        onTap: () => _pickDate(true),
-                      ),
-                    ),
-                    SheetField(
-                      label: context.t('feed:finishDate'),
-                      child: SheetDateButton(
-                        label: _finishDate,
-                        placeholder: context.t('feed:pickADate'),
-                        onTap: () => _pickDate(false),
-                      ),
-                    ),
-                  ],
+      child: ListView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: SizedBox(
+                  width: 56,
+                  height: 84,
+                  child: widget.book.imageUrl == null
+                      ? Container(
+                          color: theme.colorScheme.surfaceContainerHighest,
+                        )
+                      : SmoothImage(url: widget.book.imageUrl!),
                 ),
               ),
-            ],
-            const SizedBox(height: 16),
-            SheetListSection(
-              lists: widget.lists,
-              userId: widget.userId,
-              type: MediaType.book,
-              mediaId: widget.book.id,
-              userLists: widget.userLists,
-              listStatus: widget.listStatus,
-              onChanged: widget.onChanged,
-            ),
-            if (showReview && !widget.unreleased) ...[
-              const SizedBox(height: 16),
-              SheetSectionCard(
-                title: context.t('feed:review'),
-                icon: HugeIcons.strokeRoundedPencilEdit01,
+              const SizedBox(width: 12),
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SheetField(
-                      label: context.t('feed:overall'),
-                      child: Row(
-                        children: [
-                          StarRatingInput(
-                            value: _overall,
-                            size: 26,
-                            onChanged: (v) => setState(() {
-                              _overall = v;
-                              _recommended = v > _recommendedThreshold;
-                            }),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            _overall.toStringAsFixed(1),
-                            style: theme.textTheme.labelMedium,
-                          ),
-                        ],
+                    Text(
+                      widget.book.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                    for (final criterion
-                        in reviewContent[MediaType.book]!.criteria)
-                      SheetField(
-                        label: context.t(
-                          'feed:criteries.${reviewContent[MediaType.book]!.criteriaLabels[criterion]}',
-                        ),
-                        child: StarRatingInput(
-                          value: _criteria[criterion] ?? 0,
-                          size: 20,
-                          onChanged: (v) =>
-                              setState(() => _criteria[criterion] = v),
-                        ),
+                    Text(
+                      widget.book.releaseDate ??
+                          (widget.book.releaseYear?.toString() ?? ''),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
-                    SheetField(
-                      label: context.t('feed:summary'),
-                      child: TextField(
-                        controller: _summary,
-                        maxLength: _summaryMax,
-                        decoration: InputDecoration(
-                          isDense: true,
-                          border: const OutlineInputBorder(),
-                          hintText: context.t('feed:summaryPlaceholder'),
-                          counterText: '',
-                        ),
-                      ),
-                    ),
-                    SheetField(
-                      label: context.t('feed:notes'),
-                      child: TextField(
-                        controller: _notes,
-                        maxLength: _notesMax,
-                        maxLines: 4,
-                        minLines: 2,
-                        decoration: InputDecoration(
-                          isDense: true,
-                          border: const OutlineInputBorder(),
-                          hintText: context.t('feed:notesPlaceholder'),
-                          counterText: '',
-                        ),
-                      ),
-                    ),
-                    CheckboxListTile(
-                      dense: true,
-                      contentPadding: EdgeInsets.zero,
-                      controlAffinity: ListTileControlAffinity.leading,
-                      title: Text(context.t('feed:recommended')),
-                      value: _recommended,
-                      onChanged: (v) =>
-                          setState(() => _recommended = v ?? false),
                     ),
                   ],
                 ),
               ),
-            ],
-            if (_error)
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Text(
-                  context.t('api:INTERNAL_SERVER_ERROR'),
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: theme.colorScheme.error,
+              if (widget.onToggleFavorite != null)
+                IconButton(
+                  onPressed: widget.favoriteBusy
+                      ? null
+                      : widget.onToggleFavorite,
+                  icon: HugeIcon(
+                    icon: HugeIcons.strokeRoundedFavourite,
+                    size: 20,
+                    color: widget.isFavorited
+                        ? theme.colorScheme.error
+                        : theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
-              ),
-            const SizedBox(height: 16),
-            Row(
+            ],
+          ),
+          const SizedBox(height: 16),
+          SheetSectionCard(
+            title: context.t('common:progress'),
+            icon: HugeIcons.strokeRoundedStar,
+            child: Column(
               children: [
-                if (canDelete)
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _deleting || _saving ? null : _delete,
-                      icon: _deleting
-                          ? const SizedBox(
-                              width: 14,
-                              height: 14,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : HugeIcon(
-                              icon: HugeIcons.strokeRoundedDelete02,
-                              size: 16,
-                              color: theme.colorScheme.error,
+                SheetField(
+                  label: context.t('common:status'),
+                  child: DropdownMenu<String>(
+                    initialSelection: _status.isEmpty ? null : _status,
+                    expandedInsets: EdgeInsets.zero,
+                    hintText: context.t('feed:selectStatus'),
+                    onSelected: _onStatusChanged,
+                    dropdownMenuEntries: [
+                      for (final status in statuses)
+                        DropdownMenuEntry(
+                          value: status,
+                          label: context.t('feed:lists.$status'),
+                        ),
+                    ],
+                  ),
+                ),
+                if (!widget.unreleased) ...[
+                  SheetField(
+                    label: context.t('library:page_other'),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: _pagesRead,
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                  isDense: true,
+                                  border: const OutlineInputBorder(),
+                                  hintText: context.t('feed:pagesRead'),
+                                  errorText: _pagesError == null
+                                      ? null
+                                      : context.t(_pagesError!),
+                                ),
+                                onChanged: (_) => setState(() {}),
+                              ),
                             ),
-                      label: Text(context.t('common:delete')),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: theme.colorScheme.error,
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
+                              child: Text(
+                                '/',
+                                style: theme.textTheme.titleMedium,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 96,
+                              child: TextField(
+                                controller: _totalPages,
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                  isDense: true,
+                                  border: const OutlineInputBorder(),
+                                  hintText: '?',
+                                  errorText: _totalPagesError == null
+                                      ? null
+                                      : context.t(_totalPagesError!),
+                                ),
+                                onChanged: _onTotalPagesChanged,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  SheetField(
+                    label: context.t('feed:totalRereads'),
+                    child: TextField(
+                      controller: _readCount,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        isDense: true,
+                        border: OutlineInputBorder(),
                       ),
                     ),
                   ),
-                if (canDelete) const SizedBox(width: 10),
-                Expanded(
-                  flex: 2,
-                  child: FilledButton(
-                    onPressed: _saving || _deleting ? null : _save,
-                    child: _saving
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Text(context.t('common:save')),
-                  ),
-                ),
+                ],
               ],
             ),
+          ),
+          if (!widget.unreleased) ...[
+            const SizedBox(height: 16),
+            SheetSectionCard(
+              title: context.t('feed:timeline'),
+              icon: HugeIcons.strokeRoundedCalendar01,
+              child: Column(
+                children: [
+                  SheetField(
+                    label: context.t('feed:startDate'),
+                    child: SheetDateButton(
+                      label: _startDate,
+                      placeholder: context.t('feed:pickADate'),
+                      onTap: () => _pickDate(true),
+                    ),
+                  ),
+                  SheetField(
+                    label: context.t('feed:finishDate'),
+                    child: SheetDateButton(
+                      label: _finishDate,
+                      placeholder: context.t('feed:pickADate'),
+                      onTap: () => _pickDate(false),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
-        ),
+          const SizedBox(height: 16),
+          SheetListSection(
+            lists: widget.lists,
+            userId: widget.userId,
+            type: MediaType.book,
+            mediaId: widget.book.id,
+            userLists: widget.userLists,
+            listStatus: widget.listStatus,
+            onChanged: widget.onChanged,
+          ),
+          if (showReview && !widget.unreleased) ...[
+            const SizedBox(height: 16),
+            SheetSectionCard(
+              title: context.t('feed:review'),
+              icon: HugeIcons.strokeRoundedPencilEdit01,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SheetField(
+                    label: context.t('feed:overall'),
+                    child: Row(
+                      children: [
+                        StarRatingInput(
+                          value: _overall,
+                          size: 26,
+                          onChanged: (v) => setState(() {
+                            _overall = v;
+                            _recommended = v > _recommendedThreshold;
+                          }),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _overall.toStringAsFixed(1),
+                          style: theme.textTheme.labelMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                  for (final criterion
+                      in reviewContent[MediaType.book]!.criteria)
+                    SheetField(
+                      label: context.t(
+                        'feed:criteries.${reviewContent[MediaType.book]!.criteriaLabels[criterion]}',
+                      ),
+                      child: StarRatingInput(
+                        value: _criteria[criterion] ?? 0,
+                        size: 20,
+                        onChanged: (v) =>
+                            setState(() => _criteria[criterion] = v),
+                      ),
+                    ),
+                  SheetField(
+                    label: context.t('feed:summary'),
+                    child: TextField(
+                      controller: _summary,
+                      maxLength: _summaryMax,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        border: const OutlineInputBorder(),
+                        hintText: context.t('feed:summaryPlaceholder'),
+                        counterText: '',
+                      ),
+                    ),
+                  ),
+                  SheetField(
+                    label: context.t('feed:notes'),
+                    child: TextField(
+                      controller: _notes,
+                      maxLength: _notesMax,
+                      maxLines: 4,
+                      minLines: 2,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        border: const OutlineInputBorder(),
+                        hintText: context.t('feed:notesPlaceholder'),
+                        counterText: '',
+                      ),
+                    ),
+                  ),
+                  CheckboxListTile(
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: Text(context.t('feed:recommended')),
+                    value: _recommended,
+                    onChanged: (v) => setState(() => _recommended = v ?? false),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          if (_error)
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Text(
+                context.t('api:INTERNAL_SERVER_ERROR'),
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: theme.colorScheme.error,
+                ),
+              ),
+            ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              if (canDelete)
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _deleting || _saving ? null : _delete,
+                    icon: _deleting
+                        ? const SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : HugeIcon(
+                            icon: HugeIcons.strokeRoundedDelete02,
+                            size: 16,
+                            color: theme.colorScheme.error,
+                          ),
+                    label: Text(context.t('common:delete')),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: theme.colorScheme.error,
+                    ),
+                  ),
+                ),
+              if (canDelete) const SizedBox(width: 10),
+              Expanded(
+                flex: 2,
+                child: FilledButton(
+                  onPressed: _saving || _deleting ? null : _save,
+                  child: _saving
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(context.t('common:save')),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

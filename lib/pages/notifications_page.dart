@@ -1,3 +1,5 @@
+import '../app/scrollable_tab.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -32,7 +34,9 @@ class NotificationsPage extends StatefulWidget {
   State<NotificationsPage> createState() => _NotificationsPageState();
 }
 
-class _NotificationsPageState extends State<NotificationsPage> {
+class _NotificationsPageState extends State<NotificationsPage>
+    implements ScrollableTab {
+  final _notifScroll = ScrollController();
   final _listKey = GlobalKey<NotificationListState>();
   int _unread = 0;
   int _total = 0;
@@ -42,6 +46,26 @@ class _NotificationsPageState extends State<NotificationsPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _refreshUnread());
+  }
+
+  @override
+  void scrollToTop() {
+    final scroller = _notifScroll;
+    final atTop = !scroller.hasClients || scroller.offset <= 0;
+    if (!atTop) {
+      scroller.animateTo(
+        0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+      );
+      return;
+    }
+  }
+
+  @override
+  void dispose() {
+    _notifScroll.dispose();
+    super.dispose();
   }
 
   String get _language => L10nScope.of(context).language;
@@ -113,87 +137,91 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(context.t('common:notifications')),
-            Text(
-              context.t('notifications:description'),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            tooltip: context.t('notifications:markAllAsRead'),
-            onPressed: _pending || _unread == 0
-                ? null
-                : () => _mutate(widget.notifications.markAllRead),
-            icon: const HugeIcon(icon: HugeIcons.strokeRoundedMailOpen),
-          ),
-          PopupMenuButton<String>(
-            tooltip: context.t('common:showMore'),
-            onSelected: (value) {
-              switch (value) {
-                case 'unread':
-                  _mutate(widget.notifications.markAllUnread);
-                case 'delete':
-                  _confirmDeleteAll();
-              }
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'unread',
-                enabled: !_pending && _total > 0 && _unread != _total,
-                child: Row(
-                  children: [
-                    const HugeIcon(
-                      icon: HugeIcons.strokeRoundedMail01,
-                      size: 18,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(context.t('notifications:markAllAsUnread')),
-                  ],
-                ),
-              ),
-              const PopupMenuDivider(),
-              PopupMenuItem(
-                value: 'delete',
-                enabled: !_pending && _total > 0,
-                child: Row(
-                  children: [
-                    HugeIcon(
-                      icon: HugeIcons.strokeRoundedDelete02,
-                      size: 18,
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      context.t('notifications:deleteAll'),
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                    ),
-                  ],
+    return PrimaryScrollController(
+      controller: _notifScroll,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(context.t('common:notifications')),
+              Text(
+                context.t('notifications:description'),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
           ),
-        ],
-      ),
-      body: ContentFrame(
-        maxWidth: TgLayout.readingWidth,
-        child: NotificationList(
-          key: _listKey,
-          notifications: widget.notifications,
-          onChanged: (total) => setState(() => _total = total ?? 0),
-          onOpenUser: widget.onOpenUser,
-          onOpenMedia: widget.onOpenMedia,
-          onOpenLink: _openLink,
+          actions: [
+            IconButton(
+              tooltip: context.t('notifications:markAllAsRead'),
+              onPressed: _pending || _unread == 0
+                  ? null
+                  : () => _mutate(widget.notifications.markAllRead),
+              icon: const HugeIcon(icon: HugeIcons.strokeRoundedMailOpen),
+            ),
+            PopupMenuButton<String>(
+              tooltip: context.t('common:showMore'),
+              onSelected: (value) {
+                switch (value) {
+                  case 'unread':
+                    _mutate(widget.notifications.markAllUnread);
+                  case 'delete':
+                    _confirmDeleteAll();
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'unread',
+                  enabled: !_pending && _total > 0 && _unread != _total,
+                  child: Row(
+                    children: [
+                      const HugeIcon(
+                        icon: HugeIcons.strokeRoundedMail01,
+                        size: 18,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(context.t('notifications:markAllAsUnread')),
+                    ],
+                  ),
+                ),
+                const PopupMenuDivider(),
+                PopupMenuItem(
+                  value: 'delete',
+                  enabled: !_pending && _total > 0,
+                  child: Row(
+                    children: [
+                      HugeIcon(
+                        icon: HugeIcons.strokeRoundedDelete02,
+                        size: 18,
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        context.t('notifications:deleteAll'),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        body: ContentFrame(
+          maxWidth: TgLayout.readingWidth,
+          child: NotificationList(
+            key: _listKey,
+            scrollController: _notifScroll,
+            notifications: widget.notifications,
+            onChanged: (total) => setState(() => _total = total ?? 0),
+            onOpenUser: widget.onOpenUser,
+            onOpenMedia: widget.onOpenMedia,
+            onOpenLink: _openLink,
+          ),
         ),
       ),
     );

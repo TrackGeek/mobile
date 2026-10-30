@@ -11,6 +11,7 @@ import '../../utils/strings.dart';
 import 'user_widgets.dart';
 import '../media/smooth_image.dart';
 import '../layout/edgy.dart';
+import '../../utils/adaptive_sheet_route.dart';
 
 class SetupCard extends StatelessWidget {
   const SetupCard({
@@ -103,15 +104,14 @@ class SetupCard extends StatelessWidget {
   }
 
   void _openEdit(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => _SetupEditSheet(
+    FocusManager.instance.primaryFocus?.unfocus();
+    Navigator.of(context).push<void>(
+      _SetupEditSheet(
         user: user,
         users: users,
         games: games,
         onChanged: onChanged,
-      ),
+      ).asAdaptiveSheetRoute<void>(),
     );
   }
 }
@@ -276,11 +276,8 @@ class _SetupEditSheetState extends State<_SetupEditSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return DraggableScrollableSheet(
-      expand: false,
-      initialChildSize: 0.7,
-      builder: (context, scroll) => ListView(
-        controller: scroll,
+    return SafeArea(
+      child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           Row(

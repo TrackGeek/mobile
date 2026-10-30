@@ -188,6 +188,7 @@ class _AppearanceSectionState extends State<AppearanceSection> {
     final controller = TextEditingController(
       text: (_color ?? _defaultColor).startsWith('#') ? _color! : _defaultColor,
     );
+    FocusManager.instance.primaryFocus?.unfocus();
     final picked = await showDialog<String>(
       context: context,
       builder: (dialogContext) {

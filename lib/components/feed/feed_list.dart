@@ -118,6 +118,7 @@ class _FeedListState extends State<FeedList> {
               );
             }
             return ListView.separated(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               physics: const AlwaysScrollableScrollPhysics(),
               padding: EdgeInsets.only(top: header == null ? 8 : 0, bottom: 24),
               itemCount:

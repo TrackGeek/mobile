@@ -28,6 +28,7 @@ class _DeleteAccountCardState extends State<DeleteAccountCard> {
     final email = widget.session.user?.email ?? '';
     final username = widget.session.user?.username ?? '';
     final controller = TextEditingController();
+    FocusManager.instance.primaryFocus?.unfocus();
     final confirmed = await showDialog<bool>(
       context: context,
       barrierDismissible: !_pending,

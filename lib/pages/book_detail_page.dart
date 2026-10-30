@@ -480,6 +480,8 @@ class _BookDetailPageState extends State<BookDetailPage> {
                       ],
                     );
                     return ListView(
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
                       padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
                       children: [
                         if (wide)

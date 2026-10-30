@@ -238,6 +238,7 @@ class BackfillDialog extends StatelessWidget {
     required Future<void> Function(bool remember) onConfirm,
     required Future<void> Function(bool remember) onDecline,
   }) {
+    FocusManager.instance.primaryFocus?.unfocus();
     return showDialog<void>(
       context: context,
       builder: (_) => _BackfillDialogContent(

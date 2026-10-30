@@ -14,6 +14,7 @@ import 'user_widgets.dart';
 import '../media/smooth_image.dart';
 import '../layout/tg_refresh_indicator.dart';
 import '../../utils/haptics.dart';
+import '../../utils/adaptive_sheet_route.dart';
 
 class UserListsTab extends StatefulWidget {
   const UserListsTab({
@@ -115,6 +116,7 @@ class _UserListsTabState extends State<UserListsTab>
   }
 
   Future<void> _edit(UserList list) async {
+    FocusManager.instance.primaryFocus?.unfocus();
     final saved = await showDialog<bool>(
       context: context,
       builder: (_) => _ListEditDialog(list: list, lists: widget.lists),
@@ -126,6 +128,7 @@ class _UserListsTabState extends State<UserListsTab>
   }
 
   Future<void> _delete(UserList list) async {
+    FocusManager.instance.primaryFocus?.unfocus();
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -153,10 +156,9 @@ class _UserListsTabState extends State<UserListsTab>
   }
 
   void _open(UserList list) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => _ListItemsSheet(
+    FocusManager.instance.primaryFocus?.unfocus();
+    Navigator.of(context).push<void>(
+      _ListItemsSheet(
         list: list,
         lists: widget.lists,
         isOwner: widget.isOwner,
@@ -165,7 +167,7 @@ class _UserListsTabState extends State<UserListsTab>
           widget.onChanged?.call();
           _load();
         },
-      ),
+      ).asAdaptiveSheetRoute<void>(),
     );
   }
 
@@ -186,6 +188,7 @@ class _UserListsTabState extends State<UserListsTab>
       child: TgRefreshIndicator(
         onRefresh: _load,
         child: CustomScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(
@@ -562,10 +565,8 @@ class _ListItemsSheetState extends State<_ListItemsSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return DraggableScrollableSheet(
-      expand: false,
-      initialChildSize: 0.7,
-      builder: (context, scroll) => Column(
+    return SafeArea(
+      child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
@@ -590,7 +591,6 @@ class _ListItemsSheetState extends State<_ListItemsSheet> {
                       return false;
                     },
                     child: ListView.separated(
-                      controller: scroll,
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
                       itemCount: _items.length + (_loadingMore ? 1 : 0),
                       separatorBuilder: (_, _) => const SizedBox(height: 8),

@@ -94,6 +94,7 @@ class StarRatingInput extends StatelessWidget {
       builder: (context, constraints) {
         final width = size * 5 + 32;
         return GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTapDown: (d) => _handleTap(width, d.localPosition),
           child: Row(
             mainAxisSize: MainAxisSize.min,

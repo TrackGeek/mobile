@@ -195,6 +195,11 @@ ThemeData trackGeekTheme() {
         borderSide: const BorderSide(color: TgColors.destructive),
       ),
     ),
+    textSelectionTheme: TextSelectionThemeData(
+      selectionColor: TgColors.primary.withValues(alpha: 0.3),
+      selectionHandleColor: TgColors.primary,
+      cursorColor: TgColors.primary,
+    ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
         minimumSize: const Size(48, 48),

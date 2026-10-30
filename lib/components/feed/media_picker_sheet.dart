@@ -227,6 +227,8 @@ class _MediaPickerSheetState extends State<MediaPickerSheet> {
                     ),
                   )
                 : ListView.builder(
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
                     shrinkWrap: true,
                     itemCount: _results.length,
                     itemBuilder: (context, i) {

@@ -672,6 +672,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
+  motor:
+    dependency: transitive
+    description:
+      name: motor
+      sha256: fac1d98dc93761feda9867273fffa07be419129d1c38613a32efc87cb9e67054
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0-dev.5"
   objective_c:
     dependency: transitive
     description:
@@ -880,6 +888,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
+  scroll_drag_detector:
+    dependency: transitive
+    description:
+      name: scroll_drag_detector
+      sha256: c52c8fa529c51891f735660dccb2216e715a91ac4bf5627c5f216ff3bdaf0cc1
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.4"
   share_plus:
     dependency: "direct main"
     description:
@@ -989,6 +1005,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.1"
+  stupid_simple_sheet:
+    dependency: "direct main"
+    description:
+      name: stupid_simple_sheet
+      sha256: "591fddde18175322c0451c69a393ed5d67904edc658d20db91576c74a2b9202b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   term_glyph:
     dependency: transitive
     description:

@@ -58,6 +58,7 @@ class _PostCardState extends State<PostCard> {
   Future<void> _confirmDelete() async {
     final postId = widget.entry.postId;
     if (postId == null || widget.onDelete == null) return;
+    FocusManager.instance.primaryFocus?.unfocus();
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(

@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'app/api_config.dart';
 import 'app/server_config.dart';
 import 'app/trackgeek_app.dart';
+import 'components/layout/friendly_error_view.dart';
 import 'controllers/session_controller.dart';
 import 'l10n/l10n_context.dart';
 import 'l10n/trackgeek_localizations.dart';
@@ -32,6 +33,7 @@ import 'services/user_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  ErrorWidget.builder = (details) => FriendlyErrorView(details: details);
   final l10n = await TrackGeekLocalizations.load(
     WidgetsBinding.instance.platformDispatcher.locale,
   );

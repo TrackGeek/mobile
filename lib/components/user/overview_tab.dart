@@ -70,6 +70,7 @@ class _UserOverviewTabState extends State<UserOverviewTab>
     final viewer = widget.session.user;
     final isOwner = viewer?.id == user.id;
     return ListView(
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       padding: const EdgeInsets.all(16),
       children: [
         _StatisticsCard(

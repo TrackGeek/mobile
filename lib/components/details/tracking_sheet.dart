@@ -12,6 +12,7 @@ import '../../services/review_service.dart';
 import '../user/star_rating.dart';
 import '../media/smooth_image.dart';
 import '../../utils/haptics.dart';
+import '../../utils/adaptive_sheet_route.dart';
 
 const _statusOptions = [
   'planning',
@@ -99,11 +100,9 @@ class TrackingSheet extends StatefulWidget {
     VoidCallback? onToggleFavorite,
     VoidCallback? onChanged,
   }) {
-    return showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (_) => Padding(
+    FocusManager.instance.primaryFocus?.unfocus();
+    return Navigator.of(context).push<void>(
+      Padding(
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
@@ -124,7 +123,7 @@ class TrackingSheet extends StatefulWidget {
           onToggleFavorite: onToggleFavorite,
           onChanged: onChanged,
         ),
-      ),
+      ).asAdaptiveSheetRoute<void>(),
     );
   }
 
@@ -228,6 +227,7 @@ class _TrackingSheetState extends State<TrackingSheet> {
 
   Future<void> _pickDate(bool start) async {
     final now = DateTime.now();
+    FocusManager.instance.primaryFocus?.unfocus();
     final picked = await showDatePicker(
       context: context,
       initialDate: (start ? _startDate : _finishDate) ?? now,
@@ -295,6 +295,7 @@ class _TrackingSheetState extends State<TrackingSheet> {
 
   Future<void> _delete() async {
     if (_deleting) return;
+    FocusManager.instance.primaryFocus?.unfocus();
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
@@ -340,297 +341,290 @@ class _TrackingSheetState extends State<TrackingSheet> {
     final statuses = widget.unreleased ? const ['planning'] : _statusOptions;
     final showReview = _reviewStatuses.contains(_status);
     return SafeArea(
-      child: DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.85,
-        minChildSize: 0.5,
-        maxChildSize: 0.95,
-        builder: (context, scroll) => ListView(
-          controller: scroll,
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: SizedBox(
-                    width: 56,
-                    height: 84,
-                    child: widget.anime.imageUrl == null
-                        ? Container(
-                            color: theme.colorScheme.surfaceContainerHighest,
-                          )
-                        : SmoothImage(url: widget.anime.imageUrl!),
-                  ),
+      child: ListView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: SizedBox(
+                  width: 56,
+                  height: 84,
+                  child: widget.anime.imageUrl == null
+                      ? Container(
+                          color: theme.colorScheme.surfaceContainerHighest,
+                        )
+                      : SmoothImage(url: widget.anime.imageUrl!),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.anime.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    if (widget.anime.season != null &&
+                        widget.anime.year != null)
                       Text(
-                        widget.anime.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
+                        '${widget.anime.season} ${widget.anime.year}',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      if (widget.anime.season != null &&
-                          widget.anime.year != null)
-                        Text(
-                          '${widget.anime.season} ${widget.anime.year}',
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
+                  ],
+                ),
+              ),
+              if (widget.onToggleFavorite != null)
+                IconButton(
+                  onPressed: widget.favoriteBusy
+                      ? null
+                      : widget.onToggleFavorite,
+                  icon: HugeIcon(
+                    icon: widget.isFavorited
+                        ? HugeIcons.strokeRoundedFavourite
+                        : HugeIcons.strokeRoundedFavourite,
+                    size: 20,
+                    color: widget.isFavorited
+                        ? theme.colorScheme.error
+                        : theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          SheetSectionCard(
+            title: context.t('common:progress'),
+            icon: HugeIcons.strokeRoundedStar,
+            child: Column(
+              children: [
+                SheetField(
+                  label: context.t('common:status'),
+                  child: DropdownMenu<String>(
+                    initialSelection: _status.isEmpty ? null : _status,
+                    expandedInsets: EdgeInsets.zero,
+                    hintText: context.t('feed:selectStatus'),
+                    onSelected: (v) => setState(() => _status = v ?? _status),
+                    dropdownMenuEntries: [
+                      for (final status in statuses)
+                        DropdownMenuEntry(
+                          value: status,
+                          label: context.t('feed:lists.$status'),
                         ),
                     ],
                   ),
                 ),
-                if (widget.onToggleFavorite != null)
-                  IconButton(
-                    onPressed: widget.favoriteBusy
-                        ? null
-                        : widget.onToggleFavorite,
-                    icon: HugeIcon(
-                      icon: widget.isFavorited
-                          ? HugeIcons.strokeRoundedFavourite
-                          : HugeIcons.strokeRoundedFavourite,
-                      size: 20,
-                      color: widget.isFavorited
-                          ? theme.colorScheme.error
-                          : theme.colorScheme.onSurfaceVariant,
+                if (!widget.unreleased) ...[
+                  SheetField(
+                    label: context.t('library:episode_other'),
+                    child: TextField(
+                      controller: _episodes,
+                      enabled: _totalEpisodes > 0 && !_busyEpisodes,
+                      keyboardType: TextInputType.number,
+                      onEditingComplete: _commitEpisodes,
+                      onSubmitted: (_) => _commitEpisodes(),
+                      onTapOutside: (_) => _commitEpisodes(),
+                      decoration: InputDecoration(
+                        isDense: true,
+                        border: const OutlineInputBorder(),
+                        suffixText: '/$_totalEpisodes',
+                        suffixIcon: _busyEpisodes
+                            ? const Padding(
+                                padding: EdgeInsets.all(10),
+                                child: SizedBox(
+                                  width: 14,
+                                  height: 14,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              )
+                            : null,
+                      ),
                     ),
                   ),
+                  SheetField(
+                    label: context.t('feed:totalRewatches'),
+                    child: TextField(
+                      controller: _watchCount,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        isDense: true,
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  SheetField(
+                    label: context.t('feed:startDate'),
+                    child: SheetDateButton(
+                      label: _startDate,
+                      placeholder: context.t('feed:pickADate'),
+                      onTap: () => _pickDate(true),
+                    ),
+                  ),
+                  SheetField(
+                    label: context.t('feed:finishDate'),
+                    child: SheetDateButton(
+                      label: _finishDate,
+                      placeholder: context.t('feed:pickADate'),
+                      onTap: () => _pickDate(false),
+                    ),
+                  ),
+                ],
               ],
             ),
+          ),
+          const SizedBox(height: 16),
+          SheetListSection(
+            lists: widget.lists,
+            userId: widget.userId,
+            type: MediaType.anime,
+            mediaId: widget.anime.id,
+            userLists: widget.userLists,
+            listStatus: widget.listStatus,
+            onChanged: widget.onChanged,
+          ),
+          if (showReview && !widget.unreleased) ...[
             const SizedBox(height: 16),
             SheetSectionCard(
-              title: context.t('common:progress'),
-              icon: HugeIcons.strokeRoundedStar,
+              title: context.t('feed:review'),
+              icon: HugeIcons.strokeRoundedPencilEdit01,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SheetField(
-                    label: context.t('common:status'),
-                    child: DropdownMenu<String>(
-                      initialSelection: _status.isEmpty ? null : _status,
-                      expandedInsets: EdgeInsets.zero,
-                      hintText: context.t('feed:selectStatus'),
-                      onSelected: (v) => setState(() => _status = v ?? _status),
-                      dropdownMenuEntries: [
-                        for (final status in statuses)
-                          DropdownMenuEntry(
-                            value: status,
-                            label: context.t('feed:lists.$status'),
-                          ),
+                    label: context.t('feed:overall'),
+                    child: Row(
+                      children: [
+                        StarRatingInput(
+                          value: _overall,
+                          size: 26,
+                          onChanged: (v) => setState(() {
+                            _overall = v;
+                            _recommended = v > _recommendedThreshold;
+                          }),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _overall.toStringAsFixed(1),
+                          style: theme.textTheme.labelMedium,
+                        ),
                       ],
                     ),
                   ),
-                  if (!widget.unreleased) ...[
+                  for (final criterion
+                      in reviewContent[MediaType.anime]!.criteria)
                     SheetField(
-                      label: context.t('library:episode_other'),
-                      child: TextField(
-                        controller: _episodes,
-                        enabled: _totalEpisodes > 0 && !_busyEpisodes,
-                        keyboardType: TextInputType.number,
-                        onEditingComplete: _commitEpisodes,
-                        onSubmitted: (_) => _commitEpisodes(),
-                        onTapOutside: (_) => _commitEpisodes(),
-                        decoration: InputDecoration(
-                          isDense: true,
-                          border: const OutlineInputBorder(),
-                          suffixText: '/$_totalEpisodes',
-                          suffixIcon: _busyEpisodes
-                              ? const Padding(
-                                  padding: EdgeInsets.all(10),
-                                  child: SizedBox(
-                                    width: 14,
-                                    height: 14,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  ),
-                                )
-                              : null,
-                        ),
+                      label: context.t(
+                        'feed:criteries.${reviewContent[MediaType.anime]!.criteriaLabels[criterion]}',
+                      ),
+                      child: StarRatingInput(
+                        value: _criteria[criterion] ?? 0,
+                        size: 20,
+                        onChanged: (v) =>
+                            setState(() => _criteria[criterion] = v),
                       ),
                     ),
-                    SheetField(
-                      label: context.t('feed:totalRewatches'),
-                      child: TextField(
-                        controller: _watchCount,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          isDense: true,
-                          border: OutlineInputBorder(),
-                        ),
+                  SheetField(
+                    label: context.t('feed:summary'),
+                    child: TextField(
+                      controller: _summary,
+                      maxLength: _summaryMax,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        border: const OutlineInputBorder(),
+                        hintText: context.t('feed:summaryPlaceholder'),
+                        counterText: '',
                       ),
                     ),
-                    SheetField(
-                      label: context.t('feed:startDate'),
-                      child: SheetDateButton(
-                        label: _startDate,
-                        placeholder: context.t('feed:pickADate'),
-                        onTap: () => _pickDate(true),
+                  ),
+                  SheetField(
+                    label: context.t('feed:notes'),
+                    child: TextField(
+                      controller: _notes,
+                      maxLength: _notesMax,
+                      maxLines: 4,
+                      minLines: 2,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        border: const OutlineInputBorder(),
+                        hintText: context.t('feed:notesPlaceholder'),
+                        counterText: '',
                       ),
                     ),
-                    SheetField(
-                      label: context.t('feed:finishDate'),
-                      child: SheetDateButton(
-                        label: _finishDate,
-                        placeholder: context.t('feed:pickADate'),
-                        onTap: () => _pickDate(false),
-                      ),
-                    ),
-                  ],
+                  ),
+                  CheckboxListTile(
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: Text(context.t('feed:recommended')),
+                    value: _recommended,
+                    onChanged: (v) => setState(() => _recommended = v ?? false),
+                  ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-            SheetListSection(
-              lists: widget.lists,
-              userId: widget.userId,
-              type: MediaType.anime,
-              mediaId: widget.anime.id,
-              userLists: widget.userLists,
-              listStatus: widget.listStatus,
-              onChanged: widget.onChanged,
+          ],
+          if (_error)
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Text(
+                context.t('api:INTERNAL_SERVER_ERROR'),
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: theme.colorScheme.error,
+                ),
+              ),
             ),
-            if (showReview && !widget.unreleased) ...[
-              const SizedBox(height: 16),
-              SheetSectionCard(
-                title: context.t('feed:review'),
-                icon: HugeIcons.strokeRoundedPencilEdit01,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SheetField(
-                      label: context.t('feed:overall'),
-                      child: Row(
-                        children: [
-                          StarRatingInput(
-                            value: _overall,
-                            size: 26,
-                            onChanged: (v) => setState(() {
-                              _overall = v;
-                              _recommended = v > _recommendedThreshold;
-                            }),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              if (widget.progress != null)
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _deleting || _saving ? null : _delete,
+                    icon: _deleting
+                        ? const SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : HugeIcon(
+                            icon: HugeIcons.strokeRoundedDelete02,
+                            size: 16,
+                            color: theme.colorScheme.error,
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            _overall.toStringAsFixed(1),
-                            style: theme.textTheme.labelMedium,
-                          ),
-                        ],
-                      ),
+                    label: Text(context.t('common:delete')),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: theme.colorScheme.error,
                     ),
-                    for (final criterion
-                        in reviewContent[MediaType.anime]!.criteria)
-                      SheetField(
-                        label: context.t(
-                          'feed:criteries.${reviewContent[MediaType.anime]!.criteriaLabels[criterion]}',
-                        ),
-                        child: StarRatingInput(
-                          value: _criteria[criterion] ?? 0,
-                          size: 20,
-                          onChanged: (v) =>
-                              setState(() => _criteria[criterion] = v),
-                        ),
-                      ),
-                    SheetField(
-                      label: context.t('feed:summary'),
-                      child: TextField(
-                        controller: _summary,
-                        maxLength: _summaryMax,
-                        decoration: InputDecoration(
-                          isDense: true,
-                          border: const OutlineInputBorder(),
-                          hintText: context.t('feed:summaryPlaceholder'),
-                          counterText: '',
-                        ),
-                      ),
-                    ),
-                    SheetField(
-                      label: context.t('feed:notes'),
-                      child: TextField(
-                        controller: _notes,
-                        maxLength: _notesMax,
-                        maxLines: 4,
-                        minLines: 2,
-                        decoration: InputDecoration(
-                          isDense: true,
-                          border: const OutlineInputBorder(),
-                          hintText: context.t('feed:notesPlaceholder'),
-                          counterText: '',
-                        ),
-                      ),
-                    ),
-                    CheckboxListTile(
-                      dense: true,
-                      contentPadding: EdgeInsets.zero,
-                      controlAffinity: ListTileControlAffinity.leading,
-                      title: Text(context.t('feed:recommended')),
-                      value: _recommended,
-                      onChanged: (v) =>
-                          setState(() => _recommended = v ?? false),
-                    ),
-                  ],
+                  ),
+                ),
+              if (widget.progress != null) const SizedBox(width: 10),
+              Expanded(
+                flex: 2,
+                child: FilledButton(
+                  onPressed: _saving || _deleting ? null : _save,
+                  child: _saving
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(context.t('common:save')),
                 ),
               ),
             ],
-            if (_error)
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Text(
-                  context.t('api:INTERNAL_SERVER_ERROR'),
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: theme.colorScheme.error,
-                  ),
-                ),
-              ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                if (widget.progress != null)
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _deleting || _saving ? null : _delete,
-                      icon: _deleting
-                          ? const SizedBox(
-                              width: 14,
-                              height: 14,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : HugeIcon(
-                              icon: HugeIcons.strokeRoundedDelete02,
-                              size: 16,
-                              color: theme.colorScheme.error,
-                            ),
-                      label: Text(context.t('common:delete')),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: theme.colorScheme.error,
-                      ),
-                    ),
-                  ),
-                if (widget.progress != null) const SizedBox(width: 10),
-                Expanded(
-                  flex: 2,
-                  child: FilledButton(
-                    onPressed: _saving || _deleting ? null : _save,
-                    child: _saving
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Text(context.t('common:save')),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

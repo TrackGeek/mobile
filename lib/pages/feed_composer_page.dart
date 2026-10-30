@@ -15,6 +15,7 @@ import '../models/attached_media.dart';
 import '../services/activity_service.dart';
 import '../services/api_client.dart';
 import '../utils/haptics.dart';
+import '../utils/adaptive_sheet_route.dart';
 
 class FeedComposerPage extends StatefulWidget {
   const FeedComposerPage({
@@ -52,15 +53,13 @@ class _FeedComposerPageState extends State<FeedComposerPage> {
 
   Future<void> _attach() async {
     final language = L10nScope.of(context).language;
-    final media = await showModalBottomSheet<AttachedMedia>(
-      context: context,
-      showDragHandle: true,
-      isScrollControlled: true,
-      builder: (_) => MediaPickerSheet(
+    FocusManager.instance.primaryFocus?.unfocus();
+    final media = await Navigator.of(context).push<AttachedMedia>(
+      MediaPickerSheet(
         api: widget.api,
         session: widget.session,
         language: language,
-      ),
+      ).asAdaptiveSheetRoute<AttachedMedia>(),
     );
     if (media != null && mounted) setState(() => _media = media);
   }

@@ -255,75 +255,80 @@ class _PersonPageState extends State<PersonPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: PersonAppBarTitle(future: _future)),
-      body: FutureBuilder<Person>(
-        future: _future,
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return PersonError(
-              error: snapshot.error,
-              onRetry: () => setState(() => _future = _load()),
-            );
-          }
-          final person = snapshot.data;
-          if (person == null) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          return ContentFrame(
-            child: CustomScrollView(
-              controller: _scroll,
-              slivers: [
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                  sliver: SliverToBoxAdapter(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        PersonHero(
-                          person: person,
-                          canFavorite: widget.session.loggedIn,
-                          favorited: _favorited ?? false,
-                          favoriteBusy: _favoriteBusy || _favorited == null,
-                          onToggleFavorite: () => _toggleFavorite(person),
-                          onShare: () => _share(person),
-                        ),
-                        if (person.biography != null &&
-                            person.biography!.isNotEmpty) ...[
-                          const SizedBox(height: 32),
-                          PersonBiography(
-                            biography: person.biography!,
-                            name: person.name,
-                            markdown: person.source == PersonSource.anilist,
-                            onOpenLink: _openMarkdownLink,
+    return PrimaryScrollController(
+      controller: _scroll,
+      child: Scaffold(
+        appBar: AppBar(title: PersonAppBarTitle(future: _future)),
+        body: FutureBuilder<Person>(
+          future: _future,
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return PersonError(
+                error: snapshot.error,
+                onRetry: () => setState(() => _future = _load()),
+              );
+            }
+            final person = snapshot.data;
+            if (person == null) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            return ContentFrame(
+              child: CustomScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                controller: _scroll,
+                slivers: [
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                    sliver: SliverToBoxAdapter(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          PersonHero(
+                            person: person,
+                            canFavorite: widget.session.loggedIn,
+                            favorited: _favorited ?? false,
+                            favoriteBusy: _favoriteBusy || _favorited == null,
+                            onToggleFavorite: () => _toggleFavorite(person),
+                            onShare: () => _share(person),
                           ),
-                        ],
-                        if (person.alsoKnownAs.isNotEmpty) ...[
+                          if (person.biography != null &&
+                              person.biography!.isNotEmpty) ...[
+                            const SizedBox(height: 32),
+                            PersonBiography(
+                              biography: person.biography!,
+                              name: person.name,
+                              markdown: person.source == PersonSource.anilist,
+                              onOpenLink: _openMarkdownLink,
+                            ),
+                          ],
+                          if (person.alsoKnownAs.isNotEmpty) ...[
+                            const SizedBox(height: 32),
+                            PersonAliases(aliases: person.alsoKnownAs),
+                          ],
                           const SizedBox(height: 32),
-                          PersonAliases(aliases: person.alsoKnownAs),
                         ],
-                        const SizedBox(height: 32),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
-                  sliver: PersonCreditsSection(
-                    person: person,
-                    visible: _visible,
-                    heading: widget.request is MangaCastRequest
-                        ? context.t('library:catalog')
-                        : null,
-                    user: widget.session.user,
-                    onOpenCredit: _openCredit,
-                    onResetPaging: () => setState(() => _visible = _pageSize),
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
+                    sliver: PersonCreditsSection(
+                      person: person,
+                      visible: _visible,
+                      heading: widget.request is MangaCastRequest
+                          ? context.t('library:catalog')
+                          : null,
+                      user: widget.session.user,
+                      onOpenCredit: _openCredit,
+                      onResetPaging: () => setState(() => _visible = _pageSize),
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

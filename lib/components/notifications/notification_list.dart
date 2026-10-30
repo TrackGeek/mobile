@@ -17,6 +17,7 @@ class NotificationList extends StatefulWidget {
     this.onOpenUser,
     this.onOpenMedia,
     this.onOpenLink,
+    this.scrollController,
   });
 
   final NotificationService notifications;
@@ -24,13 +25,15 @@ class NotificationList extends StatefulWidget {
   final ValueChanged<String>? onOpenUser;
   final void Function(MediaType type, String id)? onOpenMedia;
   final ValueChanged<String>? onOpenLink;
+  final ScrollController? scrollController;
 
   @override
   State<NotificationList> createState() => NotificationListState();
 }
 
 class NotificationListState extends State<NotificationList> {
-  final _scroll = ScrollController();
+  late final ScrollController _scroll =
+      widget.scrollController ?? ScrollController();
   final _items = <AppNotification>[];
   int _page = 1;
   bool _loaded = false;
@@ -53,7 +56,7 @@ class NotificationListState extends State<NotificationList> {
 
   @override
   void dispose() {
-    _scroll.dispose();
+    if (widget.scrollController == null) _scroll.dispose();
     super.dispose();
   }
 

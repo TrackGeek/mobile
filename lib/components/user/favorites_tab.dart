@@ -153,6 +153,7 @@ class _UserFavoritesTabState extends State<UserFavoritesTab>
     return TgRefreshIndicator(
       onRefresh: _load,
       child: CustomScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
           SliverToBoxAdapter(

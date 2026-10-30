@@ -154,6 +154,7 @@ class FeedReactions extends StatelessWidget {
   }
 
   void _openSheet(BuildContext context, FeedReaction? current) {
+    FocusManager.instance.primaryFocus?.unfocus();
     showSpringBottomSheet<void>(
       context: context,
       builder: (sheetContext) {

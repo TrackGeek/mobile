@@ -1,3 +1,5 @@
+import '../app/scrollable_tab.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -54,7 +56,8 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> implements ScrollableTab {
+  final _feedScroll = ScrollController();
   FeedKind _tab = FeedKind.following;
   final _controllers = <FeedKind, FeedController>{};
 
@@ -68,7 +71,22 @@ class _HomePageState extends State<HomePage> {
   );
 
   @override
+  void scrollToTop() {
+    final scroller = _feedScroll;
+    final atTop = !scroller.hasClients || scroller.offset <= 0;
+    if (!atTop) {
+      scroller.animateTo(
+        0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+      );
+      return;
+    }
+  }
+
+  @override
   void dispose() {
+    _feedScroll.dispose();
     for (final controller in _controllers.values) {
       controller.dispose();
     }
@@ -204,41 +222,44 @@ class _HomePageState extends State<HomePage> {
         context.t('user:noActivityDescription'),
       ),
     };
-    return Scaffold(
-      body: SafeArea(
-        child: FeedList(
-          key: ValueKey(_tab),
-          controller: controller,
-          session: widget.session,
-          emptyTitle: emptyTitle,
-          emptyDescription: emptyDescription,
-          onRefresh: _refresh,
-          header: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-                child: FeedTabs(active: _tab, onChanged: _setTab),
-              ),
-              TrackingHeader(
-                userId: userId,
-                progress: widget.progress,
-                details: widget.details,
-                env: _env,
-                onViewAll: widget.onOpenProfile,
-              ),
-            ],
+    return PrimaryScrollController(
+      controller: _feedScroll,
+      child: Scaffold(
+        body: SafeArea(
+          child: FeedList(
+            key: ValueKey(_tab),
+            controller: controller,
+            session: widget.session,
+            emptyTitle: emptyTitle,
+            emptyDescription: emptyDescription,
+            onRefresh: _refresh,
+            header: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                  child: FeedTabs(active: _tab, onChanged: _setTab),
+                ),
+                TrackingHeader(
+                  userId: userId,
+                  progress: widget.progress,
+                  details: widget.details,
+                  env: _env,
+                  onViewAll: widget.onOpenProfile,
+                ),
+              ],
+            ),
+            onOpenMedia: _openMedia,
+            onOpenUser: _openUser,
+            onUpdatePost: _updatePost,
+            onDeletePost: _deletePost,
           ),
-          onOpenMedia: _openMedia,
-          onOpenUser: _openUser,
-          onUpdatePost: _updatePost,
-          onDeletePost: _deletePost,
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: context.t('feed:postPlaceholder'),
-        onPressed: _compose,
-        child: const HugeIcon(icon: HugeIcons.strokeRoundedPencilEdit01),
+        floatingActionButton: FloatingActionButton(
+          tooltip: context.t('feed:postPlaceholder'),
+          onPressed: _compose,
+          child: const HugeIcon(icon: HugeIcons.strokeRoundedPencilEdit01),
+        ),
       ),
     );
   }

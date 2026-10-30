@@ -15,6 +15,7 @@ import 'star_rating.dart';
 import 'user_widgets.dart';
 import '../layout/tg_refresh_indicator.dart';
 import '../../utils/haptics.dart';
+import '../../utils/adaptive_sheet_route.dart';
 
 class UserReviewsTab extends StatefulWidget {
   const UserReviewsTab({
@@ -151,6 +152,7 @@ class _UserReviewsTabState extends State<UserReviewsTab>
   }
 
   Future<void> _delete(UserReview review) async {
+    FocusManager.instance.primaryFocus?.unfocus();
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -181,10 +183,12 @@ class _UserReviewsTabState extends State<UserReviewsTab>
   }
 
   Future<void> _edit(UserReview review) async {
-    final saved = await showModalBottomSheet<bool>(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => _ReviewEditSheet(review: review, reviews: widget.reviews),
+    FocusManager.instance.primaryFocus?.unfocus();
+    final saved = await Navigator.of(context).push<bool>(
+      _ReviewEditSheet(
+        review: review,
+        reviews: widget.reviews,
+      ).asAdaptiveSheetRoute<bool>(),
     );
     if (saved == true) _load();
   }
@@ -211,6 +215,7 @@ class _UserReviewsTabState extends State<UserReviewsTab>
       child: TgRefreshIndicator(
         onRefresh: _load,
         child: CustomScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(
@@ -386,6 +391,7 @@ class _ReviewEditSheetState extends State<_ReviewEditSheet> {
         bottom: 16 + MediaQuery.of(context).viewInsets.bottom,
       ),
       child: SingleChildScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,

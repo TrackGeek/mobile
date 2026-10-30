@@ -501,76 +501,82 @@ class _GameDetailPageState extends State<GameDetailPage> {
   @override
   Widget build(BuildContext context) {
     final game = _game;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          game?.name ?? '',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        actions: [
-          if (game != null)
-            IconButton(
-              icon: const HugeIcon(
-                icon: HugeIcons.strokeRoundedShare08,
-                size: 20,
-              ),
-              onPressed: () => SharePlus.instance.share(
-                ShareParams(text: '$_siteUrl/game/${game.igdbId}'),
-              ),
-            ),
-        ],
-      ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : _error != null || game == null
-          ? DetailErrorState(onRetry: _load)
-          : TgRefreshIndicator(
-              onRefresh: _load,
-              child: ContentFrame(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final wide =
-                        constraints.maxWidth >= 960 &&
-                        MediaQuery.textScalerOf(context).scale(1) < 1.6;
-                    final content = Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (wide) ...[
-                          _buildHeader(game),
-                          const SizedBox(height: 24),
-                        ],
-                        _buildTabs(game),
-                        const SizedBox(height: 32),
-                        _buildReviews(game),
-                      ],
-                    );
-                    return ListView(
-                      controller: _scroll,
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
-                      children: [
-                        if (wide)
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(width: 300, child: _buildSidebar(game)),
-                              const SizedBox(width: 32),
-                              Expanded(child: content),
-                            ],
-                          )
-                        else ...[
-                          _buildHeader(game),
-                          const SizedBox(height: 24),
-                          _buildSidebar(game),
-                          const SizedBox(height: 24),
-                          content,
-                        ],
-                      ],
-                    );
-                  },
+    return PrimaryScrollController(
+      controller: _scroll,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            game?.name ?? '',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          actions: [
+            if (game != null)
+              IconButton(
+                icon: const HugeIcon(
+                  icon: HugeIcons.strokeRoundedShare08,
+                  size: 20,
+                ),
+                onPressed: () => SharePlus.instance.share(
+                  ShareParams(text: '$_siteUrl/game/${game.igdbId}'),
                 ),
               ),
-            ),
+          ],
+        ),
+        body: _loading
+            ? const Center(child: CircularProgressIndicator())
+            : _error != null || game == null
+            ? DetailErrorState(onRetry: _load)
+            : TgRefreshIndicator(
+                onRefresh: _load,
+                child: ContentFrame(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final wide =
+                          constraints.maxWidth >= 960 &&
+                          MediaQuery.textScalerOf(context).scale(1) < 1.6;
+                      final content = Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (wide) ...[
+                            _buildHeader(game),
+                            const SizedBox(height: 24),
+                          ],
+                          _buildTabs(game),
+                          const SizedBox(height: 32),
+                          _buildReviews(game),
+                        ],
+                      );
+                      return ListView(
+                        controller: _scroll,
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
+                        children: [
+                          if (wide)
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  width: 300,
+                                  child: _buildSidebar(game),
+                                ),
+                                const SizedBox(width: 32),
+                                Expanded(child: content),
+                              ],
+                            )
+                          else ...[
+                            _buildHeader(game),
+                            const SizedBox(height: 24),
+                            _buildSidebar(game),
+                            const SizedBox(height: 24),
+                            content,
+                          ],
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ),
+      ),
     );
   }
 

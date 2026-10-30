@@ -14,6 +14,7 @@ import '../../services/settings_service.dart';
 import 'detail_widgets.dart';
 import '../media/smooth_image.dart';
 import '../../utils/haptics.dart';
+import '../../utils/adaptive_sheet_route.dart';
 
 typedef WatchProvidersLoader = Future<WatchProviders> Function(
   int tmdbId, {
@@ -193,21 +194,21 @@ class _WatchProvidersSectionState extends State<WatchProvidersSection> {
 
   Future<void> _openPicker() async {
     unawaited(_loadRegions());
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (sheetContext) => _RegionPicker(
-        selected: _region ?? _defaultRegion,
-        regions: _regions,
-        fallback: _providers?.availableRegions ?? const [],
-        nameOf: _regionName,
-        onSelect: (code) {
-          HapticsHelper.selection();
-          Navigator.of(sheetContext).pop();
-          _selectRegion(code);
-        },
-      ),
+    FocusManager.instance.primaryFocus?.unfocus();
+    await Navigator.of(context).push<void>(
+      Builder(
+        builder: (sheetContext) => _RegionPicker(
+          selected: _region ?? _defaultRegion,
+          regions: _regions,
+          fallback: _providers?.availableRegions ?? const [],
+          nameOf: _regionName,
+          onSelect: (code) {
+            HapticsHelper.selection();
+            Navigator.of(sheetContext).pop();
+            _selectRegion(code);
+          },
+        ),
+      ).asAdaptiveSheetRoute<void>(),
     );
   }
 
@@ -516,6 +517,8 @@ class _RegionPickerState extends State<_RegionPicker> {
                 child: filtered.isEmpty
                     ? Center(child: Text(context.t('common:noResults')))
                     : ListView.builder(
+                        keyboardDismissBehavior:
+                            ScrollViewKeyboardDismissBehavior.onDrag,
                         itemCount: filtered.length,
                         itemBuilder: (context, index) {
                           final item = filtered[index];

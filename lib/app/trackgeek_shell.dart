@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 import '../controllers/session_controller.dart';
+import 'scrollable_tab.dart';
 import '../components/layout/adaptive_navigation.dart';
 import '../l10n/l10n_context.dart';
 import '../models/media_type.dart';
@@ -81,6 +82,7 @@ class _TrackGeekShellState extends State<TrackGeekShell>
   static const _profileTab = 3;
 
   int _tab = 0;
+  final List<GlobalKey> _pageKeys = List.generate(4, (_) => GlobalKey());
   int _unread = 0;
   Timer? _poll;
 
@@ -219,11 +221,18 @@ class _TrackGeekShellState extends State<TrackGeekShell>
   Widget build(BuildContext context) {
     return AdaptiveNavigation(
       selectedIndex: _tab,
-      onSelected: (index) => setState(() => _tab = index),
+      onSelected: (index) {
+        if (index == _tab) {
+          (_pageKeys[index].currentState as ScrollableTab?)?.scrollToTop();
+          return;
+        }
+        setState(() => _tab = index);
+      },
       body: IndexedStack(
         index: _tab,
         children: [
           HomePage(
+            key: _pageKeys[0],
             progress: widget.progress,
             details: widget.details,
             people: widget.people,
@@ -237,6 +246,7 @@ class _TrackGeekShellState extends State<TrackGeekShell>
             onOpenSettings: _openSettings,
           ),
           SearchPage(
+            key: _pageKeys[1],
             search: widget.search,
             details: widget.details,
             people: widget.people,
@@ -249,6 +259,7 @@ class _TrackGeekShellState extends State<TrackGeekShell>
             onOpenSettings: _openSettings,
           ),
           NotificationsPage(
+            key: _pageKeys[2],
             notifications: widget.notifications,
             onOpenUser: _openUser,
             onOpenMedia: _openMedia,
@@ -258,6 +269,7 @@ class _TrackGeekShellState extends State<TrackGeekShell>
             },
           ),
           ProfilePage(
+            key: _pageKeys[3],
             session: widget.session,
             users: widget.users,
             progress: widget.progress,
