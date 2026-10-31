@@ -26,6 +26,7 @@ import 'user_widgets.dart';
 import '../media/smooth_image.dart';
 import '../layout/edgy.dart';
 import '../../utils/numbers.dart';
+import '../layout/bottom_padding.dart';
 
 class UserOverviewTab extends StatefulWidget {
   const UserOverviewTab({
@@ -72,7 +73,8 @@ class _UserOverviewTabState extends State<UserOverviewTab>
     final isOwner = viewer?.id == user.id;
     return ListView(
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16)
+          .copyWith(bottom: BottomPadding.of(context)),
       children: [
         _StatisticsCard(
           user: user,
@@ -325,6 +327,7 @@ class _ActivityCardState extends State<_ActivityCard> {
         theme.colorScheme.primary;
     return UserCard(
       title: context.t('user:activity'),
+      bleedChild: true,
       child: _loading && calendar == null
           ? const Padding(
               padding: EdgeInsets.symmetric(vertical: 24),
@@ -333,14 +336,17 @@ class _ActivityCardState extends State<_ActivityCard> {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  _selected.isEmpty
-                      ? context.t('user:activityLastYear', {
-                          'value': (calendar?.total ?? 0).humanizedCount(),
-                        })
-                      : _selected,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    _selected.isEmpty
+                        ? context.t('user:activityLastYear', {
+                            'value': (calendar?.total ?? 0).humanizedCount(),
+                          })
+                        : _selected,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -390,6 +396,7 @@ class _Heatmap extends StatelessWidget {
         axis: .horizontal,
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           itemCount: _weeks + 1,
           separatorBuilder: (_, _) => const SizedBox(width: 3),
           itemBuilder: (context, week) {
@@ -488,6 +495,7 @@ class _FavoritesPreviewState extends State<_FavoritesPreview> {
     if (_loaded && _items.isEmpty) return const SizedBox.shrink();
     return UserCard(
       title: context.t('user:favorites'),
+      bleedChild: true,
       trailing: TextButton(
         onPressed: widget.onSeeMore,
         style: TextButton.styleFrom(
@@ -508,6 +516,7 @@ class _FavoritesPreviewState extends State<_FavoritesPreview> {
                 axis: .horizontal,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemCount: _items.length,
                   separatorBuilder: (_, _) => const SizedBox(width: 8),
                   itemBuilder: (context, index) {
@@ -735,12 +744,14 @@ class _MedalsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) => UserCard(
     title: context.t('user:medals'),
+    bleedChild: true,
     child: SizedBox(
       height: 64,
       child: Edgy(
         axis: .horizontal,
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           itemCount: medals.length,
           separatorBuilder: (_, _) => const SizedBox(width: 8),
           itemBuilder: (context, index) {

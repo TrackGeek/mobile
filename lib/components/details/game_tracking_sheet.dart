@@ -534,6 +534,7 @@ class _GameTrackingSheetState extends State<GameTrackingSheet> {
                 SheetField(
                   label: context.t('feed:hoursPlayed'),
                   child: TextField(
+                    textInputAction: TextInputAction.next,
                     controller: _hoursPlayed,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
@@ -546,6 +547,7 @@ class _GameTrackingSheetState extends State<GameTrackingSheet> {
                 SheetField(
                   label: context.t('feed:totalReplays'),
                   child: TextField(
+                    textInputAction: TextInputAction.next,
                     controller: _playCount,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
@@ -658,6 +660,8 @@ class _GameTrackingSheetState extends State<GameTrackingSheet> {
                   SheetField(
                     label: context.t('feed:summary'),
                     child: TextField(
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) => _save(),
                       controller: _summary,
                       maxLength: _summaryMax,
                       decoration: InputDecoration(
@@ -787,6 +791,7 @@ class _PlatformPickerDialogState extends State<_PlatformPickerDialog> {
         child: Column(
           children: [
             TextField(
+              textInputAction: TextInputAction.search,
               autofocus: false,
               decoration: InputDecoration(
                 isDense: true,
@@ -1073,6 +1078,7 @@ class _GameScreenshotsEditorState extends State<GameScreenshotsEditor> {
             children: [
               Expanded(
                 child: TextField(
+                  textInputAction: TextInputAction.done,
                   controller: _videoUrl,
                   onSubmitted: (_) => _addVideo(),
                   decoration: InputDecoration(
@@ -1266,6 +1272,7 @@ class _ScreenshotRowState extends State<_ScreenshotRow> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 TextField(
+                  textInputAction: TextInputAction.done,
                   controller: _description,
                   maxLength: _screenshotDescriptionMax,
                   onEditingComplete: () =>

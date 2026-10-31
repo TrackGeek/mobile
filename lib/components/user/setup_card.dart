@@ -12,6 +12,7 @@ import 'user_widgets.dart';
 import '../media/smooth_image.dart';
 import '../layout/edgy.dart';
 import '../../utils/adaptive_sheet_route.dart';
+import '../layout/bottom_padding.dart';
 
 class SetupCard extends StatelessWidget {
   const SetupCard({
@@ -37,6 +38,7 @@ class SetupCard extends StatelessWidget {
     final empty = photos.isEmpty && items.isEmpty;
     return UserCard(
       title: context.t('user:setup'),
+      bleedChild: true,
       trailing: isOwner
           ? IconButton(
               icon: const HugeIcon(
@@ -49,27 +51,30 @@ class SetupCard extends StatelessWidget {
             )
           : null,
       child: empty
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${context.t('user:noSetup')}\n${context.t('user:noSetupDescription')}',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                if (isOwner) ...[
-                  const SizedBox(height: 10),
-                  FilledButton.tonalIcon(
-                    onPressed: () => _openEdit(context),
-                    icon: const HugeIcon(
-                      icon: HugeIcons.strokeRoundedAdd01,
-                      size: 14,
+          ? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${context.t('user:noSetup')}\n${context.t('user:noSetupDescription')}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
-                    label: Text(context.t('user:setupAdd')),
                   ),
+                  if (isOwner) ...[
+                    const SizedBox(height: 10),
+                    FilledButton.tonalIcon(
+                      onPressed: () => _openEdit(context),
+                      icon: const HugeIcon(
+                        icon: HugeIcons.strokeRoundedAdd01,
+                        size: 14,
+                      ),
+                      label: Text(context.t('user:setupAdd')),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             )
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,6 +86,7 @@ class SetupCard extends StatelessWidget {
                       axis: .horizontal,
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
                         itemCount: photos.length,
                         separatorBuilder: (_, _) => const SizedBox(width: 8),
                         itemBuilder: (context, index) => ClipRRect(
@@ -96,7 +102,11 @@ class SetupCard extends StatelessWidget {
                   ),
                 if (items.isNotEmpty) ...[
                   if (photos.isNotEmpty) const SizedBox(height: 8),
-                  for (final item in items) _SetupItemTile(item: item),
+                  for (final item in items)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: _SetupItemTile(item: item),
+                    ),
                 ],
               ],
             ),
@@ -278,7 +288,8 @@ class _SetupEditSheetState extends State<_SetupEditSheet> {
     final theme = Theme.of(context);
     return SafeArea(
       child: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16)
+            .copyWith(bottom: BottomPadding.of(context)),
         children: [
           Row(
             children: [
@@ -542,6 +553,7 @@ class _SetupItemDialogState extends State<_SetupItemDialog> {
       mainAxisSize: MainAxisSize.min,
       children: [
         TextField(
+          textInputAction: TextInputAction.next,
           controller: _name,
           decoration: InputDecoration(
             labelText: context.t('common:name'),
@@ -552,6 +564,7 @@ class _SetupItemDialogState extends State<_SetupItemDialog> {
         if (!_isTitle) ...[
           const SizedBox(height: 8),
           TextField(
+            textInputAction: TextInputAction.next,
             controller: _brand,
             decoration: InputDecoration(
               labelText: context.t('user:setupBrand'),
@@ -561,6 +574,8 @@ class _SetupItemDialogState extends State<_SetupItemDialog> {
           ),
           const SizedBox(height: 8),
           TextField(
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => _save(),
             controller: _link,
             keyboardType: TextInputType.url,
             decoration: InputDecoration(

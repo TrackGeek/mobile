@@ -12,6 +12,7 @@ import '../../services/settings_service.dart';
 import 'settings_card.dart';
 import '../../utils/haptics.dart';
 import '../../utils/adaptive_sheet_route.dart';
+import '../layout/bottom_padding.dart';
 
 const _typeIcons = {
   MediaType.movie: HugeIcons.strokeRoundedClapperboard,
@@ -222,6 +223,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
       showDragHandle: true,
       builder: (sheetContext) {
         return ListView(
+          padding: EdgeInsets.only(bottom: BottomPadding.of(context)),
           shrinkWrap: true,
           children: [
             for (final lang in languages)

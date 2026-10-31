@@ -42,6 +42,7 @@ import '../components/layout/edgy.dart';
 import '../components/layout/tg_refresh_indicator.dart';
 import '../utils/haptics.dart';
 import '../utils/numbers.dart';
+import '../components/layout/bottom_padding.dart';
 
 const _siteUrl = 'https://trackgeek.net';
 const _planningColor = TgStatus.planning;
@@ -88,6 +89,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
   var _refreshing = false;
   String? _reactingReview;
   var _tab = 0;
+  final Map<int, GlobalKey> _chipKeys = {};
 
   bool get _loggedIn => widget.env.session.loggedIn;
 
@@ -470,6 +472,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                     final wide =
                         constraints.maxWidth >= 960 &&
                         MediaQuery.textScalerOf(context).scale(1) < 1.6;
+                    final inset = wide ? 0.0 : 16.0;
                     final content = Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -477,15 +480,23 @@ class _BookDetailPageState extends State<BookDetailPage> {
                           _buildHeader(book),
                           const SizedBox(height: 24),
                         ],
-                        _buildTabs(book),
+                        _buildTabs(book, inset),
                         const SizedBox(height: 32),
-                        _buildReviews(book),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: inset),
+                          child: _buildReviews(book),
+                        ),
                       ],
                     );
                     return ListView(
                       keyboardDismissBehavior:
                           ScrollViewKeyboardDismissBehavior.onDrag,
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
+                      padding: EdgeInsets.fromLTRB(
+                        wide ? 16 : 0,
+                        16,
+                        wide ? 16 : 0,
+                        BottomPadding.of(context, minimum: 40),
+                      ),
                       children: [
                         if (wide)
                           Row(
@@ -497,9 +508,15 @@ class _BookDetailPageState extends State<BookDetailPage> {
                             ],
                           )
                         else ...[
-                          _buildHeader(book),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: _buildHeader(book),
+                          ),
                           const SizedBox(height: 24),
-                          _buildSidebar(book),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: _buildSidebar(book),
+                          ),
                           const SizedBox(height: 24),
                           content,
                         ],
@@ -708,7 +725,18 @@ class _BookDetailPageState extends State<BookDetailPage> {
     );
   }
 
-  Widget _buildTabs(BookDetail book) {
+  void _scrollToTab(int i) {
+    final ctx = _chipKeys[i]?.currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(
+      ctx,
+      alignment: 0.5,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  Widget _buildTabs(BookDetail book, double inset) {
     final tabs = <(String, String)>[
       ('info', context.t('library:info')),
       if (book.editions.isNotEmpty)
@@ -731,15 +759,20 @@ class _BookDetailPageState extends State<BookDetailPage> {
           axis: .horizontal,
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: inset),
             child: Row(
               children: [
                 for (var i = 0; i < tabs.length; i++)
                   Padding(
+                    key: _chipKeys.putIfAbsent(i, GlobalKey.new),
                     padding: const EdgeInsets.only(right: 8),
                     child: ChoiceChip(
                       selected: _tab == i,
                       label: Text(tabs[i].$2),
-                      onSelected: (_) => setState(() => _tab = i),
+                      onSelected: (_) {
+                        setState(() => _tab = i);
+                        _scrollToTab(i);
+                      },
                     ),
                   ),
               ],
@@ -747,28 +780,31 @@ class _BookDetailPageState extends State<BookDetailPage> {
           ),
         ),
         const SizedBox(height: 16),
-        switch (selected) {
-          'info' => _infoTab(book),
-          'editions' => EditionsSection(
-            editions: book.editions,
-            title: book.title,
-            coverEditionId: book.coverEditionId,
-            customCoverEditionId: book.customCoverEditionId,
-            canCustomize: _loggedIn,
-            busy: _coverBusy,
-            onUseCover: _setCover,
-            onResetCover: _resetCover,
-          ),
-          'lists' => _listsTab(book),
-          _ => CommentsCard(
-            target: (type: 'Book', id: book.id),
-            comments: _comments,
-            sessionUserId: _userId,
-            canModerate: false,
-            onOpenUser: widget.env.onOpenUser,
-            showTitle: false,
-          ),
-        },
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: inset),
+          child: switch (selected) {
+            'info' => _infoTab(book),
+            'editions' => EditionsSection(
+              editions: book.editions,
+              title: book.title,
+              coverEditionId: book.coverEditionId,
+              customCoverEditionId: book.customCoverEditionId,
+              canCustomize: _loggedIn,
+              busy: _coverBusy,
+              onUseCover: _setCover,
+              onResetCover: _resetCover,
+            ),
+            'lists' => _listsTab(book),
+            _ => CommentsCard(
+              target: (type: 'Book', id: book.id),
+              comments: _comments,
+              sessionUserId: _userId,
+              canModerate: false,
+              onOpenUser: widget.env.onOpenUser,
+              showTitle: false,
+            ),
+          },
+        ),
       ],
     );
   }

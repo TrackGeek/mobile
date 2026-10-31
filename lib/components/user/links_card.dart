@@ -9,6 +9,7 @@ import '../../services/user_service.dart';
 import 'user_widgets.dart';
 import '../../utils/adaptive_sheet_route.dart';
 import '../../utils/social_links.dart';
+import '../layout/bottom_padding.dart';
 
 const _knownHosts = {
   'github.com': 'GitHub',
@@ -283,7 +284,8 @@ class _LinksEditSheetState extends State<_LinksEditSheet> {
     final theme = Theme.of(context);
     return SafeArea(
       child: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16)
+            .copyWith(bottom: BottomPadding.of(context)),
         children: [
           Row(
             children: [
@@ -467,6 +469,7 @@ class _LinkDialogState extends State<_LinkDialog> {
       mainAxisSize: MainAxisSize.min,
       children: [
         TextField(
+          textInputAction: TextInputAction.next,
           controller: _label,
           decoration: InputDecoration(
             labelText: context.t('user:linkLabel'),
@@ -477,6 +480,8 @@ class _LinkDialogState extends State<_LinkDialog> {
         ),
         const SizedBox(height: 8),
         TextField(
+          textInputAction: TextInputAction.done,
+          onSubmitted: (_) => _save(),
           controller: _url,
           keyboardType: TextInputType.url,
           decoration: InputDecoration(

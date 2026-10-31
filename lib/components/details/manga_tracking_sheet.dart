@@ -420,6 +420,7 @@ class _MangaTrackingSheetState extends State<MangaTrackingSheet> {
                   SheetField(
                     label: context.t('library:chapters'),
                     child: TextField(
+                      textInputAction: TextInputAction.next,
                       controller: _chaptersRead,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
@@ -433,6 +434,7 @@ class _MangaTrackingSheetState extends State<MangaTrackingSheet> {
                   SheetField(
                     label: context.t('feed:totalRereads'),
                     child: TextField(
+                      textInputAction: TextInputAction.next,
                       controller: _readCount,
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
@@ -527,6 +529,8 @@ class _MangaTrackingSheetState extends State<MangaTrackingSheet> {
                   SheetField(
                     label: context.t('feed:summary'),
                     child: TextField(
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) => _save(),
                       controller: _summary,
                       maxLength: _summaryMax,
                       decoration: InputDecoration(

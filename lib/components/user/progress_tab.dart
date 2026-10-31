@@ -23,6 +23,7 @@ import '../../utils/adaptive_sheet_route.dart';
 import '../../styles/tg_theme.dart';
 import '../../utils/haptics.dart';
 import '../../utils/numbers.dart';
+import '../layout/bottom_padding.dart';
 
 class _ProgressContent {
   const _ProgressContent({
@@ -587,6 +588,7 @@ class _UserProgressTabState extends State<UserProgressTab>
                       children: [
                         Expanded(
                           child: TextField(
+                            textInputAction: TextInputAction.search,
                             controller: _search,
                             onChanged: (_) => _onSearchChanged(),
                             decoration: InputDecoration(
@@ -698,7 +700,12 @@ class _UserProgressTabState extends State<UserProgressTab>
               )
             else
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                padding: EdgeInsets.fromLTRB(
+                  16,
+                  8,
+                  16,
+                  BottomPadding.of(context, minimum: 24),
+                ),
                 sliver: SliverPosterGrid(
                   delegate: SliverChildBuilderDelegate((context, index) {
                     if (index >= _items.length) {
@@ -967,7 +974,12 @@ class _FiltersSheetState extends State<_FiltersSheet> {
               builder: (context, options, _) => ListView(
                 keyboardDismissBehavior:
                     ScrollViewKeyboardDismissBehavior.onDrag,
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                padding: EdgeInsets.fromLTRB(
+                  16,
+                  8,
+                  16,
+                  BottomPadding.of(context, minimum: 16),
+                ),
                 children: [
                   if (showCompletion)
                     _group(
@@ -1178,6 +1190,7 @@ class _MultiSelectSheetState extends State<_MultiSelectSheet> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                 child: TextField(
+                  textInputAction: TextInputAction.search,
                   controller: _query,
                   onChanged: (_) => setState(() {}),
                   decoration: InputDecoration(

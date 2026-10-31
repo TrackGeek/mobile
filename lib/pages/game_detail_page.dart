@@ -49,6 +49,7 @@ import '../components/layout/edgy.dart';
 import '../components/layout/tg_refresh_indicator.dart';
 import '../utils/haptics.dart';
 import '../utils/numbers.dart';
+import '../components/layout/bottom_padding.dart';
 
 const _siteUrl = 'https://trackgeek.net';
 const _planningColor = TgStatus.planning;
@@ -96,6 +97,7 @@ class _GameDetailPageState extends State<GameDetailPage> {
   var _refreshing = false;
   String? _reactingReview;
   var _tab = 0;
+  final Map<int, GlobalKey> _chipKeys = {};
 
   bool get _loggedIn => widget.env.session.loggedIn;
 
@@ -536,6 +538,7 @@ class _GameDetailPageState extends State<GameDetailPage> {
                       final wide =
                           constraints.maxWidth >= 960 &&
                           MediaQuery.textScalerOf(context).scale(1) < 1.6;
+                      final inset = wide ? 0.0 : 16.0;
                       final content = Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -543,14 +546,22 @@ class _GameDetailPageState extends State<GameDetailPage> {
                             _buildHeader(game),
                             const SizedBox(height: 24),
                           ],
-                          _buildTabs(game),
+                          _buildTabs(game, inset),
                           const SizedBox(height: 32),
-                          _buildReviews(game),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: inset),
+                            child: _buildReviews(game),
+                          ),
                         ],
                       );
                       return ListView(
                         controller: _scroll,
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
+                        padding: EdgeInsets.fromLTRB(
+                          wide ? 16 : 0,
+                          16,
+                          wide ? 16 : 0,
+                          BottomPadding.of(context, minimum: 40),
+                        ),
                         children: [
                           if (wide)
                             Row(
@@ -565,9 +576,19 @@ class _GameDetailPageState extends State<GameDetailPage> {
                               ],
                             )
                           else ...[
-                            _buildHeader(game),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              child: _buildHeader(game),
+                            ),
                             const SizedBox(height: 24),
-                            _buildSidebar(game),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              child: _buildSidebar(game),
+                            ),
                             const SizedBox(height: 24),
                             content,
                           ],
@@ -754,7 +775,18 @@ class _GameDetailPageState extends State<GameDetailPage> {
     );
   }
 
-  Widget _buildTabs(GameDetail game) {
+  void _scrollToTab(int i) {
+    final ctx = _chipKeys[i]?.currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(
+      ctx,
+      alignment: 0.5,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  Widget _buildTabs(GameDetail game, double inset) {
     final keys = _tabKeys();
     final tabs = <(String, String)>[
       ('info', context.t('library:info')),
@@ -777,15 +809,20 @@ class _GameDetailPageState extends State<GameDetailPage> {
           axis: .horizontal,
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: inset),
             child: Row(
               children: [
                 for (var i = 0; i < tabs.length; i++)
                   Padding(
+                    key: _chipKeys.putIfAbsent(i, GlobalKey.new),
                     padding: const EdgeInsets.only(right: 8),
                     child: ChoiceChip(
                       selected: _tab == i,
                       label: Text(tabs[i].$2),
-                      onSelected: (_) => setState(() => _tab = i),
+                      onSelected: (_) {
+                        setState(() => _tab = i);
+                        _scrollToTab(i);
+                      },
                     ),
                   ),
               ],
@@ -793,12 +830,15 @@ class _GameDetailPageState extends State<GameDetailPage> {
           ),
         ),
         const SizedBox(height: 16),
-        switch (selected) {
-          'info' => _infoTab(game),
-          'lists' => _listsTab(game),
-          'screenshots' => _screenshotsTab(game),
-          _ => const SizedBox.shrink(),
-        },
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: inset),
+          child: switch (selected) {
+            'info' => _infoTab(game),
+            'lists' => _listsTab(game),
+            'screenshots' => _screenshotsTab(game),
+            _ => const SizedBox.shrink(),
+          },
+        ),
       ],
     );
   }

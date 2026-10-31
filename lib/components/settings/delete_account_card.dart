@@ -73,6 +73,7 @@ class _DeleteAccountCardState extends State<DeleteAccountCard> {
                   const SizedBox(height: 4),
                   TextField(
                     controller: controller,
+                    autofocus: true,
                     autocorrect: false,
                     enabled: !_pending,
                     decoration: InputDecoration(hintText: username),

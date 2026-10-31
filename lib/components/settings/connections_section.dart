@@ -477,6 +477,7 @@ class _OAuthClientFormState extends State<_OAuthClientForm> {
         SettingsFieldLabel(context.t('settings:oauth.developer.name')),
         const SizedBox(height: 4),
         TextField(
+          textInputAction: TextInputAction.next,
           controller: _name,
           enabled: !widget.pending,
           maxLength: 100,

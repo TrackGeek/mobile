@@ -8,6 +8,7 @@ import '../../services/notification_service.dart';
 import 'notification_item.dart';
 import '../layout/tg_refresh_indicator.dart';
 import '../../utils/haptics.dart';
+import '../layout/bottom_padding.dart';
 
 class NotificationList extends StatefulWidget {
   const NotificationList({
@@ -154,7 +155,12 @@ class NotificationListState extends State<NotificationList> {
           if (_loading && !_loaded) {
             return ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+              padding: EdgeInsets.fromLTRB(
+                16,
+                8,
+                16,
+                BottomPadding.of(context, minimum: 24),
+              ),
               children: [
                 for (var i = 0; i < 4; i++)
                   Container(
@@ -242,7 +248,12 @@ class NotificationListState extends State<NotificationList> {
           return ListView.separated(
             controller: _scroll,
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+            padding: EdgeInsets.fromLTRB(
+              16,
+              8,
+              16,
+              BottomPadding.of(context, minimum: 24),
+            ),
             itemCount: _items.length + (_loadingMore ? 1 : 0),
             separatorBuilder: (_, _) => const SizedBox(height: 12),
             itemBuilder: (context, index) {

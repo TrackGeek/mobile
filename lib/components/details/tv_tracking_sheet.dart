@@ -467,6 +467,7 @@ class _TvTrackingSheetState extends State<TvTrackingSheet> {
                   SheetField(
                     label: context.t('library:episode_other'),
                     child: TextField(
+                      textInputAction: TextInputAction.done,
                       controller: _episodes,
                       enabled: totalOrdered > 0 && !_busyEpisodes,
                       keyboardType: TextInputType.number,
@@ -497,6 +498,7 @@ class _TvTrackingSheetState extends State<TvTrackingSheet> {
                   SheetField(
                     label: context.t('feed:totalRewatches'),
                     child: TextField(
+                      textInputAction: TextInputAction.next,
                       controller: _watchCount,
                       keyboardType: TextInputType.number,
                       inputFormatters: [
@@ -597,6 +599,8 @@ class _TvTrackingSheetState extends State<TvTrackingSheet> {
                   SheetField(
                     label: context.t('feed:summary'),
                     child: TextField(
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) => _save(),
                       controller: _summary,
                       maxLength: _summaryMax,
                       decoration: InputDecoration(

@@ -123,6 +123,7 @@ class _ProfileFormCardState extends State<ProfileFormCard> {
               SettingsFieldLabel(context.t('common:name')),
               const SizedBox(height: 6),
               TextFormField(
+                textInputAction: TextInputAction.next,
                 controller: _name,
                 decoration: const InputDecoration(hintText: 'Jhon Doe'),
                 validator: _nameError,
@@ -132,6 +133,7 @@ class _ProfileFormCardState extends State<ProfileFormCard> {
               SettingsFieldLabel(context.t('settings:profile.username')),
               const SizedBox(height: 6),
               TextFormField(
+                textInputAction: TextInputAction.next,
                 controller: _username,
                 decoration: const InputDecoration(
                   hintText: 'jhondoe',

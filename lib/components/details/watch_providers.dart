@@ -503,6 +503,7 @@ class _RegionPickerState extends State<_RegionPicker> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                 child: TextField(
+                  textInputAction: TextInputAction.search,
                   controller: _query,
                   onChanged: (_) => setState(() {}),
                   decoration: InputDecoration(

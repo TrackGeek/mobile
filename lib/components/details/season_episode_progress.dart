@@ -31,6 +31,18 @@ class SeasonEpisodeProgress extends StatefulWidget {
 
 class _SeasonEpisodeProgressState extends State<SeasonEpisodeProgress> {
   int? _activeSeason;
+  final Map<int, GlobalKey> _seasonKeys = {};
+
+  void _scrollToSeason(int season) {
+    final ctx = _seasonKeys[season]?.currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(
+      ctx,
+      alignment: 0.5,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
+  }
 
   int? get _initialSeason {
     final fallback = widget.defaultSeason;
@@ -45,6 +57,9 @@ class _SeasonEpisodeProgressState extends State<SeasonEpisodeProgress> {
   void initState() {
     super.initState();
     _activeSeason = _initialSeason;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _activeSeason != null) _scrollToSeason(_activeSeason!);
+    });
   }
 
   @override
@@ -104,15 +119,20 @@ class _SeasonEpisodeProgressState extends State<SeasonEpisodeProgress> {
                   children: [
                     for (final s in widget.seasons)
                       _SeasonTab(
+                        key: _seasonKeys.putIfAbsent(
+                          s.seasonNumber,
+                          GlobalKey.new,
+                        ),
                         label: _seasonLabel(s.seasonNumber),
                         watched: s.watchedEpisodes.length,
                         total: s.totalEpisodes,
                         active: s.seasonNumber == active,
                         onTap: widget.busy
                             ? null
-                            : () => setState(
-                                () => _activeSeason = s.seasonNumber,
-                              ),
+                            : () {
+                                setState(() => _activeSeason = s.seasonNumber);
+                                _scrollToSeason(s.seasonNumber);
+                              },
                       ),
                   ],
                 ),
@@ -221,6 +241,7 @@ class _SeasonEpisodeProgressState extends State<SeasonEpisodeProgress> {
 
 class _SeasonTab extends StatelessWidget {
   const _SeasonTab({
+    super.key,
     required this.label,
     required this.watched,
     required this.total,

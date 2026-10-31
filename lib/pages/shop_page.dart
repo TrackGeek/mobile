@@ -17,6 +17,7 @@ import '../services/shop_service.dart';
 import '../styles/tg_theme.dart';
 import '../utils/haptics.dart';
 import '../utils/numbers.dart';
+import '../components/layout/bottom_padding.dart';
 
 class ShopPage extends StatefulWidget {
   const ShopPage({
@@ -263,7 +264,8 @@ class _ShopPageState extends State<ShopPage> {
       body: ContentFrame(
         maxWidth: TgLayout.contentWidth,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16)
+              .copyWith(bottom: BottomPadding.of(context)),
           children: [
             Text(
               context.t('shop:description'),

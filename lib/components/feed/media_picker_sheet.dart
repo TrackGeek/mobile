@@ -11,6 +11,7 @@ import '../../utils/content_types.dart';
 import '../../utils/strings.dart';
 import '../../controllers/session_controller.dart';
 import '../media/smooth_image.dart';
+import '../layout/bottom_padding.dart';
 
 const _typeIcons = <MediaType, List<List<dynamic>>>{
   MediaType.movie: HugeIcons.strokeRoundedClapperboard,
@@ -143,7 +144,8 @@ class _MediaPickerSheetState extends State<MediaPickerSheet> {
       padding: EdgeInsets.only(
         left: 16,
         right: 16,
-        bottom: MediaQuery.viewInsetsOf(context).bottom + 16,
+        bottom:
+            MediaQuery.viewInsetsOf(context).bottom + BottomPadding.of(context),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -177,6 +179,7 @@ class _MediaPickerSheetState extends State<MediaPickerSheet> {
           ),
           const SizedBox(height: 8),
           TextField(
+            textInputAction: TextInputAction.search,
             controller: _query,
             autofocus: true,
             decoration: InputDecoration(

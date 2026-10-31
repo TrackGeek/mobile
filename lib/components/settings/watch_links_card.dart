@@ -416,6 +416,15 @@ class _WatchLinkFormState extends State<_WatchLinkForm> {
     return _labelError == null && _urlError == null && _typesError == null;
   }
 
+  void _submit() {
+    if (!_validate()) return;
+    widget.onSubmit(_label.text.trim(), _url.text.trim(), [
+      for (final type in watchLinkMediaTypes)
+        if (_types.contains(watchLinkContentType[type]))
+          watchLinkContentType[type]!,
+    ]);
+  }
+
   void _insertVariable(String variable) {
     final token = '%$variable%';
     final value = _url.value;
@@ -449,6 +458,7 @@ class _WatchLinkFormState extends State<_WatchLinkForm> {
           SettingsFieldLabel(context.t('user:linkLabel')),
           const SizedBox(height: 4),
           TextField(
+            textInputAction: TextInputAction.next,
             controller: _label,
             enabled: !widget.pending,
             decoration: InputDecoration(
@@ -460,6 +470,8 @@ class _WatchLinkFormState extends State<_WatchLinkForm> {
           SettingsFieldLabel(context.t('user:linkUrl')),
           const SizedBox(height: 4),
           TextField(
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => _submit(),
             controller: _url,
             enabled: !widget.pending,
             autocorrect: false,
@@ -607,16 +619,7 @@ class _WatchLinkFormState extends State<_WatchLinkForm> {
                   child: Text(context.t('common:cancel')),
                 ),
               FilledButton(
-                onPressed: widget.pending
-                    ? null
-                    : () {
-                        if (!_validate()) return;
-                        widget.onSubmit(_label.text.trim(), _url.text.trim(), [
-                          for (final type in watchLinkMediaTypes)
-                            if (_types.contains(watchLinkContentType[type]))
-                              watchLinkContentType[type]!,
-                        ]);
-                      },
+                onPressed: widget.pending ? null : _submit,
                 child: widget.pending
                     ? const SizedBox(
                         width: 16,

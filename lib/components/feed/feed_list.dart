@@ -10,6 +10,7 @@ import 'post_card.dart';
 import 'screenshot_card.dart';
 import '../layout/tg_refresh_indicator.dart';
 import '../../utils/haptics.dart';
+import '../layout/bottom_padding.dart';
 
 class FeedList extends StatefulWidget {
   const FeedList({
@@ -86,7 +87,9 @@ class _FeedListState extends State<FeedList> {
             if (!controller.loaded && controller.isLoading) {
               return ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.only(bottom: 24),
+                padding: EdgeInsets.only(
+                  bottom: BottomPadding.of(context, minimum: 24),
+                ),
                 children: [?header, const _FeedSkeleton()],
               );
             }
@@ -120,7 +123,10 @@ class _FeedListState extends State<FeedList> {
             return ListView.separated(
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: EdgeInsets.only(top: header == null ? 8 : 0, bottom: 24),
+              padding: EdgeInsets.only(
+                top: header == null ? 8 : 0,
+                bottom: BottomPadding.of(context, minimum: 24),
+              ),
               itemCount:
                   leading +
                   controller.entries.length +

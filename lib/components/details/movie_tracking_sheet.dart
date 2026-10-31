@@ -339,6 +339,7 @@ class _MovieTrackingSheetState extends State<MovieTrackingSheet> {
                   SheetField(
                     label: context.t('feed:totalRewatches'),
                     child: TextField(
+                      textInputAction: TextInputAction.next,
                       controller: _watchCount,
                       keyboardType: TextInputType.number,
                       inputFormatters: [
@@ -408,6 +409,8 @@ class _MovieTrackingSheetState extends State<MovieTrackingSheet> {
                   SheetField(
                     label: context.t('feed:summary'),
                     child: TextField(
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) => _save(),
                       controller: _summary,
                       maxLength: _summaryMax,
                       decoration: InputDecoration(

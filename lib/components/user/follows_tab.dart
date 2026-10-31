@@ -10,6 +10,7 @@ import '../../services/user_service.dart';
 import 'follow_button.dart';
 import 'user_widgets.dart';
 import '../layout/tg_refresh_indicator.dart';
+import '../layout/bottom_padding.dart';
 
 class UserFollowsTab extends StatefulWidget {
   const UserFollowsTab({
@@ -195,7 +196,8 @@ class _UserFollowsTabState extends State<UserFollowsTab>
         onRefresh: _load,
         child: ListView.separated(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16)
+              .copyWith(bottom: BottomPadding.of(context)),
           itemCount: users.length + (_loadingMore ? 1 : 0),
           separatorBuilder: (_, _) => const SizedBox(height: 8),
           itemBuilder: (context, index) {

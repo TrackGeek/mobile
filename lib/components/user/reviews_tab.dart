@@ -17,6 +17,7 @@ import 'user_widgets.dart';
 import '../layout/tg_refresh_indicator.dart';
 import '../../utils/haptics.dart';
 import '../../utils/adaptive_sheet_route.dart';
+import '../layout/bottom_padding.dart';
 
 class UserReviewsTab extends StatefulWidget {
   const UserReviewsTab({
@@ -251,6 +252,7 @@ class _UserReviewsTabState extends State<UserReviewsTab>
                     ),
                     const SizedBox(height: 8),
                     TextField(
+                      textInputAction: TextInputAction.search,
                       controller: _search,
                       onChanged: (_) => _onSearchChanged(),
                       decoration: InputDecoration(
@@ -293,7 +295,12 @@ class _UserReviewsTabState extends State<UserReviewsTab>
               )
             else
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                padding: EdgeInsets.fromLTRB(
+                  16,
+                  8,
+                  16,
+                  BottomPadding.of(context, minimum: 24),
+                ),
                 sliver: SliverList.separated(
                   itemCount: _items.length + (_loadingMore ? 1 : 0),
                   separatorBuilder: (_, _) => const SizedBox(height: 10),
@@ -393,7 +400,9 @@ class _ReviewEditSheetState extends State<_ReviewEditSheet> {
         left: 16,
         right: 16,
         top: 16,
-        bottom: 16 + MediaQuery.of(context).viewInsets.bottom,
+        bottom:
+            BottomPadding.of(context) +
+            MediaQuery.of(context).viewInsets.bottom,
       ),
       child: SingleChildScrollView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,

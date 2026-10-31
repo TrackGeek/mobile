@@ -15,6 +15,7 @@ import '../../utils/content_types.dart';
 import 'media_card.dart';
 import 'user_widgets.dart';
 import '../layout/tg_refresh_indicator.dart';
+import '../layout/bottom_padding.dart';
 
 const _favoriteTypes = [
   ('Anime', 'common:types.anime_other'),
@@ -189,6 +190,7 @@ class _UserFavoritesTabState extends State<UserFavoritesTab>
                   ),
                   const SizedBox(height: 8),
                   TextField(
+                    textInputAction: TextInputAction.search,
                     controller: _search,
                     onChanged: (_) => _onSearchChanged(),
                     decoration: InputDecoration(
@@ -231,7 +233,12 @@ class _UserFavoritesTabState extends State<UserFavoritesTab>
             )
           else
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+              padding: EdgeInsets.fromLTRB(
+                16,
+                8,
+                16,
+                BottomPadding.of(context, minimum: 24),
+              ),
               sliver: SliverPosterGrid(
                 delegate: SliverChildBuilderDelegate((context, index) {
                   final item = items[index];

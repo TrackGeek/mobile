@@ -18,6 +18,7 @@ import '../utils/social_links.dart';
 import 'media_detail_page.dart';
 import '../components/media/smooth_image.dart';
 import '../components/layout/tg_refresh_indicator.dart';
+import '../components/layout/bottom_padding.dart';
 
 const _siteUrl = 'https://trackgeek.net';
 const _clampLength = 480;
@@ -154,44 +155,60 @@ class _CompanyPageState extends State<CompanyPage> {
                 child: ListView(
                   keyboardDismissBehavior:
                       ScrollViewKeyboardDismissBehavior.onDrag,
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
+                  padding: EdgeInsets.fromLTRB(
+                    0,
+                    8,
+                    0,
+                    BottomPadding.of(context, minimum: 40),
+                  ),
                   children: [
-                    _hero(company),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: _hero(company),
+                    ),
                     if (company.description?.isNotEmpty == true) ...[
                       const SizedBox(height: 24),
-                      _description(company),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: _description(company),
+                      ),
                     ],
                     if (company.alsoKnownAs.isNotEmpty) ...[
                       const SizedBox(height: 24),
-                      DetailSection(
-                        title: context.t('library:alsoKnownAs'),
-                        child: Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            for (final alias in company.alsoKnownAs)
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .surfaceContainerHigh,
-                                  borderRadius: BorderRadius.circular(999),
-                                  border: Border.all(
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: DetailSection(
+                          title: context.t('library:alsoKnownAs'),
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              for (final alias in company.alsoKnownAs)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
                                     color: Theme.of(context)
                                         .colorScheme
-                                        .outlineVariant,
+                                        .surfaceContainerHigh,
+                                    borderRadius: BorderRadius.circular(999),
+                                    border: Border.all(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .outlineVariant,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    alias,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall,
                                   ),
                                 ),
-                                child: Text(
-                                  alias,
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
-                              ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ],

@@ -322,6 +322,7 @@ class _SearchPageState extends State<SearchPage> implements ScrollableTab {
     controller: _searchField,
     focusNode: _searchFocus,
     onChanged: _controller.onQueryChanged,
+    textInputAction: TextInputAction.search,
     elevation: const WidgetStatePropertyAll(0),
     backgroundColor: WidgetStatePropertyAll(
       Theme.of(context).colorScheme.surfaceContainerLow,

@@ -14,6 +14,7 @@ import '../../utils/video_links.dart';
 import '../layout/tg_refresh_indicator.dart';
 import '../media/smooth_image.dart';
 import 'user_widgets.dart';
+import '../layout/bottom_padding.dart';
 
 class UserScreenshotsTab extends StatefulWidget {
   const UserScreenshotsTab({
@@ -123,7 +124,12 @@ class _UserScreenshotsTabState extends State<UserScreenshotsTab>
             )
           else
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+              padding: EdgeInsets.fromLTRB(
+                16,
+                16,
+                16,
+                BottomPadding.of(context, minimum: 24),
+              ),
               sliver: SliverGrid.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,

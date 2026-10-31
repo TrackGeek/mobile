@@ -16,6 +16,7 @@ import '../models/media_type.dart';
 import '../services/book_service.dart';
 import 'media_detail_page.dart';
 import '../components/layout/tg_refresh_indicator.dart';
+import '../components/layout/bottom_padding.dart';
 
 const _siteUrl = 'https://trackgeek.net';
 
@@ -111,7 +112,12 @@ class _BookFranchisePageState extends State<BookFranchisePage> {
               onRefresh: _load,
               child: ContentFrame(
                 child: ListView(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
+                  padding: EdgeInsets.fromLTRB(
+                    16,
+                    8,
+                    16,
+                    BottomPadding.of(context, minimum: 40),
+                  ),
                   children: [
                     BookFranchiseBanner(franchise: franchise),
                     const SizedBox(height: 24),

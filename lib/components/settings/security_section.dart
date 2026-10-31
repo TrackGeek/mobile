@@ -212,6 +212,7 @@ class _PasswordCardState extends State<PasswordCard> {
                 SettingsFieldLabel(context.t('settings:password.current')),
                 const SizedBox(height: 4),
                 TextFormField(
+                  textInputAction: TextInputAction.next,
                   controller: _current,
                   obscureText: true,
                   enabled: !_pending,
@@ -223,6 +224,7 @@ class _PasswordCardState extends State<PasswordCard> {
                 SettingsFieldLabel(context.t('settings:password.new')),
                 const SizedBox(height: 4),
                 TextFormField(
+                  textInputAction: TextInputAction.next,
                   controller: _next,
                   obscureText: true,
                   enabled: !_pending,
@@ -238,6 +240,8 @@ class _PasswordCardState extends State<PasswordCard> {
                 SettingsFieldLabel(context.t('settings:password.confirm')),
                 const SizedBox(height: 4),
                 TextFormField(
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) => _changePassword(),
                   controller: _confirm,
                   obscureText: true,
                   enabled: !_pending,

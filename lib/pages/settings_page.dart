@@ -22,6 +22,7 @@ import '../services/external_sign_in.dart';
 import '../services/settings_service.dart';
 import '../utils/haptics.dart';
 import '../utils/adaptive_sheet_route.dart';
+import '../components/layout/bottom_padding.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({
@@ -159,8 +160,9 @@ class _SettingsPageState extends State<SettingsPage> {
           builder: (context, constraints) {
             final wide = constraints.maxWidth >= 880;
             return SingleChildScrollView(
-              padding: TgLayout.pagePadding(constraints.maxWidth)
-                  .add(const EdgeInsets.symmetric(vertical: 16)),
+              padding: TgLayout.pagePadding(constraints.maxWidth).add(
+                EdgeInsets.only(top: 16, bottom: BottomPadding.of(context)),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [

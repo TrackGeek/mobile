@@ -50,6 +50,7 @@ import '../components/layout/edgy.dart';
 import '../components/layout/tg_refresh_indicator.dart';
 import '../utils/haptics.dart';
 import '../utils/numbers.dart';
+import '../components/layout/bottom_padding.dart';
 
 const _siteUrl = 'https://trackgeek.net';
 const _planningColor = TgStatus.planning;
@@ -103,6 +104,7 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
   var _refreshing = false;
   String? _reactingReview;
   var _tab = 0;
+  final Map<int, GlobalKey> _chipKeys = {};
 
   String get _backfillKey => 'anime:${_anime?.id}';
 
@@ -632,6 +634,7 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
                     final wide =
                         constraints.maxWidth >= 960 &&
                         MediaQuery.textScalerOf(context).scale(1) < 1.6;
+                    final inset = wide ? 0.0 : 16.0;
                     final content = Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -639,13 +642,21 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
                           _buildHeader(anime),
                           const SizedBox(height: 24),
                         ],
-                        _buildTabs(anime),
+                        _buildTabs(anime, inset),
                         const SizedBox(height: 32),
-                        _buildReviews(anime),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: inset),
+                          child: _buildReviews(anime),
+                        ),
                       ],
                     );
                     return ListView(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
+                      padding: EdgeInsets.fromLTRB(
+                        wide ? 16 : 0,
+                        16,
+                        wide ? 16 : 0,
+                        BottomPadding.of(context, minimum: 40),
+                      ),
                       children: [
                         if (wide)
                           Row(
@@ -657,9 +668,15 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
                             ],
                           )
                         else ...[
-                          _buildHeader(anime),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: _buildHeader(anime),
+                          ),
                           const SizedBox(height: 24),
-                          _buildSidebar(anime),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: _buildSidebar(anime),
+                          ),
                           const SizedBox(height: 24),
                           content,
                         ],
@@ -860,7 +877,18 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
     );
   }
 
-  Widget _buildTabs(AnimeDetail anime) {
+  void _scrollToTab(int i) {
+    final ctx = _chipKeys[i]?.currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(
+      ctx,
+      alignment: 0.5,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  Widget _buildTabs(AnimeDetail anime, double inset) {
     final hasEpisodes = _episodes.isNotEmpty;
     final tabs = <(String, String)>[
       ('info', context.t('library:info')),
@@ -881,15 +909,20 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
           axis: .horizontal,
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: inset),
             child: Row(
               children: [
                 for (var i = 0; i < tabs.length; i++)
                   Padding(
+                    key: _chipKeys.putIfAbsent(i, GlobalKey.new),
                     padding: const EdgeInsets.only(right: 8),
                     child: ChoiceChip(
                       selected: _tab == i,
                       label: Text(tabs[i].$2),
-                      onSelected: (_) => setState(() => _tab = i),
+                      onSelected: (_) {
+                        setState(() => _tab = i);
+                        _scrollToTab(i);
+                      },
                     ),
                   ),
               ],
@@ -897,13 +930,16 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
           ),
         ),
         const SizedBox(height: 16),
-        switch (selected) {
-          'info' => _infoTab(anime),
-          'episodes' => _episodesTab(),
-          'cast' => _castTab(anime),
-          'characters' => _charactersTab(anime),
-          _ => _listsTab(anime),
-        },
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: inset),
+          child: switch (selected) {
+            'info' => _infoTab(anime),
+            'episodes' => _episodesTab(),
+            'cast' => _castTab(anime),
+            'characters' => _charactersTab(anime),
+            _ => _listsTab(anime),
+          },
+        ),
       ],
     );
   }

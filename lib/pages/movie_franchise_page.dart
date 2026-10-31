@@ -16,6 +16,7 @@ import '../services/movie_service.dart';
 import 'media_detail_page.dart';
 import '../components/media/smooth_image.dart';
 import '../components/layout/tg_refresh_indicator.dart';
+import '../components/layout/bottom_padding.dart';
 
 const _siteUrl = 'https://trackgeek.net';
 
@@ -135,7 +136,12 @@ class _MovieFranchisePageState extends State<MovieFranchisePage> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
+                      padding: EdgeInsets.fromLTRB(
+                        16,
+                        16,
+                        16,
+                        BottomPadding.of(context, minimum: 40),
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

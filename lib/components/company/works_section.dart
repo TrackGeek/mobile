@@ -36,6 +36,18 @@ class _CompanyWorksSectionState extends State<CompanyWorksSection> {
   String? _role;
   _Sort _sort = _Sort.newest;
   var _visible = _pageSize;
+  final Map<Object, GlobalKey> _chipKeys = {};
+
+  void _ensureChipVisible(Object id) {
+    final ctx = _chipKeys[id]?.currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(
+      ctx,
+      alignment: 0.5,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
+  }
 
   @override
   void dispose() {
@@ -98,26 +110,33 @@ class _CompanyWorksSectionState extends State<CompanyWorksSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '${context.t('library:catalog')} (${filtered.length})',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            '${context.t('library:catalog')} (${filtered.length})',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
         const SizedBox(height: 12),
-        TextField(
-          controller: _search,
-          onChanged: (v) => setState(() {
-            _query = v.trim();
-            _visible = _pageSize;
-          }),
-          decoration: InputDecoration(
-            isDense: true,
-            border: const OutlineInputBorder(),
-            hintText: context.t('library:searchTitles'),
-            prefixIcon: const HugeIcon(
-              icon: HugeIcons.strokeRoundedSearch01,
-              size: 18,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: TextField(
+            textInputAction: TextInputAction.search,
+            controller: _search,
+            onChanged: (v) => setState(() {
+              _query = v.trim();
+              _visible = _pageSize;
+            }),
+            decoration: InputDecoration(
+              isDense: true,
+              border: const OutlineInputBorder(),
+              hintText: context.t('library:searchTitles'),
+              prefixIcon: const HugeIcon(
+                icon: HugeIcons.strokeRoundedSearch01,
+                size: 18,
+              ),
             ),
           ),
         ),
@@ -126,33 +145,45 @@ class _CompanyWorksSectionState extends State<CompanyWorksSection> {
           axis: .horizontal,
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
                 Padding(
+                  key: _chipKeys.putIfAbsent('all', GlobalKey.new),
                   padding: const EdgeInsets.only(right: 8),
                   child: ChoiceChip(
                     selected: _role == null,
                     label: Text(
                       '${context.t('common:all')} (${widget.works.length})',
                     ),
-                    onSelected: (_) => setState(() {
-                      _role = null;
-                      _visible = _pageSize;
-                    }),
+                    onSelected: (_) {
+                      setState(() {
+                        _role = null;
+                        _visible = _pageSize;
+                      });
+                      _ensureChipVisible('all');
+                    },
                   ),
                 ),
                 for (final role in roles)
                   Padding(
+                    key: _chipKeys.putIfAbsent(
+                      'role:${role.key}',
+                      GlobalKey.new,
+                    ),
                     padding: const EdgeInsets.only(right: 8),
                     child: ChoiceChip(
                       selected: _role == role.key,
                       label: Text(
                         '${role.key} (${role.value.humanizedCount()})',
                       ),
-                      onSelected: (_) => setState(() {
-                        _role = role.key;
-                        _visible = _pageSize;
-                      }),
+                      onSelected: (_) {
+                        setState(() {
+                          _role = role.key;
+                          _visible = _pageSize;
+                        });
+                        _ensureChipVisible('role:${role.key}');
+                      },
                     ),
                   ),
               ],
@@ -164,6 +195,7 @@ class _CompanyWorksSectionState extends State<CompanyWorksSection> {
           axis: .horizontal,
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
                 Text(
@@ -179,14 +211,18 @@ class _CompanyWorksSectionState extends State<CompanyWorksSection> {
                   (_Sort.topRated, context.t('library:topRated')),
                 ])
                   Padding(
+                    key: _chipKeys.putIfAbsent(sort, GlobalKey.new),
                     padding: const EdgeInsets.only(right: 8),
                     child: ChoiceChip(
                       selected: _sort == sort,
                       label: Text(label),
-                      onSelected: (_) => setState(() {
-                        _sort = sort;
-                        _visible = _pageSize;
-                      }),
+                      onSelected: (_) {
+                        setState(() {
+                          _sort = sort;
+                          _visible = _pageSize;
+                        });
+                        _ensureChipVisible(sort);
+                      },
                     ),
                   ),
               ],
@@ -196,7 +232,7 @@ class _CompanyWorksSectionState extends State<CompanyWorksSection> {
         const SizedBox(height: 14),
         if (filtered.isEmpty)
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 32),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
             child: Center(
               child: Text(
                 context.t('library:noTitlesFound'),
@@ -209,6 +245,7 @@ class _CompanyWorksSectionState extends State<CompanyWorksSection> {
         else ...[
           GridView.builder(
             shrinkWrap: true,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: AdaptiveGridDelegate(
               context: context,

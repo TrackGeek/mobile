@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../layout/edgy.dart';
 
-class ProfileTabs extends StatelessWidget {
+class ProfileTabs extends StatefulWidget {
   const ProfileTabs({
     super.key,
     required this.tabs,
@@ -13,6 +13,42 @@ class ProfileTabs extends StatelessWidget {
   final List<(String, String, String?)> tabs;
   final String active;
   final ValueChanged<String> onSelect;
+
+  @override
+  State<ProfileTabs> createState() => _ProfileTabsState();
+}
+
+class _ProfileTabsState extends State<ProfileTabs> {
+  final Map<String, GlobalKey> _keys = {};
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _scrollTo(widget.active);
+    });
+  }
+
+  @override
+  void didUpdateWidget(ProfileTabs oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.active != widget.active) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _scrollTo(widget.active);
+      });
+    }
+  }
+
+  void _scrollTo(String key) {
+    final ctx = _keys[key]?.currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(
+      ctx,
+      alignment: 0.5,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,16 +68,17 @@ class ProfileTabs extends StatelessWidget {
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 8),
-            itemCount: tabs.length,
+            itemCount: widget.tabs.length,
             itemBuilder: (context, index) {
-              final (key, label, count) = tabs[index];
-              final selected = key == active;
+              final (key, label, count) = widget.tabs[index];
+              final selected = key == widget.active;
               final color = selected ? scheme.primary : scheme.onSurfaceVariant;
               return Semantics(
+                key: _keys.putIfAbsent(key, GlobalKey.new),
                 selected: selected,
                 button: true,
                 child: InkWell(
-                  onTap: () => onSelect(key),
+                  onTap: () => widget.onSelect(key),
                   child: AnimatedContainer(
                     duration: animation,
                     padding: const EdgeInsets.symmetric(horizontal: 12),

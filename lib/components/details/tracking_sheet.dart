@@ -427,6 +427,7 @@ class _TrackingSheetState extends State<TrackingSheet> {
                   SheetField(
                     label: context.t('library:episode_other'),
                     child: TextField(
+                      textInputAction: TextInputAction.done,
                       controller: _episodes,
                       enabled: _totalEpisodes > 0 && !_busyEpisodes,
                       keyboardType: TextInputType.number,
@@ -455,6 +456,7 @@ class _TrackingSheetState extends State<TrackingSheet> {
                   SheetField(
                     label: context.t('feed:totalRewatches'),
                     child: TextField(
+                      textInputAction: TextInputAction.next,
                       controller: _watchCount,
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
@@ -537,6 +539,8 @@ class _TrackingSheetState extends State<TrackingSheet> {
                   SheetField(
                     label: context.t('feed:summary'),
                     child: TextField(
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) => _save(),
                       controller: _summary,
                       maxLength: _summaryMax,
                       decoration: InputDecoration(
@@ -856,6 +860,7 @@ class _SheetListSectionState extends State<SheetListSection> {
             children: [
               Expanded(
                 child: TextField(
+                  textInputAction: TextInputAction.done,
                   controller: _newList,
                   onSubmitted: (_) => _createList(),
                   decoration: InputDecoration(

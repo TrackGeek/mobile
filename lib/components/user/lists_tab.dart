@@ -16,6 +16,7 @@ import '../layout/tg_refresh_indicator.dart';
 import '../../utils/haptics.dart';
 import '../../utils/adaptive_sheet_route.dart';
 import '../../utils/numbers.dart';
+import '../layout/bottom_padding.dart';
 
 class UserListsTab extends StatefulWidget {
   const UserListsTab({
@@ -196,6 +197,7 @@ class _UserListsTabState extends State<UserListsTab>
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
                 child: TextField(
+                  textInputAction: TextInputAction.search,
                   controller: _search,
                   onChanged: (_) => _onSearchChanged(),
                   decoration: InputDecoration(
@@ -235,7 +237,12 @@ class _UserListsTabState extends State<UserListsTab>
               )
             else
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                padding: EdgeInsets.fromLTRB(
+                  16,
+                  12,
+                  16,
+                  BottomPadding.of(context, minimum: 24),
+                ),
                 sliver: SliverList.separated(
                   itemCount: filtered.length + (_loadingMore ? 1 : 0),
                   separatorBuilder: (_, _) => const SizedBox(height: 20),
@@ -453,6 +460,7 @@ class _ListEditDialogState extends State<_ListEditDialog> {
       mainAxisSize: MainAxisSize.min,
       children: [
         TextField(
+          textInputAction: TextInputAction.next,
           controller: _name,
           decoration: InputDecoration(
             labelText: context.t('user:listName'),
@@ -596,7 +604,12 @@ class _ListItemsSheetState extends State<_ListItemsSheet> {
                       return false;
                     },
                     child: ListView.separated(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                      padding: EdgeInsets.fromLTRB(
+                        16,
+                        0,
+                        16,
+                        BottomPadding.of(context, minimum: 24),
+                      ),
                       itemCount: _items.length + (_loadingMore ? 1 : 0),
                       separatorBuilder: (_, _) => const SizedBox(height: 8),
                       itemBuilder: (context, index) {

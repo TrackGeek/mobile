@@ -7,6 +7,7 @@ import '../../models/mission.dart';
 import '../../services/user_service.dart';
 import 'user_widgets.dart';
 import '../layout/tg_refresh_indicator.dart';
+import '../layout/bottom_padding.dart';
 
 const _tierOrder = ['Bronze', 'Silver', 'Gold', 'Platinum'];
 
@@ -84,7 +85,8 @@ class _UserMissionsTabState extends State<UserMissionsTab>
       onRefresh: _load,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16)
+            .copyWith(bottom: BottomPadding.of(context)),
         children: [
           Text(
             context.t('missions:description'),

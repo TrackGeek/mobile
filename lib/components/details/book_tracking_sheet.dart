@@ -482,6 +482,7 @@ class _BookTrackingSheetState extends State<BookTrackingSheet> {
                           children: [
                             Expanded(
                               child: TextField(
+                                textInputAction: TextInputAction.next,
                                 controller: _pagesRead,
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
@@ -507,6 +508,7 @@ class _BookTrackingSheetState extends State<BookTrackingSheet> {
                             SizedBox(
                               width: 96,
                               child: TextField(
+                                textInputAction: TextInputAction.next,
                                 controller: _totalPages,
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
@@ -528,6 +530,7 @@ class _BookTrackingSheetState extends State<BookTrackingSheet> {
                   SheetField(
                     label: context.t('feed:totalRereads'),
                     child: TextField(
+                      textInputAction: TextInputAction.next,
                       controller: _readCount,
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
@@ -621,6 +624,8 @@ class _BookTrackingSheetState extends State<BookTrackingSheet> {
                   SheetField(
                     label: context.t('feed:summary'),
                     child: TextField(
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) => _save(),
                       controller: _summary,
                       maxLength: _summaryMax,
                       decoration: InputDecoration(

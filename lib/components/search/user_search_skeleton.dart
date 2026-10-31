@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../layout/bottom_padding.dart';
+
 class UserSearchSkeleton extends StatelessWidget {
   const UserSearchSkeleton({super.key});
 
@@ -36,7 +38,8 @@ class UserSearchSkeletonList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16)
+          .copyWith(bottom: BottomPadding.of(context)),
       itemCount: count,
       itemBuilder: (_, _) => const UserSearchSkeleton(),
     );

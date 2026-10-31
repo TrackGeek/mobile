@@ -41,6 +41,18 @@ class _CreditsSectionState extends State<PersonCreditsSection> {
   _Role _role = _Role.all;
   _Sort _sort = _Sort.newest;
   String _query = '';
+  final Map<Object, GlobalKey> _chipKeys = {};
+
+  void _ensureChipVisible(Object id) {
+    final ctx = _chipKeys[id]?.currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(
+      ctx,
+      alignment: 0.5,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
+  }
 
   List<PersonCredit> get _credits => widget.person.credits
       .where((credit) => isMediaTypeVisible(widget.user, credit.mediaType))
@@ -163,29 +175,36 @@ class _CreditsSectionState extends State<PersonCreditsSection> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                widget.heading ?? context.t('library:filmography'),
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  widget.heading ?? context.t('library:filmography'),
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
-              TextField(
-                onChanged: (value) => setState(() {
-                  _query = value;
-                  widget.onResetPaging();
-                }),
-                decoration: InputDecoration(
-                  hintText: context.t('library:searchCredits'),
-                  prefixIcon: const Padding(
-                    padding: EdgeInsets.only(left: 12, right: 8),
-                    child: HugeIcon(
-                      icon: HugeIcons.strokeRoundedSearch01,
-                      size: 18,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: TextField(
+                  textInputAction: TextInputAction.search,
+                  onChanged: (value) => setState(() {
+                    _query = value;
+                    widget.onResetPaging();
+                  }),
+                  decoration: InputDecoration(
+                    hintText: context.t('library:searchCredits'),
+                    prefixIcon: const Padding(
+                      padding: EdgeInsets.only(left: 12, right: 8),
+                      child: HugeIcon(
+                        icon: HugeIcons.strokeRoundedSearch01,
+                        size: 18,
+                      ),
                     ),
+                    prefixIconConstraints: const BoxConstraints(),
+                    isDense: true,
                   ),
-                  prefixIconConstraints: const BoxConstraints(),
-                  isDense: true,
                 ),
               ),
               const SizedBox(height: 12),
@@ -193,40 +212,62 @@ class _CreditsSectionState extends State<PersonCreditsSection> {
                 axis: .horizontal,
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     children: [
                       if (showMediaRow) ...[
                         for (final filter in visibleMedia)
                           _FilterChip(
+                            key: _chipKeys.putIfAbsent((
+                              'media',
+                              filter.value,
+                            ), GlobalKey.new),
                             label: filter.label,
                             count: filter.count,
                             active: _media == filter.value,
-                            onTap: () => setState(() {
-                              _media = filter.value;
-                              widget.onResetPaging();
-                            }),
+                            onTap: () {
+                              setState(() {
+                                _media = filter.value;
+                                widget.onResetPaging();
+                              });
+                              _ensureChipVisible(('media', filter.value));
+                            },
                           ),
                         const SizedBox(width: 12),
                       ],
                       if (counts['cast']! > 0 && counts['crew']! > 0) ...[
                         for (final filter in roleFilters)
                           _FilterChip(
+                            key: _chipKeys.putIfAbsent((
+                              'role',
+                              filter.value,
+                            ), GlobalKey.new),
                             label: filter.label,
                             count: filter.count,
                             active: _role == filter.value,
-                            onTap: () => setState(() {
-                              _role = filter.value;
-                              widget.onResetPaging();
-                            }),
+                            onTap: () {
+                              setState(() {
+                                _role = filter.value;
+                                widget.onResetPaging();
+                              });
+                              _ensureChipVisible(('role', filter.value));
+                            },
                           ),
                         const SizedBox(width: 12),
                       ],
                       for (final option in sortOptions)
                         _FilterChip(
+                          key: _chipKeys.putIfAbsent((
+                            'sort',
+                            option.value,
+                          ), GlobalKey.new),
                           label: option.label,
                           icon: option.icon,
                           active: _sort == option.value,
-                          onTap: () => setState(() => _sort = option.value),
+                          onTap: () {
+                            setState(() => _sort = option.value);
+                            _ensureChipVisible(('sort', option.value));
+                          },
                         ),
                     ],
                   ),
@@ -239,7 +280,7 @@ class _CreditsSectionState extends State<PersonCreditsSection> {
         if (filtered.isEmpty)
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 32),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
               child: Column(
                 children: [
                   HugeIcon(
@@ -261,20 +302,23 @@ class _CreditsSectionState extends State<PersonCreditsSection> {
             ),
           )
         else
-          SliverGrid(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) => CreditCard(
-                credit: shown[index],
-                onTap: () => widget.onOpenCredit(shown[index]),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverGrid(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) => CreditCard(
+                  credit: shown[index],
+                  onTap: () => widget.onOpenCredit(shown[index]),
+                ),
+                childCount: shown.length,
               ),
-              childCount: shown.length,
-            ),
-            gridDelegate: AdaptiveGridDelegate(
-              context: context,
-              maxCrossAxisExtent: 150,
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
-              childAspectRatio: 0.56,
+              gridDelegate: AdaptiveGridDelegate(
+                context: context,
+                maxCrossAxisExtent: 150,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                childAspectRatio: 0.56,
+              ),
             ),
           ),
       ],
@@ -284,6 +328,7 @@ class _CreditsSectionState extends State<PersonCreditsSection> {
 
 class _FilterChip extends StatelessWidget {
   const _FilterChip({
+    super.key,
     required this.label,
     required this.active,
     required this.onTap,

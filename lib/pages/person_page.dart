@@ -22,6 +22,7 @@ import '../utils/dates.dart';
 import '../utils/markdown_utils.dart';
 import 'media_detail_page.dart';
 import '../utils/haptics.dart';
+import '../components/layout/bottom_padding.dart';
 
 const _pageSize = 24;
 const _siteUrl = 'https://trackgeek.net';
@@ -312,7 +313,12 @@ class _PersonPageState extends State<PersonPage> {
                     ),
                   ),
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
+                    padding: EdgeInsets.fromLTRB(
+                      0,
+                      0,
+                      0,
+                      BottomPadding.of(context, minimum: 32),
+                    ),
                     sliver: PersonCreditsSection(
                       person: person,
                       visible: _visible,

@@ -42,6 +42,7 @@ import '../components/layout/edgy.dart';
 import '../components/layout/tg_refresh_indicator.dart';
 import '../utils/haptics.dart';
 import '../utils/numbers.dart';
+import '../components/layout/bottom_padding.dart';
 
 const _siteUrl = 'https://trackgeek.net';
 const _planningColor = TgStatus.planning;
@@ -101,6 +102,7 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
   var _refreshing = false;
   String? _reactingReview;
   var _tab = 0;
+  final Map<int, GlobalKey> _chipKeys = {};
 
   bool get _loggedIn => widget.env.session.loggedIn;
 
@@ -503,6 +505,7 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
                     final wide =
                         constraints.maxWidth >= 960 &&
                         MediaQuery.textScalerOf(context).scale(1) < 1.6;
+                    final inset = wide ? 0.0 : 16.0;
                     final content = Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -510,13 +513,21 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
                           _buildHeader(manga),
                           const SizedBox(height: 24),
                         ],
-                        _buildTabs(manga),
+                        _buildTabs(manga, inset),
                         const SizedBox(height: 32),
-                        _buildReviews(manga),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: inset),
+                          child: _buildReviews(manga),
+                        ),
                       ],
                     );
                     return ListView(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
+                      padding: EdgeInsets.fromLTRB(
+                        wide ? 16 : 0,
+                        16,
+                        wide ? 16 : 0,
+                        BottomPadding.of(context, minimum: 40),
+                      ),
                       children: [
                         if (wide)
                           Row(
@@ -528,9 +539,15 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
                             ],
                           )
                         else ...[
-                          _buildHeader(manga),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: _buildHeader(manga),
+                          ),
                           const SizedBox(height: 24),
-                          _buildSidebar(manga),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: _buildSidebar(manga),
+                          ),
                           const SizedBox(height: 24),
                           content,
                         ],
@@ -732,7 +749,18 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
     );
   }
 
-  Widget _buildTabs(MangaDetail manga) {
+  void _scrollToTab(int i) {
+    final ctx = _chipKeys[i]?.currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(
+      ctx,
+      alignment: 0.5,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  Widget _buildTabs(MangaDetail manga, double inset) {
     final cast = manga.cast;
     final tabs = <(String, String)>[
       ('info', context.t('library:info')),
@@ -753,15 +781,20 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
           axis: .horizontal,
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: inset),
             child: Row(
               children: [
                 for (var i = 0; i < tabs.length; i++)
                   Padding(
+                    key: _chipKeys.putIfAbsent(i, GlobalKey.new),
                     padding: const EdgeInsets.only(right: 8),
                     child: ChoiceChip(
                       selected: _tab == i,
                       label: Text(tabs[i].$2),
-                      onSelected: (_) => setState(() => _tab = i),
+                      onSelected: (_) {
+                        setState(() => _tab = i);
+                        _scrollToTab(i);
+                      },
                     ),
                   ),
               ],
@@ -769,12 +802,15 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
           ),
         ),
         const SizedBox(height: 16),
-        switch (selected) {
-          'info' => _infoTab(manga),
-          'characters' => _charactersTab(manga),
-          'staff' => _staffTab(cast),
-          _ => _listsTab(manga),
-        },
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: inset),
+          child: switch (selected) {
+            'info' => _infoTab(manga),
+            'characters' => _charactersTab(manga),
+            'staff' => _staffTab(cast),
+            _ => _listsTab(manga),
+          },
+        ),
       ],
     );
   }

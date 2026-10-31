@@ -21,6 +21,7 @@ import 'manga_detail_page.dart';
 import 'movie_detail_page.dart';
 import 'tv_detail_page.dart';
 import '../components/media/smooth_image.dart';
+import '../components/layout/bottom_padding.dart';
 
 typedef MediaDetailEnv = ({
   ApiClient api,
@@ -94,6 +95,7 @@ class MediaDetailPage extends StatelessWidget {
           return ContentFrame(
             maxWidth: TgLayout.readingWidth,
             child: ListView(
+              padding: EdgeInsets.only(bottom: BottomPadding.of(context)),
               children: [
                 if (media.backdropUrl != null)
                   AspectRatio(
