@@ -374,7 +374,7 @@ class _GameTrackingSheetState extends State<GameTrackingSheet> {
     return SafeArea(
       child: ListView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1063,9 +1063,10 @@ class _GameScreenshotsEditorState extends State<GameScreenshotsEditor> {
         children: [
           OutlinedButton.icon(
             onPressed: _pickAndUpload,
-            icon: const HugeIcon(
+            icon: HugeIcon(
               icon: HugeIcons.strokeRoundedUpload01,
               size: 16,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
             label: Text(
               context
@@ -1091,9 +1092,10 @@ class _GameScreenshotsEditorState extends State<GameScreenshotsEditor> {
               const SizedBox(width: 8),
               IconButton.filled(
                 onPressed: _addVideo,
-                icon: const HugeIcon(
+                icon: HugeIcon(
                   icon: HugeIcons.strokeRoundedAdd01,
                   size: 16,
+                  color: Theme.of(context).colorScheme.onPrimary,
                 ),
                 tooltip: context.t('feed:addVideo'),
               ),
@@ -1253,7 +1255,7 @@ class _ScreenshotRowState extends State<_ScreenshotRow> {
                     ),
                   if (video != null)
                     Container(
-                      color: Colors.black38,
+                      color: Colors.black54,
                       child: const Center(
                         child: HugeIcon(
                           icon: HugeIcons.strokeRoundedPlay,

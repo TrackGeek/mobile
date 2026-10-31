@@ -21,7 +21,6 @@ import '../components/details/refresh_data.dart';
 import '../components/details/tracking.dart';
 import '../components/details/watch_links_row.dart';
 import '../components/details/watch_providers.dart';
-import '../components/layout/adaptive_grid_delegate.dart';
 import '../components/layout/content_frame.dart';
 import '../components/user/comments_card.dart';
 import '../components/user/star_rating.dart';
@@ -514,10 +513,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                     final content = Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (wide) ...[
-                          _buildHeader(movie),
-                          const SizedBox(height: 24),
-                        ],
+                        if (wide) ...[_buildHeader(movie)],
                         _buildTabs(movie, inset),
                         const SizedBox(height: 32),
                         Padding(
@@ -550,7 +546,6 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: _buildHeader(movie),
                           ),
-                          const SizedBox(height: 24),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: _buildSidebar(movie),
@@ -669,25 +664,28 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
         ],
         if (movie.status != null || release != null) ...[
           const SizedBox(height: 14),
-          Row(
-            children: [
-              if (movie.status != null)
-                Expanded(
-                  child: MetaStatCard(
-                    label: context.t('common:status'),
-                    value: statusLabel(context, movie.status!),
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (movie.status != null)
+                  Expanded(
+                    child: MetaStatCard(
+                      label: context.t('common:status'),
+                      value: statusLabel(context, movie.status!),
+                    ),
                   ),
-                ),
-              if (movie.status != null && release != null)
-                const SizedBox(width: 10),
-              if (release != null)
-                Expanded(
-                  child: MetaStatCard(
-                    label: context.t('common:releaseDate'),
-                    value: release,
+                if (movie.status != null && release != null)
+                  const SizedBox(width: 10),
+                if (release != null)
+                  Expanded(
+                    child: MetaStatCard(
+                      label: context.t('common:releaseDate'),
+                      value: release,
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ],
         if (_loggedIn) ...[
@@ -711,64 +709,66 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
   Widget _buildHeader(MovieDetail movie) {
     final theme = Theme.of(context);
     final reviews = _reviewsPage;
+    final hasReviews = reviews != null && (reviews.total ?? 0) >= 1;
     final collection = movie.belongsToCollection;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          movie.title,
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        if (collection != null && collection.name.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          InkWell(
-            onTap: () => _openFranchise(collection),
-            borderRadius: BorderRadius.circular(6),
-            child: Row(
+    if ((collection == null || collection.name.isEmpty) && !hasReviews) {
+      return const SizedBox.shrink();
+    }
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          if (collection != null && collection.name.isNotEmpty) ...[
+            InkWell(
+              onTap: () => _openFranchise(collection),
+              borderRadius: BorderRadius.circular(6),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  HugeIcon(
+                    icon: HugeIcons.strokeRoundedPackage,
+                    size: 17,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      collection.name,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          if (hasReviews && (collection != null && collection.name.isNotEmpty))
+            const SizedBox(height: 10),
+          if (hasReviews)
+            Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                HugeIcon(
-                  icon: HugeIcons.strokeRoundedPackage,
-                  size: 17,
-                  color: theme.colorScheme.onSurfaceVariant,
+                StarRating(value: movie.tgReviewScore),
+                const SizedBox(width: 6),
+                Text(
+                  movie.tgReviewScore.toStringAsFixed(1),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-                const SizedBox(width: 8),
-                Flexible(
-                  child: Text(
-                    collection.name,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: theme.colorScheme.primary,
-                    ),
+                const SizedBox(width: 4),
+                Text(
+                  '(${context.t('common:reviewCount', {'count': reviews.total ?? 0})})',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
             ),
-          ),
         ],
-        const SizedBox(height: 10),
-        if (reviews != null && (reviews.total ?? 0) >= 1)
-          Row(
-            children: [
-              StarRating(value: movie.tgReviewScore),
-              const SizedBox(width: 6),
-              Text(
-                movie.tgReviewScore.toStringAsFixed(1),
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                '(${context.t('common:reviewCount', {'count': reviews.total ?? 0})})',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-      ],
+      ),
     );
   }
 
@@ -1038,16 +1038,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
         title: context.t('common:noResults'),
       );
     }
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: AdaptiveGridDelegate(
-        context: context,
-        maxCrossAxisExtent: 160,
-        childAspectRatio: 0.50,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-      ),
+    return PeopleGrid(
       itemCount: movie.cast.length,
       itemBuilder: (context, index) {
         final member = movie.cast[index];
@@ -1087,16 +1078,8 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
             description: context.t('library:noListsDescription'),
           )
         else
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: AdaptiveGridDelegate(
-              context: context,
-              maxCrossAxisExtent: 260,
-              childAspectRatio: 1.6,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
+          PeopleGrid(
+            maxCrossAxisExtent: 420,
             itemCount: lists.items.length,
             itemBuilder: (context, index) => MediaListCard(
               list: lists.items[index],

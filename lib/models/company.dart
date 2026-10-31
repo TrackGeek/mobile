@@ -9,6 +9,7 @@ class CompanyWork {
     this.backdropUrl,
     this.releaseDate,
     this.year,
+    this.mediaType,
     this.roles = const [],
     this.isAdult = false,
     this.externalReviewScore,
@@ -23,6 +24,7 @@ class CompanyWork {
   final String? backdropUrl;
   final String? releaseDate;
   final int? year;
+  final MediaType? mediaType;
   final List<String> roles;
   final bool isAdult;
   final double? externalReviewScore;
@@ -37,6 +39,13 @@ class CompanyWork {
     backdropUrl: json['backdropUrl'] as String?,
     releaseDate: json['releaseDate'] as String?,
     year: (json['year'] as num?)?.toInt(),
+    mediaType: switch ('${json['mediaType']}') {
+      'movie' => MediaType.movie,
+      'tv' => MediaType.tv,
+      'anime' => MediaType.anime,
+      'game' => MediaType.game,
+      _ => null,
+    },
     roles: [for (final r in json['roles'] as List? ?? const []) '$r'],
     isAdult: json['isAdult'] as bool? ?? false,
     externalReviewScore: (json['externalReviewScore'] as num?)?.toDouble(),

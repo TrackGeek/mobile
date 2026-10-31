@@ -17,7 +17,6 @@ import '../components/details/people_cards.dart';
 import '../components/details/refresh_data.dart';
 import '../components/details/relations_view.dart';
 import '../components/details/tracking.dart';
-import '../components/layout/adaptive_grid_delegate.dart';
 import '../components/layout/content_frame.dart';
 import '../components/user/star_rating.dart';
 import '../l10n/l10n_context.dart';
@@ -265,18 +264,22 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
     setState(() => _statusBusy = true);
     try {
       final current = _progress;
+      final now = DateTime.now().toIso8601String();
       if (current != null && current.status == status) {
         await _manga.deleteProgress(current.id);
       } else {
         await _manga.saveProgress(
           manga.id,
           status: status,
-          startedAt: status == 'Reading'
-              ? DateTime.now().toIso8601String()
-              : null,
+          chaptersRead:
+              status == 'Completed' && (manga.numberOfChapters ?? 0) > 0
+              ? manga.numberOfChapters
+              : current?.chaptersRead,
+          readCount: current?.readCount,
+          startedAt: status == 'Reading' ? now : current?.startedAt,
           completedAt: status == 'Completed'
-              ? DateTime.now().toIso8601String()
-              : null,
+              ? (current?.completedAt ?? now)
+              : current?.completedAt,
         );
       }
       await _reloadTracking();
@@ -397,11 +400,36 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
     );
   }
 
-  void _writeReview() {
-    if (_progress?.status != 'Completed') {
-      _setStatus('Completed');
+  Future<void> _writeReview() async {
+    final manga = _mangaDetail;
+    if (manga == null || _statusBusy || !_loggedIn) return;
+    final current = _progress;
+    final total = manga.numberOfChapters;
+    final needsSave =
+        current?.status != 'Completed' ||
+        current?.completedAt == null ||
+        (total != null && total > 0 && current?.chaptersRead != total);
+    if (needsSave) {
+      setState(() => _statusBusy = true);
+      try {
+        await _manga.saveProgress(
+          manga.id,
+          status: 'Completed',
+          chaptersRead: total != null && total > 0
+              ? total
+              : current?.chaptersRead,
+          readCount: current?.readCount,
+          startedAt: current?.startedAt,
+          completedAt: current?.completedAt ?? DateTime.now().toIso8601String(),
+        );
+        await _reloadTracking();
+      } catch (_) {
+        _toast('api:INTERNAL_SERVER_ERROR');
+      } finally {
+        if (mounted) setState(() => _statusBusy = false);
+      }
     }
-    _openMoreOptions();
+    if (mounted) _openMoreOptions();
   }
 
   void _openCastPerson(int anilistId) {
@@ -509,10 +537,7 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
                     final content = Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (wide) ...[
-                          _buildHeader(manga),
-                          const SizedBox(height: 24),
-                        ],
+                        if (wide) ...[_buildHeader(manga)],
                         _buildTabs(manga, inset),
                         const SizedBox(height: 32),
                         Padding(
@@ -543,7 +568,6 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: _buildHeader(manga),
                           ),
-                          const SizedBox(height: 24),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: _buildSidebar(manga),
@@ -615,25 +639,28 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
         ],
         if (manga.status != null || release != null) ...[
           const SizedBox(height: 14),
-          Row(
-            children: [
-              if (manga.status != null)
-                Expanded(
-                  child: MetaStatCard(
-                    label: context.t('common:status'),
-                    value: manga.status!,
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (manga.status != null)
+                  Expanded(
+                    child: MetaStatCard(
+                      label: context.t('common:status'),
+                      value: manga.status!,
+                    ),
                   ),
-                ),
-              if (manga.status != null && release != null)
-                const SizedBox(width: 10),
-              if (release != null)
-                Expanded(
-                  child: MetaStatCard(
-                    label: context.t('common:releaseDate'),
-                    value: release,
+                if (manga.status != null && release != null)
+                  const SizedBox(width: 10),
+                if (release != null)
+                  Expanded(
+                    child: MetaStatCard(
+                      label: context.t('common:releaseDate'),
+                      value: release,
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ],
         if (altTitles.isNotEmpty) ...[
@@ -708,44 +735,33 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
   Widget _buildHeader(MangaDetail manga) {
     final theme = Theme.of(context);
     final reviews = _reviewsPage;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          manga.title,
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        const SizedBox(height: 10),
-        Wrap(
-          spacing: 16,
-          runSpacing: 8,
-          crossAxisAlignment: WrapCrossAlignment.center,
+    if (reviews == null || (reviews.total ?? 0) < 1) {
+      return const SizedBox.shrink();
+    }
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24),
+      child: Center(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                StarRating(value: manga.tgReviewScore),
-                const SizedBox(width: 6),
-                Text(
-                  manga.tgReviewScore.toStringAsFixed(1),
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '(${context.t('common:reviewCount', {'count': reviews?.total ?? 0, 'formattedCount': (reviews?.total ?? 0).humanizedCount()})})',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
+            StarRating(value: manga.tgReviewScore),
+            const SizedBox(width: 6),
+            Text(
+              manga.tgReviewScore.toStringAsFixed(1),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              '(${context.t('common:reviewCount', {'count': reviews.total ?? 0, 'formattedCount': (reviews.total ?? 0).humanizedCount()})})',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),
-      ],
+      ),
     );
   }
 
@@ -1010,16 +1026,7 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
   }
 
   Widget _charactersTab(MangaDetail manga) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: AdaptiveGridDelegate(
-        context: context,
-        maxCrossAxisExtent: 160,
-        childAspectRatio: 0.50,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-      ),
+    return PeopleGrid(
       itemCount: manga.characters.length,
       itemBuilder: (context, index) {
         final character = manga.characters[index];
@@ -1029,16 +1036,7 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
   }
 
   Widget _staffTab(List<MangaCast> cast) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: AdaptiveGridDelegate(
-        context: context,
-        maxCrossAxisExtent: 160,
-        childAspectRatio: 0.50,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-      ),
+    return PeopleGrid(
       itemCount: cast.length,
       itemBuilder: (context, index) {
         final person = cast[index];
@@ -1078,16 +1076,8 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
             description: context.t('library:noListsDescription'),
           )
         else
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: AdaptiveGridDelegate(
-              context: context,
-              maxCrossAxisExtent: 260,
-              childAspectRatio: 1.6,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
+          PeopleGrid(
+            maxCrossAxisExtent: 420,
             itemCount: lists.items.length,
             itemBuilder: (context, index) => MediaListCard(
               list: lists.items[index],

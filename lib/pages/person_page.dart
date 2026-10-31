@@ -12,6 +12,7 @@ import '../components/person/person_error.dart';
 import '../components/person/person_hero.dart';
 import '../controllers/session_controller.dart';
 import '../l10n/l10n_context.dart';
+import '../models/api_exception.dart';
 import '../models/media_type.dart';
 import '../models/person.dart';
 import '../services/api_client.dart';
@@ -94,18 +95,41 @@ class _PersonPageState extends State<PersonPage> {
   }
 
   Future<Person> _load() async {
-    final language = L10nScope.of(context).language;
+    final language = L10nScope.read(context).language;
+    Future<Person> fetch() => switch (widget.request) {
+      PersonSlugRequest(:final slug) => widget.people.person(
+        slug,
+        language: language,
+      ),
+      MangaCastRequest(:final anilistId) => widget.people.mangaCast(
+        anilistId,
+        language: language,
+      ),
+    };
+    Future<Person> fetchWithRetry() async {
+      for (var attempt = 0; ; attempt++) {
+        try {
+          return await fetch();
+        } catch (e) {
+          final retryable =
+              e is! ApiException ||
+              switch (e.failure) {
+                ApiFailure.timeout ||
+                ApiFailure.network ||
+                ApiFailure.server ||
+                ApiFailure.rateLimited => true,
+                _ => false,
+              };
+          if (attempt >= 2 || !retryable) rethrow;
+          await Future<void>.delayed(
+            Duration(milliseconds: 400 * (attempt + 1)),
+          );
+        }
+      }
+    }
+
     final results = await Future.wait([
-      switch (widget.request) {
-        PersonSlugRequest(:final slug) => widget.people.person(
-          slug,
-          language: language,
-        ),
-        MangaCastRequest(:final anilistId) => widget.people.mangaCast(
-          anilistId,
-          language: language,
-        ),
-      },
+      fetchWithRetry(),
       ensureDateLocale(language),
     ]);
     final person = results[0] as Person;

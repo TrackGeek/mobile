@@ -139,7 +139,7 @@ class _WatchProvidersSectionState extends State<WatchProvidersSection> {
       final providers = await widget.providers(
         widget.tmdbId,
         region: region,
-        language: L10nScope.of(context).language,
+        language: L10nScope.read(context).language,
       );
       if (!mounted) return;
       setState(() {
@@ -160,7 +160,7 @@ class _WatchProvidersSectionState extends State<WatchProvidersSection> {
     if (_regions != null) return;
     try {
       final regions = await widget.regions(
-        language: L10nScope.of(context).language,
+        language: L10nScope.read(context).language,
       );
       if (!mounted) return;
       setState(() {

@@ -53,16 +53,6 @@ class GameFranchiseBanner extends StatelessWidget {
                       color: theme.colorScheme.onSurface,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    franchise.name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                  ),
                   if (franchise.description != null &&
                       franchise.description!.isNotEmpty) ...[
                     const SizedBox(height: 6),

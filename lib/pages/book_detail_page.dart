@@ -13,9 +13,9 @@ import '../components/details/detail_widgets.dart';
 import '../components/details/editions_section.dart';
 import '../components/details/genre_pills.dart';
 import '../components/details/media_list_card.dart';
+import '../components/details/people_cards.dart';
 import '../components/details/refresh_data.dart';
 import '../components/details/tracking.dart';
-import '../components/layout/adaptive_grid_delegate.dart';
 import '../components/layout/content_frame.dart';
 import '../components/user/comments_card.dart';
 import '../components/user/star_rating.dart';
@@ -247,18 +247,24 @@ class _BookDetailPageState extends State<BookDetailPage> {
     setState(() => _statusBusy = true);
     try {
       final current = _progress;
+      final now = DateTime.now().toIso8601String();
       if (current != null && current.status == status) {
         await _books.deleteProgress(current.id);
       } else {
         await _books.saveProgress(
           book.id,
           status: status,
-          startedAt: status == 'Reading'
-              ? DateTime.now().toIso8601String()
+          pagesRead: status == 'Completed'
+              ? (current?.totalPages ?? book.numberOfPages)
               : null,
+          totalPages: status == 'Completed'
+              ? (current?.totalPages ?? book.numberOfPages)
+              : null,
+          readCount: current?.readCount,
+          startedAt: status == 'Reading' ? now : current?.startedAt,
           completedAt: status == 'Completed'
-              ? DateTime.now().toIso8601String()
-              : null,
+              ? (current?.completedAt ?? now)
+              : current?.completedAt,
         );
       }
       await _reloadTracking();
@@ -397,9 +403,9 @@ class _BookDetailPageState extends State<BookDetailPage> {
     );
   }
 
-  void _writeReview() {
+  Future<void> _writeReview() async {
     if (_progress?.status != 'Completed') {
-      _setStatus('Completed');
+      await _setStatus('Completed');
     }
     _openMoreOptions();
   }
@@ -476,10 +482,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                     final content = Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (wide) ...[
-                          _buildHeader(book),
-                          const SizedBox(height: 24),
-                        ],
+                        if (wide) ...[_buildHeader(book)],
                         _buildTabs(book, inset),
                         const SizedBox(height: 32),
                         Padding(
@@ -512,7 +515,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: _buildHeader(book),
                           ),
-                          const SizedBox(height: 24),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: _buildSidebar(book),
@@ -583,25 +585,28 @@ class _BookDetailPageState extends State<BookDetailPage> {
         ],
         if (book.numberOfPages != null || release != null) ...[
           const SizedBox(height: 14),
-          Row(
-            children: [
-              if (book.numberOfPages != null)
-                Expanded(
-                  child: MetaStatCard(
-                    label: context.t('library:page_other'),
-                    value: book.numberOfPages!.humanizedCount(),
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (book.numberOfPages != null)
+                  Expanded(
+                    child: MetaStatCard(
+                      label: context.t('library:page_other'),
+                      value: book.numberOfPages!.humanizedCount(),
+                    ),
                   ),
-                ),
-              if (book.numberOfPages != null && release != null)
-                const SizedBox(width: 10),
-              if (release != null)
-                Expanded(
-                  child: MetaStatCard(
-                    label: context.t('common:releaseDate'),
-                    value: release,
+                if (book.numberOfPages != null && release != null)
+                  const SizedBox(width: 10),
+                if (release != null)
+                  Expanded(
+                    child: MetaStatCard(
+                      label: context.t('common:releaseDate'),
+                      value: release,
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ],
         if (_loggedIn) ...[
@@ -620,108 +625,110 @@ class _BookDetailPageState extends State<BookDetailPage> {
   Widget _buildHeader(BookDetail book) {
     final theme = Theme.of(context);
     final reviews = _reviewsPage;
+    final hasReviews = reviews != null && (reviews.total ?? 0) >= 1;
     final pages = book.numberOfPages;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          book.title,
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        if (book.bookSeries.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 3),
-                child: HugeIcon(
-                  icon: HugeIcons.strokeRoundedBook02,
-                  size: 17,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Wrap(
-                  children: [
-                    for (var i = 0; i < book.bookSeries.length; i++) ...[
-                      if (i > 0)
-                        Text(
-                          ', ',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      InkWell(
-                        onTap: () => _openFranchise(book.bookSeries[i]),
-                        child: Text(
-                          book.bookSeries[i].position != null
-                              ? '${book.bookSeries[i].series.name} #${book.bookSeries[i].positionLabel}'
-                              : book.bookSeries[i].series.name,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: theme.colorScheme.primary,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-        const SizedBox(height: 10),
-        Wrap(
-          spacing: 16,
-          runSpacing: 8,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            if (reviews != null && (reviews.total ?? 0) >= 1)
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  StarRating(value: book.tgReviewScore),
-                  const SizedBox(width: 6),
-                  Text(
-                    book.tgReviewScore.toStringAsFixed(1),
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    '(${context.t('common:reviewCount', {'count': reviews.total ?? 0})})',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            if (pages != null)
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  HugeIcon(
-                    icon: HugeIcons.strokeRoundedChartBarLine,
+    if (book.bookSeries.isEmpty && pages == null && !hasReviews) {
+      return const SizedBox.shrink();
+    }
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          if (book.bookSeries.isNotEmpty) ...[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 3),
+                  child: HugeIcon(
+                    icon: HugeIcons.strokeRoundedBook02,
                     size: 17,
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
-                  const SizedBox(width: 6),
-                  Text(
-                    '${context.t('library:medium')}: '
-                    '${context.t('common:dayCount', {'count': (pages / 29).round()})}',
-                    style: theme.textTheme.bodySmall?.copyWith(
+                ),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    children: [
+                      for (var i = 0; i < book.bookSeries.length; i++) ...[
+                        if (i > 0)
+                          Text(
+                            ', ',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        InkWell(
+                          onTap: () => _openFranchise(book.bookSeries[i]),
+                          child: Text(
+                            book.bookSeries[i].position != null
+                                ? '${book.bookSeries[i].series.name} #${book.bookSeries[i].positionLabel}'
+                                : book.bookSeries[i].series.name,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 16,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              if (reviews != null && (reviews.total ?? 0) >= 1)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    StarRating(value: book.tgReviewScore),
+                    const SizedBox(width: 6),
+                    Text(
+                      book.tgReviewScore.toStringAsFixed(1),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '(${context.t('common:reviewCount', {'count': reviews.total ?? 0})})',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              if (pages != null)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    HugeIcon(
+                      icon: HugeIcons.strokeRoundedChartBarLine,
+                      size: 17,
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
-                  ),
-                ],
-              ),
-          ],
-        ),
-      ],
+                    const SizedBox(width: 6),
+                    Text(
+                      '${context.t('library:medium')}: '
+                      '${context.t('common:dayCount', {'count': (pages / 29).round()})}',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -959,16 +966,8 @@ class _BookDetailPageState extends State<BookDetailPage> {
             description: context.t('library:noListsDescription'),
           )
         else
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: AdaptiveGridDelegate(
-              context: context,
-              maxCrossAxisExtent: 260,
-              childAspectRatio: 1.6,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
+          PeopleGrid(
+            maxCrossAxisExtent: 420,
             itemCount: lists.items.length,
             itemBuilder: (context, index) => MediaListCard(
               list: lists.items[index],

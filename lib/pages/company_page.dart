@@ -69,7 +69,7 @@ class _CompanyPageState extends State<CompanyPage> {
       final company = await _companies.company(
         widget.type,
         widget.id,
-        language: L10nScope.of(context).language,
+        language: L10nScope.read(context).language,
       );
       if (!mounted) return;
       setState(() {
@@ -77,10 +77,21 @@ class _CompanyPageState extends State<CompanyPage> {
         _loading = false;
       });
     } on ApiException catch (e) {
+      debugPrint(
+        'CompanyPage load failed: ${e.failure} ${e.statusCode} ${e.serverCode}',
+      );
       if (mounted) {
         setState(() {
           _loading = false;
           _error = e;
+        });
+      }
+    } catch (e, st) {
+      debugPrint('CompanyPage load crashed: $e\n$st');
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _error = const ApiException(ApiFailure.invalidResponse);
         });
       }
     }
@@ -96,7 +107,7 @@ class _CompanyPageState extends State<CompanyPage> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => mediaDetailPage(
-          type: widget.type,
+          type: work.mediaType ?? widget.type,
           id: '${work.id}',
           details: widget.env.details,
           env: widget.env,
@@ -275,137 +286,141 @@ class _CompanyPageState extends State<CompanyPage> {
             ),
             Padding(
               padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  Container(
-                    width: 140,
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: theme.colorScheme.outlineVariant,
+              child: SizedBox(
+                width: double.infinity,
+                child: Column(
+                  children: [
+                    Container(
+                      width: 140,
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: theme.colorScheme.outlineVariant,
+                        ),
+                        color: theme.colorScheme.surface.withValues(alpha: 0.8),
                       ),
-                      color: theme.colorScheme.surface.withValues(alpha: 0.8),
-                    ),
-                    child: company.logoUrl?.isNotEmpty == true
-                        ? SmoothImage(
-                            url: company.logoUrl!,
-                            height: 80,
-                            fit: BoxFit.contain,
-                            error: HugeIcon(
+                      child: company.logoUrl?.isNotEmpty == true
+                          ? SmoothImage(
+                              url: company.logoUrl!,
+                              height: 80,
+                              fit: BoxFit.contain,
+                              error: HugeIcon(
+                                icon: HugeIcons.strokeRoundedBuilding03,
+                                size: 48,
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            )
+                          : HugeIcon(
                               icon: HugeIcons.strokeRoundedBuilding03,
                               size: 48,
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
-                          )
-                        : HugeIcon(
-                            icon: HugeIcons.strokeRoundedBuilding03,
-                            size: 48,
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    context
-                        .t(
-                          _mediaLabelKeys[company.mediaType] ??
-                              'library:studios',
-                        )
-                        .toUpperCase(),
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 2,
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    company.name,
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 14,
-                    runSpacing: 6,
-                    alignment: WrapAlignment.center,
-                    children: [
-                      if (founded != null)
-                        _meta(
-                          theme,
-                          HugeIcons.strokeRoundedCalendar01,
-                          '${context.t('library:founded')} $founded',
-                        ),
-                      if (company.headquarters?.isNotEmpty == true)
-                        _meta(
-                          theme,
-                          HugeIcons.strokeRoundedLocation01,
-                          company.headquarters!,
-                        ),
-                      if (company.originCountry?.isNotEmpty == true)
-                        _meta(
-                          theme,
-                          HugeIcons.strokeRoundedEarth,
-                          company.originCountry!,
-                        ),
-                      _meta(
-                        theme,
-                        HugeIcons.strokeRoundedLayers01,
-                        context.t('common:titleCount', {
-                          'count': company.totalWorks,
-                        }),
-                      ),
-                    ],
-                  ),
-                  if (links.isNotEmpty) ...[
                     const SizedBox(height: 14),
+                    Text(
+                      context
+                          .t(
+                            _mediaLabelKeys[company.mediaType] ??
+                                'library:studios',
+                          )
+                          .toUpperCase(),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 2,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      company.name,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
                     Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
+                      spacing: 14,
+                      runSpacing: 6,
                       alignment: WrapAlignment.center,
                       children: [
-                        for (final link in links)
-                          InkWell(
-                            onTap: () => _openUrl(link.href),
-                            borderRadius: BorderRadius.circular(10),
-                            child: Container(
-                              width: 42,
-                              height: 42,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: theme.colorScheme.outlineVariant,
-                                ),
-                                color: theme.colorScheme.surface.withValues(
-                                  alpha: 0.6,
-                                ),
-                              ),
-                              child: Center(
-                                child: link.asset.isEmpty
-                                    ? HugeIcon(
-                                        icon: HugeIcons.strokeRoundedLink01,
-                                        size: 18,
-                                        color:
-                                            theme.colorScheme.onSurfaceVariant,
-                                      )
-                                    : SvgPicture.asset(
-                                        link.asset,
-                                        width: 18,
-                                        height: 18,
-                                        colorFilter: ColorFilter.mode(
-                                          theme.colorScheme.onSurfaceVariant,
-                                          BlendMode.srcIn,
-                                        ),
-                                      ),
-                              ),
-                            ),
+                        if (founded != null)
+                          _meta(
+                            theme,
+                            HugeIcons.strokeRoundedCalendar01,
+                            '${context.t('library:founded')} $founded',
                           ),
+                        if (company.headquarters?.isNotEmpty == true)
+                          _meta(
+                            theme,
+                            HugeIcons.strokeRoundedLocation01,
+                            company.headquarters!,
+                          ),
+                        if (company.originCountry?.isNotEmpty == true)
+                          _meta(
+                            theme,
+                            HugeIcons.strokeRoundedEarth,
+                            company.originCountry!,
+                          ),
+                        _meta(
+                          theme,
+                          HugeIcons.strokeRoundedLayers01,
+                          context.t('common:titleCount', {
+                            'count': company.totalWorks,
+                          }),
+                        ),
                       ],
                     ),
+                    if (links.isNotEmpty) ...[
+                      const SizedBox(height: 14),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        alignment: WrapAlignment.center,
+                        children: [
+                          for (final link in links)
+                            InkWell(
+                              onTap: () => _openUrl(link.href),
+                              borderRadius: BorderRadius.circular(10),
+                              child: Container(
+                                width: 42,
+                                height: 42,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: theme.colorScheme.outlineVariant,
+                                  ),
+                                  color: theme.colorScheme.surface.withValues(
+                                    alpha: 0.6,
+                                  ),
+                                ),
+                                child: Center(
+                                  child: link.asset.isEmpty
+                                      ? HugeIcon(
+                                          icon: HugeIcons.strokeRoundedLink01,
+                                          size: 18,
+                                          color: theme
+                                              .colorScheme
+                                              .onSurfaceVariant,
+                                        )
+                                      : SvgPicture.asset(
+                                          link.asset,
+                                          width: 18,
+                                          height: 18,
+                                          colorFilter: ColorFilter.mode(
+                                            theme.colorScheme.onSurfaceVariant,
+                                            BlendMode.srcIn,
+                                          ),
+                                        ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
           ],

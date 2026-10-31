@@ -44,7 +44,7 @@ class _BookFranchisePageState extends State<BookFranchisePage> {
   }
 
   Future<void> _load() async {
-    final language = L10nScope.of(context).language;
+    final language = L10nScope.read(context).language;
     setState(() {
       _loading = true;
       _error = null;
@@ -61,6 +61,13 @@ class _BookFranchisePageState extends State<BookFranchisePage> {
         setState(() {
           _loading = false;
           _error = e;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _error = const ApiException(ApiFailure.invalidResponse);
         });
       }
     }

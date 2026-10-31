@@ -339,7 +339,7 @@ class _MangaTrackingSheetState extends State<MangaTrackingSheet> {
     return SafeArea(
       child: ListView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,

@@ -51,7 +51,7 @@ class _MovieFranchisePageState extends State<MovieFranchisePage> {
     try {
       final franchise = await _movies.franchise(
         widget.slug,
-        language: L10nScope.of(context).language,
+        language: L10nScope.read(context).language,
       );
       if (!mounted) return;
       setState(() {
@@ -63,6 +63,13 @@ class _MovieFranchisePageState extends State<MovieFranchisePage> {
         setState(() {
           _loading = false;
           _error = e;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _error = const ApiException(ApiFailure.invalidResponse);
         });
       }
     }
@@ -145,36 +152,6 @@ class _MovieFranchisePageState extends State<MovieFranchisePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 3,
-                              ),
-                              decoration: BoxDecoration(
-                                color:
-                                    theme.colorScheme.surfaceContainerHighest,
-                                borderRadius: BorderRadius.circular(4),
-                                border: Border.all(
-                                  color: theme.colorScheme.outlineVariant,
-                                ),
-                              ),
-                              child: Text(
-                                context.t('common:franchise'),
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            franchise.name,
-                            style: theme.textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
                           if (franchise.overview?.isNotEmpty == true) ...[
                             const SizedBox(height: 8),
                             Text(

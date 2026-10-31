@@ -33,30 +33,48 @@ class RefreshDataCard extends StatelessWidget {
       builder: (dialogContext) => AlertDialog(
         title: Text(context.t('library:refreshDataModal.title')),
         content: Text(context.t('library:refreshDataModal.description')),
+        actionsOverflowDirection: VerticalDirection.down,
+        actionsAlignment: MainAxisAlignment.center,
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(context.t('common:cancel')),
-          ),
-          TextButton.icon(
-            onPressed: () {
-              Navigator.of(dialogContext).pop();
-              _openSource();
-            },
-            icon: const HugeIcon(icon: HugeIcons.strokeRoundedLink01, size: 16),
-            label: Text(context.t('library:refreshDataModal.checkSource')),
-          ),
-          FilledButton.icon(
-            onPressed: () {
-              Navigator.of(dialogContext).pop();
-              onRefresh();
-            },
-            icon: const HugeIcon(
-              icon: HugeIcons.strokeRoundedRefresh,
-              size: 16,
-            ),
-            label: Text(
-              context.t('library:refreshDataModal.refreshInfoButton'),
+          SizedBox(
+            width: double.infinity,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                FilledButton.icon(
+                  onPressed: () {
+                    Navigator.of(dialogContext).pop();
+                    onRefresh();
+                  },
+                  icon: const HugeIcon(
+                    icon: HugeIcons.strokeRoundedRefresh,
+                    size: 16,
+                  ),
+                  label: Text(
+                    context.t('library:refreshDataModal.refreshInfoButton'),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.of(dialogContext).pop();
+                    _openSource();
+                  },
+                  icon: const HugeIcon(
+                    icon: HugeIcons.strokeRoundedLink01,
+                    size: 16,
+                  ),
+                  label: Text(
+                    context.t('library:refreshDataModal.checkSource'),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: Text(context.t('common:cancel')),
+                ),
+              ],
             ),
           ),
         ],

@@ -326,18 +326,24 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
     setState(() => _statusBusy = true);
     try {
       final current = _progress;
+      final now = DateTime.now().toIso8601String();
       if (current != null && current.status == status) {
         await _animeService.deleteProgress(current.id);
       } else {
+        final total = anime.numberOfEpisodes ?? 0;
+        if (status == 'Completed' && total > 0) {
+          await _animeService.watchEpisodes(anime.id, [
+            for (var i = 1; i <= total; i++) i,
+          ]);
+        }
         await _animeService.saveProgress(
           anime.id,
           status: status,
-          startedAt: status == 'Watching'
-              ? DateTime.now().toIso8601String()
-              : null,
+          watchCount: current?.watchCount,
+          startedAt: status == 'Watching' ? now : current?.startedAt,
           completedAt: status == 'Completed'
-              ? DateTime.now().toIso8601String()
-              : null,
+              ? (current?.completedAt ?? now)
+              : current?.completedAt,
         );
       }
       await _reloadTracking();
@@ -638,10 +644,7 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
                     final content = Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (wide) ...[
-                          _buildHeader(anime),
-                          const SizedBox(height: 24),
-                        ],
+                        if (wide) ...[_buildHeader(anime)],
                         _buildTabs(anime, inset),
                         const SizedBox(height: 32),
                         Padding(
@@ -672,7 +675,6 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: _buildHeader(anime),
                           ),
-                          const SizedBox(height: 24),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: _buildSidebar(anime),
@@ -738,27 +740,30 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
           ),
         ],
         const SizedBox(height: 14),
-        Row(
-          children: [
-            if (anime.status != null)
-              Expanded(
-                child: MetaStatCard(
-                  label: context.t('common:status'),
-                  value: anime.status!,
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (anime.status != null)
+                Expanded(
+                  child: MetaStatCard(
+                    label: context.t('common:status'),
+                    value: anime.status!,
+                  ),
                 ),
-              ),
-            if (anime.status != null &&
-                anime.season != null &&
-                anime.year != null)
-              const SizedBox(width: 10),
-            if (anime.season != null && anime.year != null)
-              Expanded(
-                child: MetaStatCard(
-                  label: context.t('common:releaseDate'),
-                  value: '${anime.season} ${anime.year}',
+              if (anime.status != null &&
+                  anime.season != null &&
+                  anime.year != null)
+                const SizedBox(width: 10),
+              if (anime.season != null && anime.year != null)
+                Expanded(
+                  child: MetaStatCard(
+                    label: context.t('common:releaseDate'),
+                    value: '${anime.season} ${anime.year}',
+                  ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
         if (anime.alternativeTitles.isNotEmpty) ...[
           const SizedBox(height: 10),
@@ -825,55 +830,59 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
   Widget _buildHeader(AnimeDetail anime) {
     final theme = Theme.of(context);
     final reviews = _reviewsPage;
+    final hasReviews = reviews != null && (reviews.total ?? 0) >= 1;
     final runtime = episodeRuntimeMinutes(anime.duration);
     final remaining = remainingWatchHours(
       totalEpisodes: anime.numberOfEpisodes ?? 0,
       watchedEpisodes: _watchedEpisodes,
       runtimeMinutes: runtime,
     );
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          anime.title,
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.w700,
+    if (!hasReviews &&
+        !(_loggedIn &&
+            _progress?.status == 'Watching' &&
+            _episodeWatch != null)) {
+      return const SizedBox.shrink();
+    }
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 16,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              if (reviews != null && (reviews.total ?? 0) >= 1)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    StarRating(value: anime.tgReviewScore),
+                    const SizedBox(width: 6),
+                    Text(
+                      anime.tgReviewScore.toStringAsFixed(1),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '(${context.t('common:reviewCount', {'count': reviews.total ?? 0})})',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              if (_loggedIn &&
+                  _progress?.status == 'Watching' &&
+                  _episodeWatch != null)
+                TimeLeft(hours: remaining),
+            ],
           ),
-        ),
-        const SizedBox(height: 10),
-        Wrap(
-          spacing: 16,
-          runSpacing: 8,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            if (reviews != null && (reviews.total ?? 0) >= 1)
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  StarRating(value: anime.tgReviewScore),
-                  const SizedBox(width: 6),
-                  Text(
-                    anime.tgReviewScore.toStringAsFixed(1),
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    '(${context.t('common:reviewCount', {'count': reviews.total ?? 0})})',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            if (_loggedIn &&
-                _progress?.status == 'Watching' &&
-                _episodeWatch != null)
-              TimeLeft(hours: remaining),
-          ],
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -1209,16 +1218,7 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
         title: context.t('common:types.cast'),
       );
     }
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: AdaptiveGridDelegate(
-        context: context,
-        maxCrossAxisExtent: 160,
-        childAspectRatio: 0.50,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-      ),
+    return PeopleGrid(
       itemCount: anime.cast.length,
       itemBuilder: (context, index) {
         final member = anime.cast[index];
@@ -1239,16 +1239,7 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
         title: context.t('library:characters'),
       );
     }
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: AdaptiveGridDelegate(
-        context: context,
-        maxCrossAxisExtent: 160,
-        childAspectRatio: 0.58,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-      ),
+    return PeopleGrid(
       itemCount: anime.characters.length,
       itemBuilder: (context, index) {
         final character = anime.characters[index];
@@ -1326,16 +1317,8 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
             description: context.t('library:noListsDescription'),
           )
         else
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: AdaptiveGridDelegate(
-              context: context,
-              maxCrossAxisExtent: 260,
-              childAspectRatio: 1.6,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
+          PeopleGrid(
+            maxCrossAxisExtent: 420,
             itemCount: lists.items.length,
             itemBuilder: (context, index) => MediaListCard(
               list: lists.items[index],

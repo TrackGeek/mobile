@@ -15,11 +15,11 @@ import '../components/details/game_media_carousel.dart';
 import '../components/details/game_tracking_sheet.dart';
 import '../components/details/genre_pills.dart';
 import '../components/details/media_list_card.dart';
+import '../components/details/people_cards.dart';
 import '../components/details/refresh_data.dart';
 import '../components/details/relations_view.dart';
 import '../components/details/tracking.dart';
 import '../components/details/website_icon.dart';
-import '../components/layout/adaptive_grid_delegate.dart';
 import '../components/layout/content_frame.dart';
 import '../components/user/star_rating.dart';
 import '../l10n/l10n_context.dart';
@@ -316,18 +316,24 @@ class _GameDetailPageState extends State<GameDetailPage> {
     setState(() => _statusBusy = true);
     try {
       final current = _progress;
+      final now = DateTime.now().toIso8601String();
       if (current != null && current.status == status) {
         await _games.deleteProgress(current.id);
       } else {
         await _games.saveProgress(
           game.id,
           status: status,
-          startedAt: status == 'Playing'
-              ? DateTime.now().toIso8601String()
-              : null,
+          playCount: current?.playCount,
+          completion: current?.completion,
+          platforms: current == null || current.platforms.isEmpty
+              ? null
+              : current.platforms,
+          hoursPlayed: current?.hoursPlayed,
+          notes: current?.notes,
+          startedAt: status == 'Playing' ? now : current?.startedAt,
           completedAt: status == 'Completed'
-              ? DateTime.now().toIso8601String()
-              : null,
+              ? (current?.completedAt ?? now)
+              : current?.completedAt,
         );
       }
       await _reloadTracking();
@@ -438,11 +444,34 @@ class _GameDetailPageState extends State<GameDetailPage> {
     );
   }
 
-  void _writeReview() {
-    if (_progress?.status != 'Completed') {
-      _setStatus('Completed');
+  Future<void> _writeReview() async {
+    final game = _game;
+    if (game == null || _statusBusy || !_loggedIn) return;
+    final current = _progress;
+    if (current?.status != 'Completed' || current?.completedAt == null) {
+      setState(() => _statusBusy = true);
+      try {
+        await _games.saveProgress(
+          game.id,
+          status: 'Completed',
+          playCount: current?.playCount,
+          completion: current?.completion,
+          platforms: current == null || current.platforms.isEmpty
+              ? null
+              : current.platforms,
+          hoursPlayed: current?.hoursPlayed,
+          notes: current?.notes,
+          startedAt: current?.startedAt,
+          completedAt: current?.completedAt ?? DateTime.now().toIso8601String(),
+        );
+        await _reloadTracking();
+      } catch (_) {
+        _toast('api:INTERNAL_SERVER_ERROR');
+      } finally {
+        if (mounted) setState(() => _statusBusy = false);
+      }
     }
-    _openMoreOptions();
+    if (mounted) _openMoreOptions();
   }
 
   void _openCompany(int companyId) {
@@ -542,10 +571,7 @@ class _GameDetailPageState extends State<GameDetailPage> {
                       final content = Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (wide) ...[
-                            _buildHeader(game),
-                            const SizedBox(height: 24),
-                          ],
+                          if (wide) ...[_buildHeader(game)],
                           _buildTabs(game, inset),
                           const SizedBox(height: 32),
                           Padding(
@@ -582,7 +608,6 @@ class _GameDetailPageState extends State<GameDetailPage> {
                               ),
                               child: _buildHeader(game),
                             ),
-                            const SizedBox(height: 24),
                             Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 16,
@@ -662,25 +687,28 @@ class _GameDetailPageState extends State<GameDetailPage> {
         ],
         if (game.gameStatus != null || release != null) ...[
           const SizedBox(height: 14),
-          Row(
-            children: [
-              if (game.gameStatus != null)
-                Expanded(
-                  child: MetaStatCard(
-                    label: context.t('common:status'),
-                    value: game.gameStatus!,
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (game.gameStatus != null)
+                  Expanded(
+                    child: MetaStatCard(
+                      label: context.t('common:status'),
+                      value: game.gameStatus!,
+                    ),
                   ),
-                ),
-              if (game.gameStatus != null && release != null)
-                const SizedBox(width: 10),
-              if (release != null)
-                Expanded(
-                  child: MetaStatCard(
-                    label: context.t('common:releaseDate'),
-                    value: release,
+                if (game.gameStatus != null && release != null)
+                  const SizedBox(width: 10),
+                if (release != null)
+                  Expanded(
+                    child: MetaStatCard(
+                      label: context.t('common:releaseDate'),
+                      value: release,
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ],
         if (_loggedIn) ...[
@@ -714,64 +742,66 @@ class _GameDetailPageState extends State<GameDetailPage> {
   Widget _buildHeader(GameDetail game) {
     final theme = Theme.of(context);
     final reviews = _reviewsPage;
+    final hasReviews = reviews != null && (reviews.total ?? 0) >= 1;
     final franchise = game.franchises.isEmpty ? null : game.franchises.first;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          game.name,
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        if (franchise != null && franchise.name.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          InkWell(
-            onTap: () => _openFranchise(franchise),
-            borderRadius: BorderRadius.circular(6),
-            child: Row(
+    if ((franchise == null || franchise.name.isEmpty) && !hasReviews) {
+      return const SizedBox.shrink();
+    }
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          if (franchise != null && franchise.name.isNotEmpty) ...[
+            InkWell(
+              onTap: () => _openFranchise(franchise),
+              borderRadius: BorderRadius.circular(6),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  HugeIcon(
+                    icon: HugeIcons.strokeRoundedPackage,
+                    size: 17,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      franchise.name,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          if (hasReviews && (franchise != null && franchise.name.isNotEmpty))
+            const SizedBox(height: 10),
+          if (hasReviews)
+            Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                HugeIcon(
-                  icon: HugeIcons.strokeRoundedPackage,
-                  size: 17,
-                  color: theme.colorScheme.onSurfaceVariant,
+                StarRating(value: game.tgReviewScore),
+                const SizedBox(width: 6),
+                Text(
+                  game.tgReviewScore.toStringAsFixed(1),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-                const SizedBox(width: 8),
-                Flexible(
-                  child: Text(
-                    franchise.name,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: theme.colorScheme.primary,
-                    ),
+                const SizedBox(width: 4),
+                Text(
+                  '(${context.t('common:reviewCount', {'count': reviews.total ?? 0})})',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
             ),
-          ),
         ],
-        const SizedBox(height: 10),
-        if (reviews != null && (reviews.total ?? 0) >= 1)
-          Row(
-            children: [
-              StarRating(value: game.tgReviewScore),
-              const SizedBox(width: 6),
-              Text(
-                game.tgReviewScore.toStringAsFixed(1),
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                '(${context.t('common:reviewCount', {'count': reviews.total ?? 0})})',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-      ],
+      ),
     );
   }
 
@@ -1085,16 +1115,8 @@ class _GameDetailPageState extends State<GameDetailPage> {
             description: context.t('library:noListsDescription'),
           )
         else
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: AdaptiveGridDelegate(
-              context: context,
-              maxCrossAxisExtent: 260,
-              childAspectRatio: 1.6,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
+          PeopleGrid(
+            maxCrossAxisExtent: 420,
             itemCount: lists.items.length,
             itemBuilder: (context, index) => MediaListCard(
               list: lists.items[index],

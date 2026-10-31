@@ -114,78 +114,83 @@ class PersonHero extends StatelessWidget {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                children: [
-                  const SizedBox(height: 24),
-                  PersonImage(person: person),
-                  const SizedBox(height: 24),
-                  if (person.knownForDepartment != null &&
-                      person.knownForDepartment!.isNotEmpty)
+            SizedBox(
+              width: double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 24),
+                    PersonImage(person: person),
+                    const SizedBox(height: 24),
+                    if (person.knownForDepartment != null &&
+                        person.knownForDepartment!.isNotEmpty)
+                      Text(
+                        person.knownForDepartment!.toUpperCase(),
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 2.4,
+                        ),
+                      ),
                     Text(
-                      person.knownForDepartment!.toUpperCase(),
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.primary,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 2.4,
+                      person.name,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  Text(
-                    person.name,
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 20,
-                    runSpacing: 8,
-                    children: [
-                      if (formatLongDate(person.birthday, language)
-                          case final birthday?)
-                        PersonMetaItem(
-                          icon: HugeIcons.strokeRoundedBirthdayCake,
-                          text:
-                              birthday +
-                              (age != null
-                                  ? ', ${context.t('library:yearsOld', {'count': age})}'
-                                  : ''),
-                        ),
-                      if (formatLongDate(person.deathday, language)
-                          case final deathday?)
-                        PersonMetaItem(
-                          icon: HugeIcons.strokeRoundedFlower,
-                          text: deathday,
-                        ),
-                      if (person.placeOfBirth != null &&
-                          person.placeOfBirth!.isNotEmpty)
-                        PersonMetaItem(
-                          icon: HugeIcons.strokeRoundedLocation01,
-                          text: person.placeOfBirth!,
-                        ),
-                      PersonMetaItem(
-                        icon: HugeIcons.strokeRoundedLayers01,
-                        text: context.t('library:creditCount', {
-                          'count': person.stats.total,
-                        }),
-                      ),
-                    ],
-                  ),
-                  if (links.isNotEmpty) ...[
                     const SizedBox(height: 12),
                     Wrap(
                       alignment: WrapAlignment.center,
-                      spacing: 12,
-                      runSpacing: 12,
+                      spacing: 20,
+                      runSpacing: 8,
                       children: [
-                        for (final link in links) PersonLinkButton(link: link),
+                        if (formatLongDate(person.birthday, language)
+                            case final birthday?)
+                          PersonMetaItem(
+                            icon: HugeIcons.strokeRoundedBirthdayCake,
+                            text:
+                                birthday +
+                                (age != null
+                                    ? ', ${context.t('library:yearsOld', {'count': age})}'
+                                    : ''),
+                          ),
+                        if (formatLongDate(person.deathday, language)
+                            case final deathday?)
+                          PersonMetaItem(
+                            icon: HugeIcons.strokeRoundedFlower,
+                            text: deathday,
+                          ),
+                        if (person.placeOfBirth != null &&
+                            person.placeOfBirth!.isNotEmpty)
+                          PersonMetaItem(
+                            icon: HugeIcons.strokeRoundedLocation01,
+                            text: person.placeOfBirth!,
+                          ),
+                        PersonMetaItem(
+                          icon: HugeIcons.strokeRoundedLayers01,
+                          text: context.t('library:creditCount', {
+                            'count': person.stats.total,
+                          }),
+                        ),
                       ],
                     ),
+                    if (links.isNotEmpty) ...[
+                      const SizedBox(height: 12),
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: [
+                          for (final link in links)
+                            PersonLinkButton(link: link),
+                        ],
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
             Positioned(

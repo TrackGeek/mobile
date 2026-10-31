@@ -184,3 +184,52 @@ class EpisodeCard extends StatelessWidget {
     );
   }
 }
+
+class PeopleGrid extends StatelessWidget {
+  const PeopleGrid({
+    super.key,
+    required this.itemCount,
+    required this.itemBuilder,
+    this.maxCrossAxisExtent = 160,
+    this.spacing = 10,
+  });
+
+  final int itemCount;
+  final IndexedWidgetBuilder itemBuilder;
+  final double maxCrossAxisExtent;
+  final double spacing;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns = (constraints.maxWidth / (maxCrossAxisExtent + spacing))
+            .ceil()
+            .clamp(1, 12);
+        final rows = (itemCount / columns).ceil();
+        return Column(
+          children: [
+            for (var r = 0; r < rows; r++) ...[
+              if (r > 0) SizedBox(height: spacing),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (var c = 0; c < columns; c++) ...[
+                      if (c > 0) SizedBox(width: spacing),
+                      Expanded(
+                        child: r * columns + c < itemCount
+                            ? itemBuilder(context, r * columns + c)
+                            : const SizedBox.shrink(),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ],
+        );
+      },
+    );
+  }
+}

@@ -22,7 +22,6 @@ import '../components/details/tracking.dart';
 import '../components/details/tv_tracking_sheet.dart';
 import '../components/details/watch_links_row.dart';
 import '../components/details/watch_providers.dart';
-import '../components/layout/adaptive_grid_delegate.dart';
 import '../components/layout/content_frame.dart';
 import '../components/user/comments_card.dart';
 import '../components/user/star_rating.dart';
@@ -343,18 +342,19 @@ class _TvDetailPageState extends State<TvDetailPage> {
     setState(() => _statusBusy = true);
     try {
       final current = _progress;
+      final now = DateTime.now().toIso8601String();
       if (current != null && current.status == status) {
         await _tv.deleteProgress(current.id);
       } else {
+        if (status == 'Completed') await _tv.watchAll(show.id);
         await _tv.saveProgress(
           show.id,
           status: status,
-          startedAt: status == 'Watching'
-              ? DateTime.now().toIso8601String()
-              : null,
+          watchCount: current?.watchCount,
+          startedAt: status == 'Watching' ? now : current?.startedAt,
           completedAt: status == 'Completed'
-              ? DateTime.now().toIso8601String()
-              : null,
+              ? (current?.completedAt ?? now)
+              : current?.completedAt,
         );
       }
       await _reloadTracking();
@@ -913,7 +913,7 @@ class _TvDetailPageState extends State<TvDetailPage> {
     );
   }
 
-  Widget _buildHeader(TvShowDetail show, {bool center = false}) {
+  Widget _buildHeader(TvShowDetail show, {bool center = true}) {
     final theme = Theme.of(context);
     final reviews = _reviewsPage;
     final showTimeLeft =
@@ -1272,16 +1272,7 @@ class _TvDetailPageState extends State<TvDetailPage> {
         title: context.t('common:noResults'),
       );
     }
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: AdaptiveGridDelegate(
-        context: context,
-        maxCrossAxisExtent: 160,
-        childAspectRatio: 0.50,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-      ),
+    return PeopleGrid(
       itemCount: show.cast.length,
       itemBuilder: (context, index) {
         final member = show.cast[index];
@@ -1321,16 +1312,8 @@ class _TvDetailPageState extends State<TvDetailPage> {
             description: context.t('library:noListsDescription'),
           )
         else
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: AdaptiveGridDelegate(
-              context: context,
-              maxCrossAxisExtent: 260,
-              childAspectRatio: 1.6,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
+          PeopleGrid(
+            maxCrossAxisExtent: 420,
             itemCount: lists.items.length,
             itemBuilder: (context, index) => MediaListCard(
               list: lists.items[index],
