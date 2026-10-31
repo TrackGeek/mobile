@@ -873,9 +873,10 @@ class _SheetListSectionState extends State<SheetListSection> {
               const SizedBox(width: 8),
               IconButton.filled(
                 onPressed: _createList,
-                icon: const HugeIcon(
+                icon: HugeIcon(
                   icon: HugeIcons.strokeRoundedAdd01,
-                  size: 16,
+                  size: 18,
+                  color: theme.colorScheme.onPrimary,
                 ),
               ),
             ],

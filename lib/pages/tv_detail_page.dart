@@ -586,11 +586,37 @@ class _TvDetailPageState extends State<TvDetailPage> {
     );
   }
 
-  void _writeReview() {
-    if (_progress?.status != 'Completed') {
-      _setStatus('Completed');
+  Future<void> _writeReview() async {
+    final show = _show;
+    if (show == null || _statusBusy || _episodeBusy || !_loggedIn) return;
+    setState(() {
+      _statusBusy = true;
+      _episodeBusy = true;
+    });
+    try {
+      final current = _progress;
+      await _tv.watchAll(show.id);
+      final finished = DateTime.tryParse(current?.completedAt ?? '');
+      await _tv.saveProgress(
+        show.id,
+        status: 'Completed',
+        startedAt: current?.startedAt,
+        completedAt: (finished ?? DateTime.now()).toIso8601String(),
+        watchCount: current?.watchCount,
+        notes: current?.notes,
+      );
+      await _reloadTracking();
+    } catch (_) {
+      _toast('api:INTERNAL_SERVER_ERROR');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _statusBusy = false;
+          _episodeBusy = false;
+        });
+      }
     }
-    _openMoreOptions();
+    if (mounted) _openMoreOptions();
   }
 
   void _openPerson(String? slug) {
@@ -722,7 +748,7 @@ class _TvDetailPageState extends State<TvDetailPage> {
                         else ...[
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: _buildHeader(show),
+                            child: _buildHeader(show, center: true),
                           ),
                           const SizedBox(height: 24),
                           Padding(
@@ -845,25 +871,28 @@ class _TvDetailPageState extends State<TvDetailPage> {
         ],
         if (show.status != null || release != null) ...[
           const SizedBox(height: 14),
-          Row(
-            children: [
-              if (show.status != null)
-                Expanded(
-                  child: MetaStatCard(
-                    label: context.t('common:status'),
-                    value: statusLabel(context, show.status!),
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (show.status != null)
+                  Expanded(
+                    child: MetaStatCard(
+                      label: context.t('common:status'),
+                      value: statusLabel(context, show.status!),
+                    ),
                   ),
-                ),
-              if (show.status != null && release != null)
-                const SizedBox(width: 10),
-              if (release != null)
-                Expanded(
-                  child: MetaStatCard(
-                    label: context.t('common:releaseDate'),
-                    value: release,
+                if (show.status != null && release != null)
+                  const SizedBox(width: 10),
+                if (release != null)
+                  Expanded(
+                    child: MetaStatCard(
+                      label: context.t('common:releaseDate'),
+                      value: release,
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ],
         if (_loggedIn) ...[
@@ -884,7 +913,7 @@ class _TvDetailPageState extends State<TvDetailPage> {
     );
   }
 
-  Widget _buildHeader(TvShowDetail show) {
+  Widget _buildHeader(TvShowDetail show, {bool center = false}) {
     final theme = Theme.of(context);
     final reviews = _reviewsPage;
     final showTimeLeft =
@@ -893,16 +922,12 @@ class _TvDetailPageState extends State<TvDetailPage> {
         _episodeWatch != null &&
         _seasons != null;
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: center
+          ? CrossAxisAlignment.center
+          : CrossAxisAlignment.start,
       children: [
-        Text(
-          show.name,
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        const SizedBox(height: 10),
         Wrap(
+          alignment: center ? WrapAlignment.center : WrapAlignment.start,
           spacing: 16,
           runSpacing: 6,
           crossAxisAlignment: WrapCrossAlignment.center,

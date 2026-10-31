@@ -86,16 +86,17 @@ class _StatusButton extends StatelessWidget {
           child: Column(
             children: [
               Container(
-                width: 32,
-                height: 32,
+                width: 36,
+                height: 36,
+                alignment: Alignment.center,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: color.withValues(alpha: 0.15),
                   border: Border.all(color: color.withValues(alpha: 0.35)),
                 ),
-                child: HugeIcon(icon: config.icon, size: 15, color: color),
+                child: HugeIcon(icon: config.icon, size: 16, color: color),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               Text(
                 config.label,
                 textAlign: TextAlign.center,

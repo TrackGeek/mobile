@@ -113,29 +113,38 @@ class _SeasonEpisodeProgressState extends State<SeasonEpisodeProgress> {
             ),
             child: Edgy(
               axis: .horizontal,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    for (final s in widget.seasons)
-                      _SeasonTab(
-                        key: _seasonKeys.putIfAbsent(
-                          s.seasonNumber,
-                          GlobalKey.new,
-                        ),
-                        label: _seasonLabel(s.seasonNumber),
-                        watched: s.watchedEpisodes.length,
-                        total: s.totalEpisodes,
-                        active: s.seasonNumber == active,
-                        onTap: widget.busy
-                            ? null
-                            : () {
-                                setState(() => _activeSeason = s.seasonNumber);
-                                _scrollToSeason(s.seasonNumber);
-                              },
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final fits =
+                      constraints.maxWidth >= widget.seasons.length * 110;
+                  Widget tab(SeasonWatchData s) {
+                    final item = _SeasonTab(
+                      key: _seasonKeys.putIfAbsent(
+                        s.seasonNumber,
+                        GlobalKey.new,
                       ),
-                  ],
-                ),
+                      label: _seasonLabel(s.seasonNumber),
+                      watched: s.watchedEpisodes.length,
+                      total: s.totalEpisodes,
+                      active: s.seasonNumber == active,
+                      onTap: widget.busy
+                          ? null
+                          : () {
+                              setState(() => _activeSeason = s.seasonNumber);
+                              _scrollToSeason(s.seasonNumber);
+                            },
+                    );
+                    return fits ? Expanded(child: item) : item;
+                  }
+
+                  final tabs = [for (final s in widget.seasons) tab(s)];
+                  return fits
+                      ? Row(children: tabs)
+                      : SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(children: tabs),
+                        );
+                },
               ),
             ),
           ),
