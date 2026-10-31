@@ -6,6 +6,7 @@ import '../../l10n/l10n_context.dart';
 import '../../models/feed_entry.dart';
 import '../layout/spring_sheet.dart';
 import '../../utils/haptics.dart';
+import '../../utils/numbers.dart';
 
 const quickReactions = ['👍', '❤️', '🔥', '😂', '😮', '😢'];
 
@@ -48,7 +49,7 @@ class FeedReactions extends StatelessWidget {
           const HugeIcon(icon: HugeIcons.strokeRoundedFavourite, size: 16),
           const SizedBox(width: 6),
           Text(
-            '$likes',
+            likes.humanizedCount(),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
@@ -229,7 +230,7 @@ class _EmojiButton extends StatelessWidget {
             Text(emoji, style: const TextStyle(fontSize: 18)),
             if (count > 0) ...[
               const SizedBox(width: 6),
-              Text('$count', style: theme.textTheme.labelMedium),
+              Text(count.humanizedCount(), style: theme.textTheme.labelMedium),
             ],
             if (active) ...[
               const SizedBox(width: 4),

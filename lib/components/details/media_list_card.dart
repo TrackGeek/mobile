@@ -8,6 +8,7 @@ import '../../services/list_service.dart';
 import '../../utils/strings.dart';
 import '../media/smooth_image.dart';
 import '../../utils/adaptive_sheet_route.dart';
+import '../../utils/numbers.dart';
 
 const _previewCount = 3;
 
@@ -109,7 +110,7 @@ class MediaListCard extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          '+$remaining',
+                          '+${remaining.humanizedCount()}',
                           style: theme.textTheme.labelMedium?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),

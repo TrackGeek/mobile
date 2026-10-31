@@ -49,6 +49,7 @@ import 'person_page.dart';
 import '../components/layout/edgy.dart';
 import '../components/layout/tg_refresh_indicator.dart';
 import '../utils/haptics.dart';
+import '../utils/numbers.dart';
 
 const _siteUrl = 'https://trackgeek.net';
 const _planningColor = TgStatus.planning;
@@ -868,7 +869,7 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
       ('characters', context.t('library:characters')),
       (
         'lists',
-        '${context.t('common:lists')} (${_containingLists?.total ?? 0})',
+        '${context.t('common:lists')} (${(_containingLists?.total ?? 0).humanizedCount()})',
       ),
     ];
     if (_tab >= tabs.length) _tab = 0;
@@ -1059,7 +1060,7 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
         InfoCard(
           title: context.t('library:totalEpisodes'),
           icon: HugeIcons.strokeRoundedVideo01,
-          description: Text('${anime.numberOfEpisodes}'),
+          description: Text(anime.numberOfEpisodes!.humanizedCount()),
         ),
       if (anime.broadcast != null && anime.broadcast!.isNotEmpty)
         InfoCard(
@@ -1320,7 +1321,7 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
           children: [
             Expanded(
               child: Text(
-                '${context.t('common:reviews')} (${reviews?.total ?? 0})',
+                '${context.t('common:reviews')} (${(reviews?.total ?? 0).humanizedCount()})',
                 style: Theme.of(context).textTheme.titleMedium
                     ?.copyWith(fontWeight: FontWeight.w600),
               ),

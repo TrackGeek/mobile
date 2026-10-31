@@ -25,6 +25,7 @@ import 'setup_card.dart';
 import 'user_widgets.dart';
 import '../media/smooth_image.dart';
 import '../layout/edgy.dart';
+import '../../utils/numbers.dart';
 
 class UserOverviewTab extends StatefulWidget {
   const UserOverviewTab({
@@ -322,7 +323,7 @@ class _ActivityCardState extends State<_ActivityCard> {
                 Text(
                   _selected.isEmpty
                       ? context.t('user:activityLastYear', {
-                          'value': '${calendar?.total ?? 0}',
+                          'value': (calendar?.total ?? 0).humanizedCount(),
                         })
                       : _selected,
                   style: theme.textTheme.bodySmall?.copyWith(
@@ -337,7 +338,7 @@ class _ActivityCardState extends State<_ActivityCard> {
                     () => _selected = context.t('user:activityTooltip', {
                       'value': count == 0
                           ? context.t('user:activityNoCount')
-                          : '$count',
+                          : count.humanizedCount(),
                       'date': DateFormat.yMd(locale).format(date),
                     }),
                   ),

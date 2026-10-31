@@ -1,7 +1,7 @@
 {
   "title": "Comments",
-  "count_one": "{{count}} comment",
-  "count_other": "{{count}} comments",
+  "count_one": "{{formattedCount}} comment",
+  "count_other": "{{formattedCount}} comments",
   "placeholder": "Write a comment...",
   "required": "Comment cannot be empty.",
   "tooLong": "Comment is too long.",

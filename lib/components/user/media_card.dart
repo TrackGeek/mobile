@@ -5,6 +5,7 @@ import '../../styles/tg_theme.dart';
 import '../../../l10n/l10n_context.dart';
 import '../../models/progress_item.dart';
 import '../media/smooth_image.dart';
+import '../../utils/numbers.dart';
 
 class MediaCard extends StatelessWidget {
   const MediaCard({
@@ -74,7 +75,7 @@ class MediaCard extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '${progress.current}/${progress.total}',
+                              '${progress.current!.humanizedCount()}/${progress.total!.humanizedCount()}',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 12,
@@ -125,7 +126,7 @@ class MediaCard extends StatelessWidget {
                 ),
               if ((progress?.hoursPlayed ?? 0) > 0)
                 Text(
-                  '${progress!.hoursPlayed!.toStringAsFixed(0)}h',
+                  '${progress!.hoursPlayed!.humanizedCount(decimalDigits: 0)}h',
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                     fontSize: 12,

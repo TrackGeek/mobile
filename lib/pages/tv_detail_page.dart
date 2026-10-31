@@ -55,6 +55,7 @@ import 'person_page.dart';
 import '../components/layout/edgy.dart';
 import '../components/layout/tg_refresh_indicator.dart';
 import '../utils/haptics.dart';
+import '../utils/numbers.dart';
 
 const _siteUrl = 'https://trackgeek.net';
 const _planningColor = TgStatus.planning;
@@ -927,7 +928,7 @@ class _TvDetailPageState extends State<TvDetailPage> {
       ('cast', context.t('common:types.cast')),
       (
         'lists',
-        '${context.t('common:lists')} (${_containingLists?.total ?? 0})',
+        '${context.t('common:lists')} (${(_containingLists?.total ?? 0).humanizedCount()})',
       ),
       ('comments', context.t('comments:title')),
     ];
@@ -1143,13 +1144,13 @@ class _TvDetailPageState extends State<TvDetailPage> {
         InfoCard(
           title: context.t('library:season_other'),
           icon: HugeIcons.strokeRoundedGridView,
-          description: Text('${show.numberOfSeasons}'),
+          description: Text(show.numberOfSeasons!.humanizedCount()),
         ),
       if (show.numberOfEpisodes != null && show.numberOfEpisodes! > 0)
         InfoCard(
           title: context.t('library:totalEpisodes'),
           icon: HugeIcons.strokeRoundedTv01,
-          description: Text('${show.numberOfEpisodes}'),
+          description: Text(show.numberOfEpisodes!.humanizedCount()),
         ),
       if (show.originalLanguage?.isNotEmpty == true)
         InfoCard(
@@ -1290,7 +1291,7 @@ class _TvDetailPageState extends State<TvDetailPage> {
           children: [
             Expanded(
               child: Text(
-                '${context.t('common:reviews')} (${reviews?.total ?? 0})',
+                '${context.t('common:reviews')} (${(reviews?.total ?? 0).humanizedCount()})',
                 style: Theme.of(context).textTheme.titleMedium
                     ?.copyWith(fontWeight: FontWeight.w600),
               ),

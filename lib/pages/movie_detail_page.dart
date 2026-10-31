@@ -54,6 +54,7 @@ import 'person_page.dart';
 import '../components/layout/edgy.dart';
 import '../components/layout/tg_refresh_indicator.dart';
 import '../utils/haptics.dart';
+import '../utils/numbers.dart';
 
 const _siteUrl = 'https://trackgeek.net';
 const _planningColor = TgStatus.planning;
@@ -761,7 +762,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
       ('cast', context.t('common:types.cast')),
       (
         'lists',
-        '${context.t('common:lists')} (${_containingLists?.total ?? 0})',
+        '${context.t('common:lists')} (${(_containingLists?.total ?? 0).humanizedCount()})',
       ),
       ('comments', context.t('comments:title')),
     ];
@@ -1081,7 +1082,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
           children: [
             Expanded(
               child: Text(
-                '${context.t('common:reviews')} (${reviews?.total ?? 0})',
+                '${context.t('common:reviews')} (${(reviews?.total ?? 0).humanizedCount()})',
                 style: Theme.of(context).textTheme.titleMedium
                     ?.copyWith(fontWeight: FontWeight.w600),
               ),

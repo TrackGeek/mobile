@@ -9,6 +9,7 @@ import '../../services/comment_service.dart';
 import '../feed/feed_markdown.dart';
 import '../feed/feed_reactions.dart';
 import 'user_widgets.dart';
+import '../../utils/numbers.dart';
 
 const _maxLength = 500;
 
@@ -188,7 +189,7 @@ class _CommentsCardState extends State<CommentsCard> {
     return UserCard(
       title:
           '${context.t('comments:title')}'
-          '${_total > 0 ? ' (${context.t('comments:count', {'count': '$_total'})})' : ''}',
+          '${_total > 0 ? ' (${context.t('comments:count', {'count': _total, 'formattedCount': _total.humanizedCount()})})' : ''}',
       icon: HugeIcons.strokeRoundedMessage01,
       child: body,
     );
@@ -512,7 +513,7 @@ class _CommentItemState extends State<_CommentItem> {
                             ),
                             child: Text(
                               (counts[emoji] ?? 0) > 0
-                                  ? '$emoji ${counts[emoji]}'
+                                  ? '$emoji ${counts[emoji]!.humanizedCount()}'
                                   : emoji,
                               style: const TextStyle(fontSize: 12),
                             ),

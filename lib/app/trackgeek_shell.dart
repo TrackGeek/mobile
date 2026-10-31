@@ -32,6 +32,7 @@ import '../services/settings_service.dart';
 import '../services/genre_service.dart';
 import '../services/shop_service.dart';
 import '../services/user_service.dart';
+import '../utils/numbers.dart';
 
 class TrackGeekShell extends StatefulWidget {
   const TrackGeekShell({
@@ -299,7 +300,7 @@ class _TrackGeekShellState extends State<TrackGeekShell>
         NavigationDestination(
           icon: Badge(
             isLabelVisible: _unread > 0,
-            label: Text('$_unread'),
+            label: Text(_unread.humanizedCount()),
             child: const HugeIcon(icon: HugeIcons.strokeRoundedNotification01),
           ),
           label: context.t('common:notifications'),

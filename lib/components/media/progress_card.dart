@@ -9,6 +9,7 @@ import '../../models/progress_item.dart';
 import '../../services/progress_service.dart';
 import 'smooth_image.dart';
 import '../../utils/haptics.dart';
+import '../../utils/numbers.dart';
 
 class ProgressCard extends StatefulWidget {
   const ProgressCard({
@@ -128,7 +129,7 @@ class _ProgressCardState extends State<ProgressCard> {
                                     vertical: 2,
                                   ),
                                   child: Text(
-                                    '${item.current}/${item.total ?? '?'}',
+                                    '${item.current!.humanizedCount()}/${item.total?.humanizedCount() ?? '?'}',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),

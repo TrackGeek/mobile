@@ -15,6 +15,7 @@ import '../media/smooth_image.dart';
 import '../layout/tg_refresh_indicator.dart';
 import '../../utils/haptics.dart';
 import '../../utils/adaptive_sheet_route.dart';
+import '../../utils/numbers.dart';
 
 class UserListsTab extends StatefulWidget {
   const UserListsTab({
@@ -332,7 +333,7 @@ class _ListCard extends StatelessWidget {
                           ),
                         ),
                       Text(
-                        '${list.itemCount}',
+                        list.itemCount.humanizedCount(),
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),

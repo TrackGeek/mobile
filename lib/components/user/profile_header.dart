@@ -8,6 +8,7 @@ import '../../models/user_profile.dart';
 import '../../utils/profile_cosmetics.dart';
 import 'user_widgets.dart';
 import '../media/smooth_image.dart';
+import '../../utils/numbers.dart';
 
 class ProfileHeader extends StatelessWidget {
   const ProfileHeader({
@@ -377,7 +378,7 @@ class _StatPill extends StatelessWidget {
           child: Column(
             children: [
               Text(
-                '$count',
+                count.humanizedCount(),
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),

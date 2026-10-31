@@ -4,8 +4,12 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
+import '../utils/numbers.dart';
+
 class TrackGeekLocalizations extends ChangeNotifier {
-  TrackGeekLocalizations._(this._resources, this._language);
+  TrackGeekLocalizations._(this._resources, this._language) {
+    setNumberLocale(_language);
+  }
 
   static const String fallbackLanguage = 'en-US';
 
@@ -141,6 +145,7 @@ class TrackGeekLocalizations extends ChangeNotifier {
     if (!supportedLanguages.contains(language) || language == _language) return;
     _resources[language] ??= await _loadLanguage(language, read);
     _language = language;
+    setNumberLocale(language);
     notifyListeners();
   }
 

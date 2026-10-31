@@ -41,6 +41,7 @@ import 'person_page.dart';
 import '../components/layout/edgy.dart';
 import '../components/layout/tg_refresh_indicator.dart';
 import '../utils/haptics.dart';
+import '../utils/numbers.dart';
 
 const _siteUrl = 'https://trackgeek.net';
 const _planningColor = TgStatus.planning;
@@ -718,7 +719,7 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  '(${context.t('common:reviewCount', {'count': reviews?.total ?? 0})})',
+                  '(${context.t('common:reviewCount', {'count': reviews?.total ?? 0, 'formattedCount': (reviews?.total ?? 0).humanizedCount()})})',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -740,7 +741,7 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
       if (cast.isNotEmpty) ('staff', context.t('library:staff')),
       (
         'lists',
-        '${context.t('common:lists')} (${_containingLists?.total ?? 0})',
+        '${context.t('common:lists')} (${(_containingLists?.total ?? 0).humanizedCount()})',
       ),
     ];
     if (_tab >= tabs.length) _tab = 0;
@@ -925,13 +926,13 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
         InfoCard(
           title: context.t('library:chapters'),
           icon: HugeIcons.strokeRoundedBookOpen01,
-          description: Text('${manga.numberOfChapters}'),
+          description: Text(manga.numberOfChapters!.humanizedCount()),
         ),
       if (manga.numberOfVolumes != null)
         InfoCard(
           title: context.t('library:volumes'),
           icon: HugeIcons.strokeRoundedSwatchBook,
-          description: Text('${manga.numberOfVolumes}'),
+          description: Text(manga.numberOfVolumes!.humanizedCount()),
         ),
       if (themes.isNotEmpty)
         InfoCard(
@@ -1072,7 +1073,7 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
           children: [
             Expanded(
               child: Text(
-                '${context.t('common:reviews')} (${reviews?.total ?? 0})',
+                '${context.t('common:reviews')} (${(reviews?.total ?? 0).humanizedCount()})',
                 style: Theme.of(context).textTheme.titleMedium
                     ?.copyWith(fontWeight: FontWeight.w600),
               ),

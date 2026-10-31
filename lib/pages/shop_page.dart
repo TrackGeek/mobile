@@ -16,6 +16,7 @@ import '../models/wallet.dart';
 import '../services/shop_service.dart';
 import '../styles/tg_theme.dart';
 import '../utils/haptics.dart';
+import '../utils/numbers.dart';
 
 class ShopPage extends StatefulWidget {
   const ShopPage({
@@ -246,7 +247,10 @@ class _ShopPageState extends State<ShopPage> {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      context.t('common:coinCount', {'count': _wallet.balance}),
+                      context.t('common:coinCount', {
+                        'count': _wallet.balance,
+                        'formattedCount': _wallet.balance.humanizedCount(),
+                      }),
                       style: theme.textTheme.bodyMedium,
                     ),
                   ],

@@ -19,6 +19,7 @@ import 'user_widgets.dart';
 import '../layout/edgy.dart';
 import '../layout/tg_refresh_indicator.dart';
 import '../../utils/adaptive_sheet_route.dart';
+import '../../utils/numbers.dart';
 
 class _ProgressContent {
   const _ProgressContent({
@@ -436,7 +437,7 @@ class _UserProgressTabState extends State<UserProgressTab>
                             ),
                             label: Text(
                               count > 0
-                                  ? '${context.t(section.labelKey)}, $count'
+                                  ? '${context.t(section.labelKey)}, ${count.humanizedCount()}'
                                   : context.t(section.labelKey),
                             ),
                             selected: _status == section.status,
@@ -495,7 +496,7 @@ class _UserProgressTabState extends State<UserProgressTab>
                         IconButton.filledTonal(
                           icon: Badge(
                             isLabelVisible: _activeFilterCount > 0,
-                            label: Text('$_activeFilterCount'),
+                            label: Text(_activeFilterCount.humanizedCount()),
                             child: const HugeIcon(
                               icon: HugeIcons.strokeRoundedFilterHorizontal,
                               size: 16,

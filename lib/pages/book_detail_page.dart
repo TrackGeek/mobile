@@ -32,6 +32,7 @@ import '../services/comment_service.dart';
 import '../services/favorite_service.dart';
 import '../services/list_service.dart';
 import '../services/review_service.dart';
+import '../utils/dates.dart';
 import '../utils/genres.dart';
 import '../utils/release.dart';
 import '../utils/slug.dart';
@@ -40,6 +41,7 @@ import 'media_detail_page.dart';
 import '../components/layout/edgy.dart';
 import '../components/layout/tg_refresh_indicator.dart';
 import '../utils/haptics.dart';
+import '../utils/numbers.dart';
 
 const _siteUrl = 'https://trackgeek.net';
 const _planningColor = TgStatus.planning;
@@ -116,6 +118,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
     });
     try {
       final book = await _books.detail(widget.hardcoverId, language: language);
+      await ensureDateLocale(language);
       if (!mounted) return;
       setState(() {
         _book = book;
@@ -510,7 +513,9 @@ class _BookDetailPageState extends State<BookDetailPage> {
   }
 
   Widget _buildSidebar(BookDetail book) {
-    final release = book.releaseDate ?? book.releaseYear?.toString();
+    final release =
+        formatLongDate(book.releaseDate, L10nScope.of(context).language) ??
+        book.releaseYear?.toString();
     return DetailOverview(
       cover: CoverArt(url: book.imageUrl),
       children: [
@@ -567,7 +572,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                 Expanded(
                   child: MetaStatCard(
                     label: context.t('library:page_other'),
-                    value: '${book.numberOfPages}',
+                    value: book.numberOfPages!.humanizedCount(),
                   ),
                 ),
               if (book.numberOfPages != null && release != null)
@@ -709,11 +714,11 @@ class _BookDetailPageState extends State<BookDetailPage> {
       if (book.editions.isNotEmpty)
         (
           'editions',
-          '${context.t('library:editions')} (${book.editionsCount ?? book.editions.length})',
+          '${context.t('library:editions')} (${(book.editionsCount ?? book.editions.length).humanizedCount()})',
         ),
       (
         'lists',
-        '${context.t('common:lists')} (${_containingLists?.total ?? 0})',
+        '${context.t('common:lists')} (${(_containingLists?.total ?? 0).humanizedCount()})',
       ),
       ('comments', context.t('comments:title')),
     ];
@@ -949,7 +954,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
           children: [
             Expanded(
               child: Text(
-                '${context.t('common:reviews')} (${reviews?.total ?? 0})',
+                '${context.t('common:reviews')} (${(reviews?.total ?? 0).humanizedCount()})',
                 style: Theme.of(context).textTheme.titleMedium
                     ?.copyWith(fontWeight: FontWeight.w600),
               ),

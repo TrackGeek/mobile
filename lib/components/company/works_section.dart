@@ -10,6 +10,7 @@ import '../../l10n/l10n_context.dart';
 import '../../models/company.dart';
 import '../media/smooth_image.dart';
 import '../layout/edgy.dart';
+import '../../utils/numbers.dart';
 
 const _pageSize = 24;
 
@@ -145,7 +146,9 @@ class _CompanyWorksSectionState extends State<CompanyWorksSection> {
                     padding: const EdgeInsets.only(right: 8),
                     child: ChoiceChip(
                       selected: _role == role.key,
-                      label: Text('${role.key} (${role.value})'),
+                      label: Text(
+                        '${role.key} (${role.value.humanizedCount()})',
+                      ),
                       onSelected: (_) => setState(() {
                         _role = role.key;
                         _visible = _pageSize;

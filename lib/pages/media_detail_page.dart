@@ -4,6 +4,7 @@ import '../components/details/media_summary_header.dart';
 import '../components/details/media_summary_fields.dart';
 import '../components/layout/content_frame.dart';
 import '../styles/tg_layout.dart';
+import '../utils/dates.dart';
 import '../controllers/session_controller.dart';
 import '../l10n/l10n_context.dart';
 import '../models/media_detail.dart';
@@ -74,10 +75,14 @@ class MediaDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final language = L10nScope.of(context).language;
     return Scaffold(
       appBar: AppBar(title: Text(context.t('common:viewDetails'))),
       body: FutureBuilder<MediaDetail>(
-        future: details.detail(type, id),
+        future: Future.wait<Object?>([
+          details.detail(type, id, language: language),
+          ensureDateLocale(language),
+        ]).then((results) => results[0]! as MediaDetail),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(child: Text(context.t('common:internalError')));

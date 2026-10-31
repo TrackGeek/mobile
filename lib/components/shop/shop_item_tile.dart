@@ -5,6 +5,7 @@ import '../../l10n/l10n_context.dart';
 import '../../models/cosmetic.dart';
 import '../../styles/tg_theme.dart';
 import '../../utils/profile_cosmetics.dart';
+import '../../utils/numbers.dart';
 
 class ShopItemTile extends StatelessWidget {
   const ShopItemTile({
@@ -61,7 +62,7 @@ class ShopItemTile extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      '$price',
+                      price.humanizedCount(),
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: scheme.onSurfaceVariant,
                       ),

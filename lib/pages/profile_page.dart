@@ -39,6 +39,7 @@ import '../services/review_service.dart';
 import '../services/user_service.dart';
 import 'media_detail_page.dart';
 import 'person_page.dart';
+import '../utils/numbers.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({
@@ -313,20 +314,32 @@ class _ProfilePageState extends State<ProfilePage> implements ScrollableTab {
       ('overview', t('user:overview')),
       ('activity', t('user:activity')),
       if (user.totalProgress > 0)
-        ('progress', '${t('common:progress')} (${user.totalProgress})'),
+        (
+          'progress',
+          '${t('common:progress')} (${user.totalProgress.humanizedCount()})',
+        ),
       if (user.reviewCount > 0)
-        ('reviews', '${t('common:reviews')} (${user.reviewCount})'),
+        (
+          'reviews',
+          '${t('common:reviews')} (${user.reviewCount.humanizedCount()})',
+        ),
       if (user.listCount > 0)
-        ('lists', '${t('common:lists')} (${user.listCount})'),
+        ('lists', '${t('common:lists')} (${user.listCount.humanizedCount()})'),
       if (user.favoriteCount > 0)
-        ('favorites', '${t('user:favorites')} (${user.favoriteCount})'),
+        (
+          'favorites',
+          '${t('user:favorites')} (${user.favoriteCount.humanizedCount()})',
+        ),
       if (user.missionsTotal > 0)
         (
           'missions',
-          '${t('missions:title')} (${user.missionsCompleted}/${user.missionsTotal})',
+          '${t('missions:title')} (${user.missionsCompleted.humanizedCount()}/${user.missionsTotal.humanizedCount()})',
         ),
       if (user.screenshotCount > 0)
-        ('screenshots', '${t('common:screenshots')} (${user.screenshotCount})'),
+        (
+          'screenshots',
+          '${t('common:screenshots')} (${user.screenshotCount.humanizedCount()})',
+        ),
     ];
   }
 

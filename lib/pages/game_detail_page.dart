@@ -48,6 +48,7 @@ import '../components/media/smooth_image.dart';
 import '../components/layout/edgy.dart';
 import '../components/layout/tg_refresh_indicator.dart';
 import '../utils/haptics.dart';
+import '../utils/numbers.dart';
 
 const _siteUrl = 'https://trackgeek.net';
 const _planningColor = TgStatus.planning;
@@ -759,10 +760,13 @@ class _GameDetailPageState extends State<GameDetailPage> {
       ('info', context.t('library:info')),
       (
         'lists',
-        '${context.t('common:lists')} (${_containingLists?.total ?? 0})',
+        '${context.t('common:lists')} (${(_containingLists?.total ?? 0).humanizedCount()})',
       ),
       if (_shotsTotal > 0)
-        ('screenshots', '${context.t('common:screenshots')} ($_shotsTotal)'),
+        (
+          'screenshots',
+          '${context.t('common:screenshots')} (${_shotsTotal.humanizedCount()})',
+        ),
     ];
     if (_tab >= tabs.length) _tab = 0;
     final selected = keys[_tab];
@@ -1185,7 +1189,7 @@ class _GameDetailPageState extends State<GameDetailPage> {
           children: [
             Expanded(
               child: Text(
-                '${context.t('common:reviews')} (${reviews?.total ?? 0})',
+                '${context.t('common:reviews')} (${(reviews?.total ?? 0).humanizedCount()})',
                 style: Theme.of(context).textTheme.titleMedium
                     ?.copyWith(fontWeight: FontWeight.w600),
               ),

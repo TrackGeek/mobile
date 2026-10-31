@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../l10n/l10n_context.dart';
 import '../../utils/episode_backfill.dart';
 import '../layout/edgy.dart';
+import '../../utils/numbers.dart';
 
 class SeasonEpisodeProgress extends StatefulWidget {
   const SeasonEpisodeProgress({
@@ -270,7 +271,7 @@ class _SeasonTab extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                '$watched/$total${progress > 0 ? ' ($progress%)' : ''}',
+                '${watched.humanizedCount()}/${total.humanizedCount()}${progress > 0 ? ' ($progress%)' : ''}',
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: active
                       ? theme.colorScheme.primary

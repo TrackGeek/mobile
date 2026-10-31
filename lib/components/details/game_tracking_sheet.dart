@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,6 +13,7 @@ import '../../models/user_list.dart';
 import '../../services/game_service.dart';
 import '../../services/list_service.dart';
 import '../../services/review_service.dart';
+import '../../utils/dates.dart';
 import '../../utils/video_links.dart';
 import '../user/star_rating.dart';
 import 'tracking_sheet.dart';
@@ -173,6 +176,12 @@ class _GameTrackingSheetState extends State<GameTrackingSheet> {
     final parsed = DateTime.tryParse(widget.game.firstReleaseDate ?? '');
     if (parsed == null) return null;
     return DateTime(parsed.year, parsed.month, parsed.day);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    unawaited(ensureDateLocale(L10nScope.of(context).language));
   }
 
   @override
@@ -397,9 +406,11 @@ class _GameTrackingSheetState extends State<GameTrackingSheet> {
                     ),
                     if (widget.game.firstReleaseDate != null)
                       Text(
-                        widget.game.firstReleaseDate!.length >= 10
-                            ? widget.game.firstReleaseDate!.substring(0, 10)
-                            : widget.game.firstReleaseDate!,
+                        formatLongDate(
+                              widget.game.firstReleaseDate,
+                              L10nScope.of(context).language,
+                            ) ??
+                            widget.game.firstReleaseDate!,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
