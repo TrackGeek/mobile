@@ -14,6 +14,7 @@ import '../components/settings/notifications_card.dart';
 import '../components/settings/preferences_section.dart';
 import '../components/settings/profile_form_card.dart';
 import '../components/settings/security_section.dart';
+import '../components/settings/version_indicator.dart';
 import '../components/settings/watch_links_card.dart';
 import '../controllers/session_controller.dart';
 import '../l10n/l10n_context.dart';
@@ -249,6 +250,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                     ),
                   ],
+                  const SizedBox(height: 32),
+                  const Center(child: VersionIndicator()),
                 ],
               ),
             );

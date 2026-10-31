@@ -55,6 +55,7 @@ dependencies:
   image_fade: ^0.6.2
   haptic_feedback: ^0.8.0
   stupid_simple_sheet: ^0.0.2
+  package_info_plus: ^10.2.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
