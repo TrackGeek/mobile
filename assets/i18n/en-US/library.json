@@ -267,6 +267,8 @@
   "role": "Role",
   "mediaType": "Media Type",
   "sortBy": "Sort by",
+  "filters": "Filters",
+  "resetFilters": "Reset",
   "newestFirst": "Newest",
   "oldestFirst": "Oldest",
   "topRated": "Top Rated",

@@ -7,8 +7,9 @@ import '../../models/person.dart';
 import '../../services/auth_service.dart';
 import '../../utils/content_types.dart';
 import '../layout/adaptive_grid_delegate.dart';
+import '../../utils/haptics.dart';
+import '../layout/bottom_padding.dart';
 import 'credit_card.dart';
-import '../layout/edgy.dart';
 
 enum _Role { all, cast, crew }
 
@@ -41,16 +42,156 @@ class _CreditsSectionState extends State<PersonCreditsSection> {
   _Role _role = _Role.all;
   _Sort _sort = _Sort.newest;
   String _query = '';
-  final Map<Object, GlobalKey> _chipKeys = {};
 
-  void _ensureChipVisible(Object id) {
-    final ctx = _chipKeys[id]?.currentContext;
-    if (ctx == null) return;
-    Scrollable.ensureVisible(
-      ctx,
-      alignment: 0.5,
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeInOut,
+  int get _activeFilters =>
+      (_media != null ? 1 : 0) +
+      (_role != _Role.all ? 1 : 0) +
+      (_sort != _Sort.newest ? 1 : 0);
+
+  void _openFilters({
+    required List<({MediaType? value, String label, int count})> media,
+    required bool showRole,
+    required Map<String, int> roleCounts,
+    required List<({_Sort value, String label, List<List<dynamic>> icon})>
+    sortOptions,
+  }) {
+    FocusManager.instance.primaryFocus?.unfocus();
+    HapticsHelper.light();
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (sheetContext, setSheet) {
+          final theme = Theme.of(sheetContext);
+          void update(VoidCallback fn) {
+            HapticsHelper.selection();
+            setState(() {
+              fn();
+              widget.onResetPaging();
+            });
+            setSheet(() {});
+          }
+
+          Widget section(String title, Widget child) => Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                child,
+              ],
+            ),
+          );
+
+          return SingleChildScrollView(
+            padding: EdgeInsets.only(
+              bottom: BottomPadding.of(sheetContext, minimum: 16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 8, 12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          context.t('library:filters'),
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      if (_activeFilters > 0)
+                        TextButton(
+                          onPressed: () => update(() {
+                            _media = null;
+                            _role = _Role.all;
+                            _sort = _Sort.newest;
+                          }),
+                          child: Text(context.t('library:resetFilters')),
+                        ),
+                    ],
+                  ),
+                ),
+                if (media.where((m) => m.value != null).length > 1)
+                  section(
+                    context.t('library:mediaType'),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        for (final m in media)
+                          ChoiceChip(
+                            selected: _media == m.value,
+                            onSelected: (_) => update(() => _media = m.value),
+                            label: Text('${m.label} · ${m.count}'),
+                          ),
+                      ],
+                    ),
+                  ),
+                if (showRole)
+                  section(
+                    context.t('library:role'),
+                    SizedBox(
+                      width: double.infinity,
+                      child: SegmentedButton<_Role>(
+                        showSelectedIcon: false,
+                        segments: [
+                          ButtonSegment(
+                            value: _Role.all,
+                            label: Text(context.t('common:all')),
+                          ),
+                          ButtonSegment(
+                            value: _Role.cast,
+                            label: Text(context.t('common:types.cast')),
+                          ),
+                          ButtonSegment(
+                            value: _Role.crew,
+                            label: Text(context.t('library:crew')),
+                          ),
+                        ],
+                        selected: {_role},
+                        onSelectionChanged: (s) =>
+                            update(() => _role = s.first),
+                      ),
+                    ),
+                  ),
+                section(
+                  context.t('library:sortBy'),
+                  Column(
+                    children: [
+                      for (final option in sortOptions)
+                        ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          dense: true,
+                          leading: HugeIcon(icon: option.icon, size: 20),
+                          title: Text(option.label),
+                          trailing: _sort == option.value
+                              ? HugeIcon(
+                                  icon: HugeIcons.strokeRoundedTick02,
+                                  size: 20,
+                                  color: theme.colorScheme.primary,
+                                )
+                              : null,
+                          onTap: () => update(() => _sort = option.value),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -105,6 +246,7 @@ class _CreditsSectionState extends State<PersonCreditsSection> {
     final counts = _counts;
     final filtered = _filtered;
     final shown = filtered.take(widget.visible).toList();
+    final activeFilters = _activeFilters;
 
     final mediaFilters = <({MediaType? value, String label, int count})>[
       (value: null, label: context.t('common:all'), count: counts['all']!),
@@ -133,22 +275,6 @@ class _CreditsSectionState extends State<PersonCreditsSection> {
     final visibleMedia = mediaFilters
         .where((filter) => filter.value == null || filter.count > 0)
         .toList();
-    final showMediaRow =
-        mediaFilters.where((filter) => filter.count > 0).length > 2;
-
-    final roleFilters = <({_Role value, String label, int count})>[
-      (value: _Role.all, label: context.t('common:all'), count: counts['all']!),
-      (
-        value: _Role.cast,
-        label: context.t('common:types.cast'),
-        count: counts['cast']!,
-      ),
-      (
-        value: _Role.crew,
-        label: context.t('library:crew'),
-        count: counts['crew']!,
-      ),
-    ];
 
     final sortOptions =
         <({_Sort value, String label, List<List<dynamic>> icon})>[
@@ -187,90 +313,48 @@ class _CreditsSectionState extends State<PersonCreditsSection> {
               const SizedBox(height: 12),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: TextField(
-                  textInputAction: TextInputAction.search,
-                  onChanged: (value) => setState(() {
-                    _query = value;
-                    widget.onResetPaging();
-                  }),
-                  decoration: InputDecoration(
-                    hintText: context.t('library:searchCredits'),
-                    prefixIcon: const Padding(
-                      padding: EdgeInsets.only(left: 12, right: 8),
-                      child: HugeIcon(
-                        icon: HugeIcons.strokeRoundedSearch01,
-                        size: 18,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        textInputAction: TextInputAction.search,
+                        onChanged: (value) => setState(() {
+                          _query = value;
+                          widget.onResetPaging();
+                        }),
+                        decoration: InputDecoration(
+                          hintText: context.t('library:searchCredits'),
+                          prefixIcon: const Padding(
+                            padding: EdgeInsets.only(left: 12, right: 8),
+                            child: HugeIcon(
+                              icon: HugeIcons.strokeRoundedSearch01,
+                              size: 18,
+                            ),
+                          ),
+                          prefixIconConstraints: const BoxConstraints(),
+                          isDense: true,
+                        ),
                       ),
                     ),
-                    prefixIconConstraints: const BoxConstraints(),
-                    isDense: true,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Edgy(
-                axis: .horizontal,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    children: [
-                      if (showMediaRow) ...[
-                        for (final filter in visibleMedia)
-                          _FilterChip(
-                            key: _chipKeys.putIfAbsent((
-                              'media',
-                              filter.value,
-                            ), GlobalKey.new),
-                            label: filter.label,
-                            count: filter.count,
-                            active: _media == filter.value,
-                            onTap: () {
-                              setState(() {
-                                _media = filter.value;
-                                widget.onResetPaging();
-                              });
-                              _ensureChipVisible(('media', filter.value));
-                            },
-                          ),
-                        const SizedBox(width: 12),
-                      ],
-                      if (counts['cast']! > 0 && counts['crew']! > 0) ...[
-                        for (final filter in roleFilters)
-                          _FilterChip(
-                            key: _chipKeys.putIfAbsent((
-                              'role',
-                              filter.value,
-                            ), GlobalKey.new),
-                            label: filter.label,
-                            count: filter.count,
-                            active: _role == filter.value,
-                            onTap: () {
-                              setState(() {
-                                _role = filter.value;
-                                widget.onResetPaging();
-                              });
-                              _ensureChipVisible(('role', filter.value));
-                            },
-                          ),
-                        const SizedBox(width: 12),
-                      ],
-                      for (final option in sortOptions)
-                        _FilterChip(
-                          key: _chipKeys.putIfAbsent((
-                            'sort',
-                            option.value,
-                          ), GlobalKey.new),
-                          label: option.label,
-                          icon: option.icon,
-                          active: _sort == option.value,
-                          onTap: () {
-                            setState(() => _sort = option.value);
-                            _ensureChipVisible(('sort', option.value));
-                          },
+                    const SizedBox(width: 8),
+                    Badge(
+                      isLabelVisible: activeFilters > 0,
+                      label: Text('$activeFilters'),
+                      child: IconButton.filledTonal(
+                        tooltip: context.t('library:filters'),
+                        onPressed: () => _openFilters(
+                          media: visibleMedia,
+                          showRole: counts['cast']! > 0 && counts['crew']! > 0,
+                          roleCounts: counts,
+                          sortOptions: sortOptions,
                         ),
-                    ],
-                  ),
+                        icon: const HugeIcon(
+                          icon: HugeIcons.strokeRoundedFilterHorizontal,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 16),
@@ -322,59 +406,6 @@ class _CreditsSectionState extends State<PersonCreditsSection> {
             ),
           ),
       ],
-    );
-  }
-}
-
-class _FilterChip extends StatelessWidget {
-  const _FilterChip({
-    super.key,
-    required this.label,
-    required this.active,
-    required this.onTap,
-    this.count,
-    this.icon,
-  });
-
-  final String label;
-  final bool active;
-  final VoidCallback onTap;
-  final int? count;
-  final List<List<dynamic>>? icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: ChoiceChip(
-        selected: active,
-        onSelected: (_) => onTap(),
-        label: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (icon != null) ...[
-              HugeIcon(icon: icon!, size: 14),
-              const SizedBox(width: 6),
-            ],
-            Text(label),
-            if (count != null) ...[
-              const SizedBox(width: 6),
-              Text(
-                '$count',
-                style: TextStyle(
-                  color: active
-                      ? theme.colorScheme.onPrimary.withValues(alpha: 0.7)
-                      : theme.colorScheme.onSurfaceVariant.withValues(
-                          alpha: 0.7,
-                        ),
-                  fontFeatures: const [FontFeature.tabularFigures()],
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
     );
   }
 }
