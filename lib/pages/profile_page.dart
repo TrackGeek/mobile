@@ -40,6 +40,16 @@ import '../services/user_service.dart';
 import 'media_detail_page.dart';
 import 'person_page.dart';
 import '../utils/numbers.dart';
+import '../utils/profile_cosmetics.dart';
+
+const _progressStatKeys = {
+  'anime': MediaType.anime,
+  'manga': MediaType.manga,
+  'tvShow': MediaType.tv,
+  'movie': MediaType.movie,
+  'game': MediaType.game,
+  'book': MediaType.book,
+};
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({
@@ -148,7 +158,7 @@ class _ProfilePageState extends State<ProfilePage> implements ScrollableTab {
       _error = null;
     });
     try {
-      final language = L10nScope.of(context).language;
+      final language = L10nScope.read(context).language;
       final user = await widget.users.userByUsername(
         username,
         language: language,
@@ -189,7 +199,7 @@ class _ProfilePageState extends State<ProfilePage> implements ScrollableTab {
     try {
       final status = await widget.users.followStatusDetails(
         user.username,
-        language: L10nScope.of(context).language,
+        language: L10nScope.read(context).language,
       );
       if (mounted) setState(() => _followStatus = status);
     } catch (_) {
@@ -203,7 +213,7 @@ class _ProfilePageState extends State<ProfilePage> implements ScrollableTab {
     if (user == null || _followBusy) return;
     setState(() => _followBusy = true);
     try {
-      final language = L10nScope.of(context).language;
+      final language = L10nScope.read(context).language;
       if (status?.isFollowing == true) {
         await widget.users.unfollow(user.id, language: language);
       } else {
@@ -308,38 +318,27 @@ class _ProfilePageState extends State<ProfilePage> implements ScrollableTab {
     unawaited(_activityController?.refresh());
   }
 
-  List<(String, String)> _tabs(UserProfile user) {
+  List<(String, String, String?)> _tabs(UserProfile user) {
     String t(String key) => context.t(key);
+    String n(int v) => v.humanizedCount();
     return [
-      ('overview', t('user:overview')),
-      ('activity', t('user:activity')),
+      ('overview', t('user:overview'), null),
+      ('activity', t('user:activity'), null),
       if (user.totalProgress > 0)
-        (
-          'progress',
-          '${t('common:progress')} (${user.totalProgress.humanizedCount()})',
-        ),
+        ('progress', t('common:progress'), n(user.totalProgress)),
       if (user.reviewCount > 0)
-        (
-          'reviews',
-          '${t('common:reviews')} (${user.reviewCount.humanizedCount()})',
-        ),
-      if (user.listCount > 0)
-        ('lists', '${t('common:lists')} (${user.listCount.humanizedCount()})'),
+        ('reviews', t('common:reviews'), n(user.reviewCount)),
+      if (user.listCount > 0) ('lists', t('common:lists'), n(user.listCount)),
       if (user.favoriteCount > 0)
-        (
-          'favorites',
-          '${t('user:favorites')} (${user.favoriteCount.humanizedCount()})',
-        ),
+        ('favorites', t('user:favorites'), n(user.favoriteCount)),
       if (user.missionsTotal > 0)
         (
           'missions',
-          '${t('missions:title')} (${user.missionsCompleted.humanizedCount()}/${user.missionsTotal.humanizedCount()})',
+          t('missions:title'),
+          '${n(user.missionsCompleted)}/${n(user.missionsTotal)}',
         ),
       if (user.screenshotCount > 0)
-        (
-          'screenshots',
-          '${t('common:screenshots')} (${user.screenshotCount.humanizedCount()})',
-        ),
+        ('screenshots', t('common:screenshots'), n(user.screenshotCount)),
     ];
   }
 
@@ -347,93 +346,89 @@ class _ProfilePageState extends State<ProfilePage> implements ScrollableTab {
   Widget build(BuildContext context) {
     final user = _user;
     final isNested = widget.username != null;
-    return PrimaryScrollController(
-      controller: _scrollFor(_tab),
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            user == null ? context.t('common:profile') : '@${user.username}',
-          ),
-          actions: [
-            if (widget.onOpenShop != null && _isOwner)
-              IconButton(
-                onPressed: widget.onOpenShop,
-                tooltip: context.t('common:shop'),
-                icon: const HugeIcon(
-                  icon: HugeIcons.strokeRoundedShoppingBag03,
+    return Theme(
+      data: profileTheme(Theme.of(context), user?.profile.color),
+      child: PrimaryScrollController(
+        controller: _scrollFor(_tab),
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              user == null ? context.t('common:profile') : '@${user.username}',
+            ),
+            actions: [
+              if (widget.onOpenShop != null && _isOwner)
+                IconButton(
+                  onPressed: widget.onOpenShop,
+                  tooltip: context.t('common:shop'),
+                  icon: const HugeIcon(
+                    icon: HugeIcons.strokeRoundedShoppingBag03,
+                  ),
                 ),
-              ),
-            if (_isOwner) ...[
-              IconButton(
-                onPressed: widget.onOpenSettings,
-                tooltip: context.t('app:tabs.settings'),
-                icon: const HugeIcon(icon: HugeIcons.strokeRoundedSettings01),
-              ),
-              PopupMenuButton<String>(
-                onSelected: (value) {
-                  if (value == 'logout') {
+              if (_isOwner) ...[
+                IconButton(
+                  onPressed: widget.onOpenSettings,
+                  tooltip: context.t('app:tabs.settings'),
+                  icon: const HugeIcon(icon: HugeIcons.strokeRoundedSettings01),
+                ),
+                IconButton(
+                  onPressed: () {
                     unawaited(widget.session.signOut());
                     widget.onSignedOut?.call();
-                  }
-                },
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    value: 'logout',
-                    child: Text(context.t('auth:logout')),
-                  ),
-                ],
-              ),
-            ],
-            if (isNested)
-              IconButton(
-                onPressed: _load,
-                tooltip: context.t('common:tryAgain'),
-                icon: const HugeIcon(icon: HugeIcons.strokeRoundedRefresh),
-              ),
-          ],
-        ),
-        body: SafeArea(
-          child: _loading && user == null
-              ? const Center(child: CircularProgressIndicator())
-              : _error != null && user == null
-              ? ProfileError(
-                  notFound:
-                      _error is ApiException &&
-                      (_error as ApiException).failure == ApiFailure.notFound,
-                  onRetry: _load,
-                )
-              : user == null
-              ? const SizedBox.shrink()
-              : NestedScrollView(
-                  headerSliverBuilder: (context, _) => [
-                    SliverToBoxAdapter(
-                      child: Column(
-                        children: [
-                          ProfileHeader(
-                            user: user,
-                            isOwner: _isOwner,
-                            isAuthenticated: widget.session.user != null,
-                            isFollowing: _followStatus?.isFollowing == true,
-                            followsYou: _followStatus?.followsYou == true,
-                            followBusy: _followBusy,
-                            onFollow: _toggleFollow,
-                            onEdit: widget.onOpenSettings,
-                            onOpenFollowers: () => _setTab('followers'),
-                            onOpenFollowing: () => _setTab('following'),
-                          ),
-                          const SizedBox(height: 12),
-                          ProfileTabs(
-                            tabs: _tabs(user),
-                            active: _tab,
-                            onSelect: _setTab,
-                          ),
-                          const SizedBox(height: 8),
-                        ],
-                      ),
-                    ),
-                  ],
-                  body: _tabBody(user),
+                  },
+                  tooltip: context.t('auth:logout'),
+                  icon: const HugeIcon(icon: HugeIcons.strokeRoundedLogout01),
                 ),
+              ],
+              if (isNested)
+                IconButton(
+                  onPressed: _load,
+                  tooltip: context.t('common:tryAgain'),
+                  icon: const HugeIcon(icon: HugeIcons.strokeRoundedRefresh),
+                ),
+            ],
+          ),
+          body: SafeArea(
+            child: _loading && user == null
+                ? const Center(child: CircularProgressIndicator())
+                : _error != null && user == null
+                ? ProfileError(
+                    notFound:
+                        _error is ApiException &&
+                        (_error as ApiException).failure == ApiFailure.notFound,
+                    onRetry: _load,
+                  )
+                : user == null
+                ? const SizedBox.shrink()
+                : NestedScrollView(
+                    headerSliverBuilder: (context, _) => [
+                      SliverToBoxAdapter(
+                        child: Column(
+                          children: [
+                            ProfileHeader(
+                              user: user,
+                              isOwner: _isOwner,
+                              isAuthenticated: widget.session.user != null,
+                              isFollowing: _followStatus?.isFollowing == true,
+                              followsYou: _followStatus?.followsYou == true,
+                              followBusy: _followBusy,
+                              onFollow: _toggleFollow,
+                              onEdit: widget.onOpenSettings,
+                              onOpenFollowers: () => _setTab('followers'),
+                              onOpenFollowing: () => _setTab('following'),
+                            ),
+                            const SizedBox(height: 16),
+                            ProfileTabs(
+                              tabs: _tabs(user),
+                              active: _tab,
+                              onSelect: _setTab,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    body: _tabBody(user),
+                  ),
+          ),
         ),
       ),
     );
@@ -461,7 +456,11 @@ class _ProfilePageState extends State<ProfilePage> implements ScrollableTab {
           session: widget.session,
           progress: widget.progress,
           contentType: _progressType ?? MediaType.game,
-          onContentTypeChange: (type) => _progressType = type,
+          typeCounts: {
+            for (final entry in _progressStatKeys.entries)
+              entry.value: user.progressStats[entry.key]?.total ?? 0,
+          },
+          onContentTypeChange: (type) => setState(() => _progressType = type),
           onOpenMedia: _openMedia,
         );
       case 'reviews':

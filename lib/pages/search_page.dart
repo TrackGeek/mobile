@@ -26,7 +26,8 @@ import '../services/user_service.dart';
 import '../utils/content_types.dart';
 import 'media_detail_page.dart';
 import 'person_page.dart';
-import '../components/layout/edgy.dart';
+import '../components/feed/media_picker_sheet.dart' show mediaTypeIcon;
+import '../utils/haptics.dart';
 import '../utils/adaptive_sheet_route.dart';
 
 class SearchPage extends StatefulWidget {
@@ -68,6 +69,8 @@ class _SearchPageState extends State<SearchPage> implements ScrollableTab {
   late final ctrl.SearchController _controller;
   final _scroll = ScrollController();
   final _searchField = TextEditingController();
+  final _kindButtonKey = GlobalKey();
+  static const _barClearance = 96.0;
 
   static const _kinds = [
     MediaSearchKind(MediaType.movie),
@@ -84,6 +87,12 @@ class _SearchPageState extends State<SearchPage> implements ScrollableTab {
     MediaSearchKind(:final type) => context.t('common:types.${type.name}'),
     PersonSearchKind() => context.t('common:types.cast'),
     UserSearchKind() => context.t('common:profile'),
+  };
+
+  List<List<dynamic>> _kindIcon(SearchKind kind) => switch (kind) {
+    MediaSearchKind(:final type) => mediaTypeIcon(type),
+    PersonSearchKind() => HugeIcons.strokeRoundedUserGroup,
+    UserSearchKind() => HugeIcons.strokeRoundedUser,
   };
 
   @override
@@ -205,113 +214,47 @@ class _SearchPageState extends State<SearchPage> implements ScrollableTab {
       child: Scaffold(
         body: SafeArea(
           child: ContentFrame(
-            child: Column(
+            child: Stack(
               children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-                  child: SearchBar(
-                    controller: _searchField,
-                    focusNode: _searchFocus,
-                    onChanged: _controller.onQueryChanged,
-                    elevation: const WidgetStatePropertyAll(0),
-                    backgroundColor: WidgetStatePropertyAll(
-                      Theme.of(context).colorScheme.surfaceContainerLow,
-                    ),
-                    side: WidgetStatePropertyAll(
-                      BorderSide(
-                        color: Theme.of(context).colorScheme.outlineVariant,
-                      ),
-                    ),
-                    shape: WidgetStatePropertyAll(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    hintText: context.t('common:search'),
-                    leading: Navigator.of(context).canPop()
-                        ? IconButton(
-                            icon: const HugeIcon(
-                              icon: HugeIcons.strokeRoundedArrowLeft01,
-                              size: 20,
-                            ),
-                            onPressed: () => Navigator.of(context).pop(),
-                          )
-                        : const HugeIcon(icon: HugeIcons.strokeRoundedSearch01),
-                    trailing: [
-                      ListenableBuilder(
-                        listenable: _controller,
-                        builder: (context, _) => _controller.query.isEmpty
-                            ? const SizedBox.shrink()
-                            : IconButton(
-                                icon: const HugeIcon(
-                                  icon: HugeIcons.strokeRoundedCancel01,
-                                  size: 18,
-                                ),
-                                onPressed: () {
-                                  _searchField.clear();
-                                  _controller.search('');
-                                },
-                              ),
-                      ),
-                      IconButton(
-                        icon: const HugeIcon(
-                          icon: HugeIcons.strokeRoundedClipboard,
-                          size: 18,
-                        ),
-                        tooltip: context.t('common:clipboard.paste'),
-                        onPressed: _paste,
-                      ),
-                      ListenableBuilder(
-                        listenable: _controller,
-                        builder: (context, _) {
-                          if (_controller.kind is! MediaSearchKind) {
-                            return const SizedBox.shrink();
-                          }
-                          return IconButton(
-                            tooltip: context.t('common:filters'),
-                            icon: Badge.count(
-                              count: _controller.filters.length,
-                              isLabelVisible: _controller.filters.isNotEmpty,
-                              child: const HugeIcon(
-                                icon: HugeIcons.strokeRoundedFilter,
-                                size: 18,
-                              ),
-                            ),
-                            onPressed: () => _openFilters(context),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height:
-                      56 + (MediaQuery.textScalerOf(context).scale(14) - 14),
-                  child: ListenableBuilder(
-                    listenable: _controller,
-                    builder: (context, _) => Edgy(
-                      axis: .horizontal,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: kinds.length,
-                        separatorBuilder: (_, _) => const SizedBox(width: 8),
-                        itemBuilder: (context, index) {
-                          final kind = kinds[index];
-                          return ChoiceChip(
-                            label: Text(_kindLabel(context, kind)),
-                            selected: kind.path == _controller.kind.path,
-                            onSelected: (_) => _selectKind(kind),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
+                Positioned.fill(
                   child: ListenableBuilder(
                     listenable: _controller,
                     builder: (context, _) => _buildBody(context),
+                  ),
+                ),
+                Positioned(
+                  left: 16,
+                  right: 16,
+                  bottom: 12,
+                  child: Row(
+                    spacing: 12,
+                    children: [
+                      Expanded(child: _buildSearchBar(context)),
+                      ListenableBuilder(
+                        listenable: _controller,
+                        builder: (context, _) => FloatingActionButton(
+                          key: _kindButtonKey,
+                          heroTag: null,
+                          tooltip: _kindLabel(context, _controller.kind),
+                          onPressed: () => _openKindMenu(context, kinds),
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 180),
+                            transitionBuilder: (child, animation) =>
+                                ScaleTransition(
+                                  scale: animation,
+                                  child: FadeTransition(
+                                    opacity: animation,
+                                    child: child,
+                                  ),
+                                ),
+                            child: HugeIcon(
+                              key: ValueKey(_controller.kind.path),
+                              icon: _kindIcon(_controller.kind),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -321,6 +264,127 @@ class _SearchPageState extends State<SearchPage> implements ScrollableTab {
       ),
     );
   }
+
+  Future<void> _openKindMenu(
+    BuildContext context,
+    List<SearchKind> kinds,
+  ) async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    final button =
+        _kindButtonKey.currentContext!.findRenderObject()! as RenderBox;
+    final overlay =
+        Navigator.of(context).overlay!.context.findRenderObject()! as RenderBox;
+    final origin = button.localToGlobal(Offset.zero, ancestor: overlay);
+    final menuHeight = kinds.length * kMinInteractiveDimension + 16;
+    final anchor = Rect.fromLTWH(
+      origin.dx,
+      origin.dy - menuHeight - 8,
+      button.size.width,
+      button.size.height,
+    );
+    final theme = Theme.of(context);
+    final selected = _controller.kind.path;
+    final picked = await showMenu<SearchKind>(
+      context: context,
+      position: RelativeRect.fromRect(anchor, Offset.zero & overlay.size),
+      items: [
+        for (final kind in kinds)
+          PopupMenuItem(
+            value: kind,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                HugeIcon(
+                  icon: _kindIcon(kind),
+                  size: 18,
+                  color: kind.path == selected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurface,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  _kindLabel(context, kind),
+                  style: kind.path == selected
+                      ? TextStyle(color: theme.colorScheme.primary)
+                      : null,
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+    if (picked == null) return;
+    HapticsHelper.selection();
+    _selectKind(picked);
+  }
+
+  Widget _buildSearchBar(BuildContext context) => SearchBar(
+    controller: _searchField,
+    focusNode: _searchFocus,
+    onChanged: _controller.onQueryChanged,
+    elevation: const WidgetStatePropertyAll(0),
+    backgroundColor: WidgetStatePropertyAll(
+      Theme.of(context).colorScheme.surfaceContainerLow,
+    ),
+    side: WidgetStatePropertyAll(
+      BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+    ),
+    shape: WidgetStatePropertyAll(
+      RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    ),
+    hintText: context.t('common:search'),
+    leading: Navigator.of(context).canPop()
+        ? IconButton(
+            icon: const HugeIcon(
+              icon: HugeIcons.strokeRoundedArrowLeft01,
+              size: 20,
+            ),
+            onPressed: () => Navigator.of(context).pop(),
+          )
+        : const HugeIcon(icon: HugeIcons.strokeRoundedSearch01),
+    trailing: [
+      ListenableBuilder(
+        listenable: _controller,
+        builder: (context, _) => _controller.query.isEmpty
+            ? const SizedBox.shrink()
+            : IconButton(
+                icon: const HugeIcon(
+                  icon: HugeIcons.strokeRoundedCancel01,
+                  size: 18,
+                ),
+                onPressed: () {
+                  _searchField.clear();
+                  _controller.search('');
+                },
+              ),
+      ),
+      IconButton(
+        icon: const HugeIcon(icon: HugeIcons.strokeRoundedClipboard, size: 18),
+        tooltip: context.t('common:clipboard.paste'),
+        onPressed: _paste,
+      ),
+      ListenableBuilder(
+        listenable: _controller,
+        builder: (context, _) {
+          if (_controller.kind is! MediaSearchKind) {
+            return const SizedBox.shrink();
+          }
+          return IconButton(
+            tooltip: context.t('common:filters'),
+            icon: Badge.count(
+              count: _controller.filters.length,
+              isLabelVisible: _controller.filters.isNotEmpty,
+              child: const HugeIcon(
+                icon: HugeIcons.strokeRoundedFilter,
+                size: 18,
+              ),
+            ),
+            onPressed: () => _openFilters(context),
+          );
+        },
+      ),
+    ],
+  );
 
   Future<void> _openFilters(BuildContext context) async {
     final kind = _controller.kind;
@@ -332,7 +396,7 @@ class _SearchPageState extends State<SearchPage> implements ScrollableTab {
           listenable: _controller,
           builder: (context, _) => SingleChildScrollView(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: SearchFilters(
               type: kind.type,
               values: _controller.filters,
@@ -350,31 +414,40 @@ class _SearchPageState extends State<SearchPage> implements ScrollableTab {
     final isUser = _controller.kind is UserSearchKind;
     if (_controller.isLoading) {
       if (isUser) return const UserSearchSkeletonList(count: 8);
-      return const Center(child: CircularProgressIndicator());
+      return const Padding(
+        padding: EdgeInsets.only(bottom: _barClearance),
+        child: Center(child: CircularProgressIndicator()),
+      );
     }
     final error = _controller.error;
     if (error != null && _controller.results.isEmpty) {
-      return SearchError(
-        message: _errorMessage(context, error),
-        onRetry: _controller.retry,
+      return Padding(
+        padding: const EdgeInsets.only(bottom: _barClearance),
+        child: SearchError(
+          message: _errorMessage(context, error),
+          onRetry: _controller.retry,
+        ),
       );
     }
     if (_controller.results.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const HugeIcon(icon: HugeIcons.strokeRoundedSearch02, size: 40),
-            const SizedBox(height: 8),
-            Text(
-              context.t('common:noResults'),
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            Text(
-              context.t('common:noResultsDescription'),
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ],
+      return Padding(
+        padding: const EdgeInsets.only(bottom: _barClearance),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const HugeIcon(icon: HugeIcons.strokeRoundedSearch02, size: 40),
+              const SizedBox(height: 8),
+              Text(
+                context.t('common:noResults'),
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(
+                context.t('common:noResultsDescription'),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -382,7 +455,7 @@ class _SearchPageState extends State<SearchPage> implements ScrollableTab {
       return ListView.builder(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         controller: _scroll,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, _barClearance),
         itemCount:
             _controller.results.length + (_controller.isLoadingMore ? 4 : 0),
         itemBuilder: (context, index) {
@@ -401,7 +474,7 @@ class _SearchPageState extends State<SearchPage> implements ScrollableTab {
     }
     return GridView.builder(
       controller: _scroll,
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, _barClearance),
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 190,
         mainAxisSpacing: 12,

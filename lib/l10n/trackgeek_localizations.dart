@@ -160,6 +160,9 @@ class TrackGeekLocalizations extends ChangeNotifier {
       if (_value(ns, '$path$suffix') != null) lookup = '$path$suffix';
     }
     var value = _value(ns, lookup) ?? _value('common', lookup) ?? key;
+    if (count is int && !params.containsKey('formattedCount')) {
+      value = value.replaceAll('{{formattedCount}}', count.humanizedCount());
+    }
     params.forEach((name, param) {
       value = value.replaceAll('{{$name}}', '$param');
     });

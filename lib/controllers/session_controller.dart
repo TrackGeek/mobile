@@ -38,6 +38,11 @@ class SessionController extends ChangeNotifier {
       _auth.restoreToken(token);
       try {
         _user = await _auth.session();
+        final userId = _user?.id;
+        if (userId != null) {
+          await prefs.setString(_userIdKey, userId);
+          unawaited(WidgetSync.refresh());
+        }
       } catch (_) {
         _user = null;
       }

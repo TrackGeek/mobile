@@ -49,7 +49,7 @@ class _CommentsCardState extends State<CommentsCard> {
     _load();
   }
 
-  String get _language => L10nScope.of(context).language;
+  String get _language => L10nScope.read(context).language;
 
   Future<void> _load() async {
     setState(() {

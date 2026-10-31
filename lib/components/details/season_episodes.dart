@@ -30,6 +30,28 @@ class _SeasonEpisodesSectionState extends State<SeasonEpisodesSection> {
   final _failed = <int>{};
   final _pending = <int>{};
 
+  int? get _defaultOpen {
+    if (widget.seasons.isEmpty) return null;
+    if (widget.initialSeason != null &&
+        widget.seasons.any((s) => s.seasonNumber == widget.initialSeason)) {
+      return widget.initialSeason;
+    }
+    return widget.seasons.any((s) => s.seasonNumber == 1)
+        ? 1
+        : widget.seasons.first.seasonNumber;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final open = _defaultOpen;
+    if (open != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _ensureLoaded(open);
+      });
+    }
+  }
+
   Future<void> _ensureLoaded(int seasonNumber) async {
     if (_cache.containsKey(seasonNumber) || _pending.contains(seasonNumber)) {
       return;
@@ -57,13 +79,7 @@ class _SeasonEpisodesSectionState extends State<SeasonEpisodesSection> {
         title: context.t('library:noEpisodes'),
       );
     }
-    final defaultOpen =
-        widget.initialSeason != null &&
-            widget.seasons.any((s) => s.seasonNumber == widget.initialSeason)
-        ? widget.initialSeason
-        : (widget.seasons.any((s) => s.seasonNumber == 1)
-              ? 1
-              : widget.seasons.first.seasonNumber);
+    final defaultOpen = _defaultOpen!;
     return Column(
       children: [
         for (final season in widget.seasons)

@@ -93,7 +93,7 @@ class ReviewItem extends StatelessWidget {
                         const SizedBox(height: 2),
                         Row(
                           children: [
-                            StarRating(value: review.overall / 2),
+                            StarRating(value: review.overall),
                             const SizedBox(width: 6),
                             Text(
                               review.overall.toStringAsFixed(1),

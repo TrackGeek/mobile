@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -7,6 +8,7 @@ import '../../models/user_profile.dart';
 import '../../services/user_service.dart';
 import 'user_widgets.dart';
 import '../../utils/adaptive_sheet_route.dart';
+import '../../utils/social_links.dart';
 
 const _knownHosts = {
   'github.com': 'GitHub',
@@ -134,9 +136,14 @@ class LinksCard extends StatelessWidget {
                         Tooltip(
                           message: link.label,
                           child: ActionChip(
-                            avatar: const HugeIcon(
-                              icon: HugeIcons.strokeRoundedLink01,
-                              size: 14,
+                            avatar: SvgPicture.asset(
+                              resolveLink(link.url).asset,
+                              width: 16,
+                              height: 16,
+                              colorFilter: ColorFilter.mode(
+                                theme.colorScheme.onSurface,
+                                BlendMode.srcIn,
+                              ),
                             ),
                             label: Text(
                               linkPlatform(link.url),

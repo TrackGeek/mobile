@@ -67,7 +67,7 @@ object TrackingApi {
         for (source in sources[section].orEmpty()) {
             for (status in source.statuses) {
                 val json = get(
-                    "$base/${source.slug}/progress" +
+                    "$base/${source.slug}/progress/" +
                         "?userId=$userId&status=$status" +
                         "&sortBy=updatedAt&sortOrder=desc" +
                         "&page=1&itemsPerPage=$LIMIT",
@@ -144,7 +144,7 @@ object TrackingApi {
                 Locale.getDefault().toLanguageTag(),
             )
             setRequestProperty("Authorization", "Bearer $token")
-            instanceFollowRedirects = false
+            instanceFollowRedirects = true
         }
         try {
             if (conn.responseCode !in 200..299) {

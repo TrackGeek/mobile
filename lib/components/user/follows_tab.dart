@@ -48,7 +48,7 @@ class _UserFollowsTabState extends State<UserFollowsTab>
   @override
   bool get wantKeepAlive => true;
 
-  String get _language => L10nScope.of(context).language;
+  String get _language => L10nScope.read(context).language;
 
   @override
   void initState() {

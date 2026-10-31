@@ -212,27 +212,39 @@ class _StatisticsCard extends StatelessWidget {
         mainAxisSpacing: 8,
         crossAxisSpacing: 8,
         mainAxisExtent:
-            110 + (MediaQuery.textScalerOf(context).scale(14) - 14) * 3,
+            124 + (MediaQuery.textScalerOf(context).scale(14) - 14) * 3,
         children: [
           for (final (key, type, labelKey, icon) in _statConfig)
             if (visible.contains(type))
               InkWell(
                 onTap: () => onSeeProgress?.call(type),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(14),
                 child: Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: theme.colorScheme.outlineVariant),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      HugeIcon(
-                        icon: icon,
-                        size: 18,
-                        color: theme.colorScheme.onSurfaceVariant,
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                          color: theme.colorScheme.primary.withValues(
+                            alpha: 0.16,
+                          ),
+                        ),
+                        child: Center(
+                          child: HugeIcon(
+                            icon: icon,
+                            size: 26,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -247,7 +259,8 @@ class _StatisticsCard extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            '${user.progressStats[key]?.total ?? 0}',
+                            (user.progressStats[key]?.total ?? 0)
+                                .humanizedCount(),
                             style: theme.textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.w700,
                             ),
@@ -292,7 +305,7 @@ class _ActivityCardState extends State<_ActivityCard> {
     try {
       _calendar = await widget.users.activityCalendar(
         widget.userId,
-        language: L10nScope.of(context).language,
+        language: L10nScope.read(context).language,
       );
       _selected = '';
     } catch (_) {
@@ -458,7 +471,7 @@ class _FavoritesPreviewState extends State<_FavoritesPreview> {
       final page = await widget.favorites.favoritesByUser(
         widget.userId,
         itemsPerPage: 6,
-        language: L10nScope.of(context).language,
+        language: L10nScope.read(context).language,
       );
       _items = [for (final favorite in page.items) ?favoriteToItem(favorite)];
       _loaded = true;
@@ -751,6 +764,7 @@ class _MedalsCard extends StatelessWidget {
                 child: SmoothImage(
                   url: medal.imageUrl,
                   fit: BoxFit.contain,
+                  transparent: true,
                   error: const HugeIcon(
                     icon: HugeIcons.strokeRoundedAward01,
                     size: 24,

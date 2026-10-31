@@ -93,7 +93,7 @@ class _UserListsTabState extends State<UserListsTab>
         widget.userId,
         query: _search.text,
         page: page,
-        language: L10nScope.of(context).language,
+        language: L10nScope.read(context).language,
       );
 
   Future<void> _loadMore() async {
@@ -200,10 +200,14 @@ class _UserListsTabState extends State<UserListsTab>
                   onChanged: (_) => _onSearchChanged(),
                   decoration: InputDecoration(
                     hintText: context.t('common:search'),
-                    prefixIcon: const HugeIcon(
-                      icon: HugeIcons.strokeRoundedSearch01,
-                      size: 18,
+                    prefixIcon: const Padding(
+                      padding: EdgeInsets.only(left: 12, right: 8),
+                      child: HugeIcon(
+                        icon: HugeIcons.strokeRoundedSearch01,
+                        size: 18,
+                      ),
                     ),
+                    prefixIconConstraints: const BoxConstraints(),
                     border: const OutlineInputBorder(),
                     isDense: true,
                   ),

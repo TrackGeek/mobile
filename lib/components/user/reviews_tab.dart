@@ -10,6 +10,7 @@ import '../../models/media_type.dart';
 import '../../models/review.dart';
 import '../../services/review_service.dart';
 import '../../utils/content_types.dart';
+import 'progress_tab.dart' show TgMenuField, TgMenuEntry, progressTypeIcons;
 import 'review_item.dart';
 import 'star_rating.dart';
 import 'user_widgets.dart';
@@ -70,16 +71,20 @@ class _UserReviewsTabState extends State<UserReviewsTab>
     super.dispose();
   }
 
-  String get _language => L10nScope.of(context).language;
+  String get _language => L10nScope.read(context).language;
+
+  int _loadToken = 0;
 
   Future<void> _load() async {
-    if (_loading) return;
+    final token = ++_loadToken;
     setState(() {
       _loading = true;
+      _loadingMore = false;
       _error = null;
     });
     try {
       final page = await _fetch(1);
+      if (token != _loadToken) return;
       _items
         ..clear()
         ..addAll(page.items);
@@ -87,10 +92,10 @@ class _UserReviewsTabState extends State<UserReviewsTab>
       _hasNext = page.hasNextPage;
       _loaded = true;
     } catch (e) {
+      if (token != _loadToken) return;
       _error = e;
-    } finally {
-      if (mounted) setState(() => _loading = false);
     }
+    if (mounted) setState(() => _loading = false);
   }
 
   Future<dynamic> _fetch(int page) => widget.reviews.userReviews(
@@ -223,24 +228,20 @@ class _UserReviewsTabState extends State<UserReviewsTab>
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                 child: Column(
                   children: [
-                    DropdownButtonFormField<MediaType>(
-                      initialValue: _type,
-                      isExpanded: true,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        isDense: true,
-                      ),
+                    TgMenuField<MediaType>(
+                      icon: progressTypeIcons[_type]!,
+                      label: context.t('common:types.${_type.name}_other'),
+                      value: _type,
                       items: [
                         for (final t in types)
-                          DropdownMenuItem(
+                          TgMenuEntry(
                             value: t,
-                            child: Text(
-                              context.t('common:types.${t.name}_other'),
-                            ),
+                            icon: progressTypeIcons[t]!,
+                            label: context.t('common:types.${t.name}_other'),
                           ),
                       ],
-                      onChanged: (value) {
-                        if (value == null || value == _type) return;
+                      onSelected: (value) {
+                        if (value == _type) return;
                         setState(() {
                           _type = value;
                           _search.clear();
@@ -254,10 +255,14 @@ class _UserReviewsTabState extends State<UserReviewsTab>
                       onChanged: (_) => _onSearchChanged(),
                       decoration: InputDecoration(
                         hintText: context.t('common:search'),
-                        prefixIcon: const HugeIcon(
-                          icon: HugeIcons.strokeRoundedSearch01,
-                          size: 18,
+                        prefixIcon: const Padding(
+                          padding: EdgeInsets.only(left: 12, right: 8),
+                          child: HugeIcon(
+                            icon: HugeIcons.strokeRoundedSearch01,
+                            size: 18,
+                          ),
                         ),
+                        prefixIconConstraints: const BoxConstraints(),
                         border: const OutlineInputBorder(),
                         isDense: true,
                       ),

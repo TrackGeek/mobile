@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../media/sliver_poster_grid.dart';
 
@@ -16,9 +18,10 @@ import '../../utils/content_types.dart';
 import '../../utils/genres.dart';
 import 'media_card.dart';
 import 'user_widgets.dart';
-import '../layout/edgy.dart';
 import '../layout/tg_refresh_indicator.dart';
 import '../../utils/adaptive_sheet_route.dart';
+import '../../styles/tg_theme.dart';
+import '../../utils/haptics.dart';
 import '../../utils/numbers.dart';
 
 class _ProgressContent {
@@ -102,6 +105,119 @@ List<({String status, String labelKey})> _sections(MediaType type) {
   ];
 }
 
+const progressTypeIcons = {
+  MediaType.anime: HugeIcons.strokeRoundedMountain,
+  MediaType.manga: HugeIcons.strokeRoundedBookOpen01,
+  MediaType.tv: HugeIcons.strokeRoundedTv01,
+  MediaType.movie: HugeIcons.strokeRoundedClapperboard,
+  MediaType.game: HugeIcons.strokeRoundedGameController01,
+  MediaType.book: HugeIcons.strokeRoundedBook01,
+};
+
+class TgMenuEntry<T> {
+  const TgMenuEntry({
+    required this.value,
+    required this.icon,
+    required this.label,
+    this.count,
+  });
+
+  final T value;
+  final List<List<dynamic>> icon;
+  final String label;
+  final int? count;
+}
+
+class TgMenuField<T> extends StatelessWidget {
+  const TgMenuField({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.items,
+    required this.onSelected,
+  });
+
+  final List<List<dynamic>> icon;
+  final String label;
+  final T value;
+  final List<TgMenuEntry<T>> items;
+  final ValueChanged<T> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    return PopupMenuButton<T>(
+      position: PopupMenuPosition.under,
+      onSelected: onSelected,
+      itemBuilder: (context) => [
+        for (final item in items)
+          PopupMenuItem<T>(
+            value: item.value,
+            child: Row(
+              children: [
+                HugeIcon(
+                  icon: item.icon,
+                  size: 20,
+                  color: item.value == value
+                      ? scheme.primary
+                      : scheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    item.label,
+                    style: TextStyle(
+                      fontWeight: item.value == value
+                          ? FontWeight.w700
+                          : FontWeight.w500,
+                      color: item.value == value ? scheme.primary : null,
+                    ),
+                  ),
+                ),
+                if (item.count != null && item.count! > 0)
+                  Text(
+                    item.count!.humanizedCount(),
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+      ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerHigh,
+          borderRadius: BorderRadius.circular(TgRadii.md),
+          border: Border.all(color: scheme.outlineVariant),
+        ),
+        child: Row(
+          children: [
+            HugeIcon(icon: icon, size: 20, color: scheme.primary),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelLarge,
+              ),
+            ),
+            HugeIcon(
+              icon: HugeIcons.strokeRoundedArrowDown01,
+              size: 18,
+              color: scheme.onSurfaceVariant,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 const _sortOptions = [
   ('name', 'user:sort.title'),
   ('addedAt', 'user:sort.lastAdded'),
@@ -117,6 +233,7 @@ class UserProgressTab extends StatefulWidget {
     required this.progress,
     required this.contentType,
     required this.onContentTypeChange,
+    this.typeCounts = const {},
     this.onOpenMedia,
   });
 
@@ -125,6 +242,7 @@ class UserProgressTab extends StatefulWidget {
   final ProgressService progress;
   final MediaType contentType;
   final ValueChanged<MediaType> onContentTypeChange;
+  final Map<MediaType, int> typeCounts;
   final void Function(MediaType type, String slug)? onOpenMedia;
 
   @override
@@ -153,7 +271,7 @@ class _UserProgressTabState extends State<UserProgressTab>
   String _year = '';
   bool? _released;
   List<String> _releaseStates = const [];
-  ProgressFilterOptions? _options;
+  final _options = ValueNotifier<ProgressFilterOptions?>(null);
   MediaType _type = MediaType.game;
 
   @override
@@ -183,6 +301,7 @@ class _UserProgressTabState extends State<UserProgressTab>
   void dispose() {
     _debounce?.cancel();
     _search.dispose();
+    _options.dispose();
     super.dispose();
   }
 
@@ -198,10 +317,10 @@ class _UserProgressTabState extends State<UserProgressTab>
     _year = '';
     _released = null;
     _releaseStates = const [];
-    _options = null;
+    _options.value = null;
   }
 
-  String get _language => L10nScope.of(context).language;
+  String get _language => L10nScope.read(context).language;
 
   Future<PaginatedPage<ProgressItem>> _pageFetch(int page) async {
     final result = await widget.progress.userProgress(
@@ -225,31 +344,37 @@ class _UserProgressTabState extends State<UserProgressTab>
     return result.page;
   }
 
+  int _loadToken = 0;
+
   Future<void> _load() async {
-    if (_loading) return;
+    final token = ++_loadToken;
     setState(() {
       _loading = true;
+      _loadingMore = false;
       _error = null;
     });
     try {
       final page = await _pageFetch(1);
+      if (token != _loadToken) return;
       _items
         ..clear()
         ..addAll(page.items);
       _page = page.inPage;
       _hasNext = page.hasNextPage;
     } catch (e) {
+      if (token != _loadToken) return;
       _error = e;
-    } finally {
-      if (mounted) setState(() => _loading = false);
     }
+    if (mounted) setState(() => _loading = false);
   }
 
   Future<void> _loadMore() async {
     if (_loading || _loadingMore || !_hasNext) return;
+    final token = _loadToken;
     setState(() => _loadingMore = true);
     try {
       final page = await _pageFetch(_page + 1);
+      if (token != _loadToken) return;
       _items.addAll(page.items);
       _page = page.inPage;
       _hasNext = page.hasNextPage;
@@ -262,13 +387,15 @@ class _UserProgressTabState extends State<UserProgressTab>
 
   Future<void> _loadOptions() async {
     try {
-      _options = await widget.progress.progressFilters(
-        _type,
+      final type = _type;
+      final options = await widget.progress.progressFilters(
+        type,
         userId: widget.userId,
         language: _language,
       );
+      if (mounted && type == _type) _options.value = options;
     } catch (_) {
-      _options = null;
+      _options.value = null;
     }
   }
 
@@ -360,8 +487,7 @@ class _UserProgressTabState extends State<UserProgressTab>
                 _released = released;
                 _releaseStates = releaseStates;
               });
-              _debounce?.cancel();
-              _debounce = Timer(const Duration(milliseconds: 500), _load);
+              _load();
             },
       ).asAdaptiveSheetRoute<void>(),
     );
@@ -388,62 +514,63 @@ class _UserProgressTabState extends State<UserProgressTab>
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: 40,
-                    child: Edgy(
-                      axis: .horizontal,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: MediaType.values.length,
-                        separatorBuilder: (_, _) => const SizedBox(width: 8),
-                        itemBuilder: (context, index) {
-                          final type = MediaType.values[index];
-                          if (!visible.contains(type)) {
-                            return const SizedBox.shrink();
-                          }
-                          return ChoiceChip(
-                            label: Text(
-                              context.t('common:types.${type.name}_other'),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TgMenuField<MediaType>(
+                            icon: progressTypeIcons[_type]!,
+                            label: context.t(
+                              'common:types.${_type.name}_other',
                             ),
-                            selected: _type == type,
-                            onSelected: (_) => widget.onContentTypeChange(type),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 40,
-                    child: Edgy(
-                      axis: .horizontal,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: sections.length,
-                        separatorBuilder: (_, _) => const SizedBox(width: 8),
-                        itemBuilder: (context, index) {
-                          final section = sections[index];
-                          final count = _statusCounts[section.status] ?? 0;
-                          return ChoiceChip(
-                            avatar: HugeIcon(
-                              icon:
-                                  _statusIcons[section.status] ??
-                                  HugeIcons.strokeRoundedListView,
-                              size: 14,
+                            value: _type,
+                            items: [
+                              for (final type in MediaType.values)
+                                if (visible.contains(type))
+                                  TgMenuEntry(
+                                    value: type,
+                                    icon: progressTypeIcons[type]!,
+                                    label: context.t(
+                                      'common:types.${type.name}_other',
+                                    ),
+                                    count: widget.typeCounts[type],
+                                  ),
+                            ],
+                            onSelected: widget.onContentTypeChange,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: TgMenuField<String>(
+                            icon:
+                                _statusIcons[_status] ??
+                                HugeIcons.strokeRoundedListView,
+                            label: context.t(
+                              sections
+                                  .firstWhere(
+                                    (s) => s.status == _status,
+                                    orElse: () => sections.first,
+                                  )
+                                  .labelKey,
                             ),
-                            label: Text(
-                              count > 0
-                                  ? '${context.t(section.labelKey)}, ${count.humanizedCount()}'
-                                  : context.t(section.labelKey),
-                            ),
-                            selected: _status == section.status,
-                            onSelected: (_) {
+                            value: _status,
+                            items: [
+                              for (final section in sections)
+                                TgMenuEntry(
+                                  value: section.status,
+                                  icon:
+                                      _statusIcons[section.status] ??
+                                      HugeIcons.strokeRoundedListView,
+                                  label: context.t(section.labelKey),
+                                  count: _statusCounts[section.status] ?? 0,
+                                ),
+                            ],
+                            onSelected: (status) {
                               setState(() {
-                                _status = section.status;
+                                _status = status;
                                 if (_status != 'Completed' &&
                                     _status != 'Dropped') {
                                   _completion = const [];
@@ -451,14 +578,12 @@ class _UserProgressTabState extends State<UserProgressTab>
                               });
                               _load();
                             },
-                          );
-                        },
-                      ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-                    child: Row(
+                    const SizedBox(height: 10),
+                    Row(
                       children: [
                         Expanded(
                           child: TextField(
@@ -466,10 +591,14 @@ class _UserProgressTabState extends State<UserProgressTab>
                             onChanged: (_) => _onSearchChanged(),
                             decoration: InputDecoration(
                               hintText: context.t('common:search'),
-                              prefixIcon: const HugeIcon(
-                                icon: HugeIcons.strokeRoundedSearch01,
-                                size: 18,
+                              prefixIcon: const Padding(
+                                padding: EdgeInsets.only(left: 12, right: 8),
+                                child: HugeIcon(
+                                  icon: HugeIcons.strokeRoundedSearch01,
+                                  size: 18,
+                                ),
                               ),
+                              prefixIconConstraints: const BoxConstraints(),
                               border: const OutlineInputBorder(),
                               isDense: true,
                             ),
@@ -477,89 +606,74 @@ class _UserProgressTabState extends State<UserProgressTab>
                         ),
                         const SizedBox(width: 8),
                         IconButton.filledTonal(
-                          icon: _randomizing
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const HugeIcon(
-                                  icon: HugeIcons.strokeRoundedShuffle,
-                                  size: 16,
-                                ),
-                          tooltip: context.t('user:random'),
-                          onPressed: _random,
-                        ),
-                        const SizedBox(width: 4),
-                        IconButton.filledTonal(
                           icon: Badge(
                             isLabelVisible: _activeFilterCount > 0,
                             label: Text(_activeFilterCount.humanizedCount()),
                             child: const HugeIcon(
                               icon: HugeIcons.strokeRoundedFilterHorizontal,
-                              size: 16,
+                              size: 20,
                             ),
                           ),
                           tooltip: context.t('user:filter'),
                           onPressed: _openFilters,
                         ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: DropdownButtonFormField<String>(
-                            initialValue: _sortBy,
-                            isExpanded: true,
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              isDense: true,
-                            ),
-                            items: [
-                              for (final (value, key) in _sortOptions)
-                                if (value != 'releaseDate' ||
-                                    _type != MediaType.manga)
-                                  DropdownMenuItem(
-                                    value: value,
-                                    child: Text(context.t(key)),
+                        PopupMenuButton<String>(
+                          tooltip: context.t('user:sort.title'),
+                          icon: _randomizing
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
                                   ),
-                            ],
-                            onChanged: (value) {
-                              if (value == null || value == _sortBy) return;
+                                )
+                              : const HugeIcon(
+                                  icon: HugeIcons.strokeRoundedMoreVertical,
+                                  size: 20,
+                                ),
+                          onSelected: (value) {
+                            if (value == 'random') {
+                              _random();
+                            } else if (value == 'order') {
+                              setState(
+                                () => _sortOrder = _sortOrder == 'asc'
+                                    ? 'desc'
+                                    : 'asc',
+                              );
+                              _load();
+                            } else if (value != _sortBy) {
                               setState(() => _sortBy = value);
                               _load();
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        IconButton.filledTonal(
-                          icon: HugeIcon(
-                            icon: _sortOrder == 'asc'
-                                ? HugeIcons.strokeRoundedSortByUp02
-                                : HugeIcons.strokeRoundedSortByDown02,
-                            size: 16,
-                          ),
-                          tooltip: _sortOrder == 'asc'
-                              ? context.t('common:ascending')
-                              : context.t('common:descending'),
-                          onPressed: () {
-                            setState(
-                              () => _sortOrder = _sortOrder == 'asc'
-                                  ? 'desc'
-                                  : 'asc',
-                            );
-                            _load();
+                            }
                           },
+                          itemBuilder: (context) => [
+                            for (final (value, key) in _sortOptions)
+                              if (value != 'releaseDate' ||
+                                  _type != MediaType.manga)
+                                CheckedPopupMenuItem(
+                                  value: value,
+                                  checked: _sortBy == value,
+                                  child: Text(context.t(key)),
+                                ),
+                            const PopupMenuDivider(),
+                            PopupMenuItem(
+                              value: 'order',
+                              child: Text(
+                                _sortOrder == 'asc'
+                                    ? context.t('common:ascending')
+                                    : context.t('common:descending'),
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: 'random',
+                              child: Text(context.t('user:random')),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             if (_loading && _items.isEmpty)
@@ -644,6 +758,8 @@ const _releaseStateLabels = <MediaType, Map<String, String>>{
   },
 };
 
+typedef _Option = ({String slug, String name});
+
 class _FiltersSheet extends StatefulWidget {
   const _FiltersSheet({
     required this.type,
@@ -661,7 +777,7 @@ class _FiltersSheet extends StatefulWidget {
 
   final MediaType type;
   final String status;
-  final ProgressFilterOptions? options;
+  final ValueListenable<ProgressFilterOptions?> options;
   final List<String> completion;
   final List<String> selectedPlatforms;
   final List<String> availablePlatforms;
@@ -706,198 +822,423 @@ class _FiltersSheetState extends State<_FiltersSheet> {
     super.dispose();
   }
 
-  void _emit() => widget.onChanged(
-    completion: _completion,
-    selectedPlatforms: _selected,
-    availablePlatforms: _available,
-    genres: _genres,
-    year: _year.text,
-    released: _released,
-    releaseStates: _releaseStates,
-  );
+  bool get _validYear => RegExp(r'^\d{4}$').hasMatch(_year.text.trim());
+
+  int get _count =>
+      (_completion.isNotEmpty ? 1 : 0) +
+      (_selected.isNotEmpty ? 1 : 0) +
+      (_available.isNotEmpty ? 1 : 0) +
+      (_genres.isNotEmpty ? 1 : 0) +
+      (_validYear ? 1 : 0) +
+      (_released != null ? 1 : 0) +
+      (_releaseStates.isNotEmpty ? 1 : 0);
+
+  void _apply() {
+    HapticsHelper.selection();
+    widget.onChanged(
+      completion: _completion,
+      selectedPlatforms: _selected,
+      availablePlatforms: _available,
+      genres: _genres,
+      year: _validYear ? _year.text.trim() : '',
+      released: _released,
+      releaseStates: _releaseStates,
+    );
+    Navigator.of(context).pop();
+  }
+
+  void _clear() => setState(() {
+    _completion = [];
+    _selected = [];
+    _available = [];
+    _genres = [];
+    _year.clear();
+    _released = null;
+    _releaseStates = [];
+  });
 
   void _toggle(List<String> list, String value) => setState(() {
-    if (list.contains(value)) {
-      list.remove(value);
-    } else {
-      list.add(value);
-    }
-    _emit();
+    list.contains(value) ? list.remove(value) : list.add(value);
   });
+
+  Future<void> _pick({
+    required String title,
+    required List<_Option> options,
+    required List<String> current,
+    required ValueChanged<List<String>> onDone,
+  }) async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    final result = await showModalBottomSheet<List<String>>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (_) =>
+          _MultiSelectSheet(title: title, options: options, initial: current),
+    );
+    if (result != null) setState(() => onDone(result));
+  }
+
+  String _summary(List<String> values, List<_Option> options) {
+    if (values.isEmpty) return context.t('user:filterAny');
+    final names = [
+      for (final o in options)
+        if (values.contains(o.slug)) o.name,
+    ];
+    if (names.length <= 2) return names.join(', ');
+    return '${names.take(2).join(', ')} +${names.length - 2}';
+  }
+
+  Widget _pickerTile({
+    required String title,
+    required List<_Option> options,
+    required List<String> values,
+    required ValueChanged<List<String>> onDone,
+  }) {
+    final theme = Theme.of(context);
+    final active = values.isNotEmpty;
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Text(title, style: theme.textTheme.labelLarge),
+      subtitle: Text(
+        _summary(values, options),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: active
+              ? theme.colorScheme.primary
+              : theme.colorScheme.onSurfaceVariant,
+        ),
+      ),
+      trailing: HugeIcon(
+        icon: HugeIcons.strokeRoundedArrowRight01,
+        size: 18,
+        color: theme.colorScheme.onSurfaceVariant,
+      ),
+      onTap: () => _pick(
+        title: title,
+        options: options,
+        current: values,
+        onDone: onDone,
+      ),
+    );
+  }
+
+  Widget _group(String title, Widget child) => Padding(
+    padding: const EdgeInsets.only(bottom: 20),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionTitle(text: title),
+        child,
+      ],
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final options = widget.options;
     final isGame = widget.type == MediaType.game;
     final showCompletion =
         isGame && (widget.status == 'Completed' || widget.status == 'Dropped');
     return SafeArea(
-      child: ListView(
-        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        padding: const EdgeInsets.all(16),
+      child: Column(
         children: [
-          Row(
-            children: [
-              Text(
-                context.t('user:filter'),
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const Spacer(),
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    _completion = [];
-                    _selected = [];
-                    _available = [];
-                    _genres = [];
-                    _year.clear();
-                    _released = null;
-                    _releaseStates = [];
-                  });
-                  _emit();
-                },
-                child: Text(context.t('common:clear')),
-              ),
-            ],
-          ),
-          if (options == null)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 24),
-              child: Center(child: CircularProgressIndicator()),
-            )
-          else ...[
-            if (showCompletion) ...[
-              _SectionTitle(text: context.t('feed:completionStatus.label')),
-              Wrap(
-                spacing: 8,
-                children: [
-                  for (final value in _completions)
-                    FilterChip(
-                      label: Text(
-                        value == '100%'
-                            ? '100%'
-                            : context.t('feed:completionStatus.$value'),
-                      ),
-                      selected: _completion.contains(value),
-                      onSelected: (_) => _toggle(_completion, value),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 12),
-            ],
-            if (isGame &&
-                showCompletion &&
-                options.selectedPlatforms.isNotEmpty) ...[
-              _SectionTitle(text: context.t('library:selectedPlatforms')),
-              Wrap(
-                spacing: 8,
-                children: [
-                  for (final platform in options.selectedPlatforms)
-                    FilterChip(
-                      label: Text(platform.name),
-                      selected: _selected.contains(platform.slug),
-                      onSelected: (_) => _toggle(_selected, platform.slug),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 12),
-            ],
-            if (isGame && options.availablePlatforms.isNotEmpty) ...[
-              _SectionTitle(text: context.t('library:availablePlatforms')),
-              Wrap(
-                spacing: 8,
-                children: [
-                  for (final platform in options.availablePlatforms)
-                    FilterChip(
-                      label: Text(platform.name),
-                      selected: _available.contains(platform.slug),
-                      onSelected: (_) => _toggle(_available, platform.slug),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 12),
-            ],
-            if (options.genres.isNotEmpty) ...[
-              _SectionTitle(text: context.t('library:genres')),
-              Wrap(
-                spacing: 8,
-                children: [
-                  for (final genre in options.genres)
-                    FilterChip(
-                      label: Text(genreLabel(context, genre)),
-                      selected: _genres.contains(genre),
-                      onSelected: (_) => _toggle(_genres, genre),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 12),
-            ],
-            _SectionTitle(text: context.t('library:year')),
-            TextField(
-              controller: _year,
-              keyboardType: TextInputType.number,
-              maxLength: 4,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                isDense: true,
-                counterText: '',
-              ),
-              onChanged: (_) => _emit(),
-            ),
-            const SizedBox(height: 12),
-            _SectionTitle(text: context.t('library:availability')),
-            Wrap(
-              spacing: 8,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 8, 8),
+            child: Row(
               children: [
-                ChoiceChip(
-                  label: Text(context.t('common:all')),
-                  selected: _released == null,
-                  onSelected: (_) => setState(() {
-                    _released = null;
-                    _emit();
-                  }),
+                Text(
+                  context.t('user:filter'),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-                ChoiceChip(
-                  label: Text(context.t('library:statusAir.released')),
-                  selected: _released == true,
-                  onSelected: (_) => setState(() {
-                    _released = true;
-                    _emit();
-                  }),
-                ),
-                ChoiceChip(
-                  label: Text(context.t('library:statusAir.unreleased')),
-                  selected: _released == false,
-                  onSelected: (_) => setState(() {
-                    _released = false;
-                    _emit();
-                  }),
+                const Spacer(),
+                TextButton(
+                  onPressed: _count == 0 ? null : _clear,
+                  child: Text(context.t('common:clear')),
                 ),
               ],
             ),
-            if (options.releaseStates.length > 1) ...[
-              const SizedBox(height: 12),
-              _SectionTitle(text: context.t('common:status')),
-              Wrap(
-                spacing: 8,
+          ),
+          Expanded(
+            child: ValueListenableBuilder<ProgressFilterOptions?>(
+              valueListenable: widget.options,
+              builder: (context, options, _) => ListView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                 children: [
-                  for (final state in options.releaseStates)
-                    if (_releaseStateLabels[widget.type]?[state] != null)
-                      FilterChip(
-                        label: Text(
-                          context.t(_releaseStateLabels[widget.type]![state]!),
-                        ),
-                        selected: _releaseStates.contains(state),
-                        onSelected: (_) => _toggle(_releaseStates, state),
+                  if (showCompletion)
+                    _group(
+                      context.t('feed:completionStatus.label'),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          for (final value in _completions)
+                            FilterChip(
+                              label: Text(
+                                value == '100%'
+                                    ? '100%'
+                                    : context.t('feed:completionStatus.$value'),
+                              ),
+                              selected: _completion.contains(value),
+                              onSelected: (_) => _toggle(_completion, value),
+                            ),
+                        ],
                       ),
+                    ),
+                  _group(
+                    context.t('library:availability'),
+                    SegmentedButton<bool?>(
+                      showSelectedIcon: false,
+                      segments: [
+                        ButtonSegment(
+                          value: null,
+                          label: Text(context.t('common:all')),
+                        ),
+                        ButtonSegment(
+                          value: true,
+                          label: Text(context.t('library:statusAir.released')),
+                        ),
+                        ButtonSegment(
+                          value: false,
+                          label: Text(
+                            context.t('library:statusAir.unreleased'),
+                          ),
+                        ),
+                      ],
+                      selected: {_released},
+                      onSelectionChanged: (v) =>
+                          setState(() => _released = v.first),
+                    ),
+                  ),
+                  if (options != null &&
+                      options.releaseStates.length > 1 &&
+                      options.releaseStates.any(
+                        (s) => _releaseStateLabels[widget.type]?[s] != null,
+                      ))
+                    _group(
+                      context.t('common:status'),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          for (final state in options.releaseStates)
+                            if (_releaseStateLabels[widget.type]?[state] !=
+                                null)
+                              FilterChip(
+                                label: Text(
+                                  context.t(
+                                    _releaseStateLabels[widget.type]![state]!,
+                                  ),
+                                ),
+                                selected: _releaseStates.contains(state),
+                                onSelected: (_) =>
+                                    _toggle(_releaseStates, state),
+                              ),
+                        ],
+                      ),
+                    ),
+                  _group(
+                    context.t('library:year'),
+                    TextField(
+                      controller: _year,
+                      keyboardType: TextInputType.number,
+                      maxLength: 4,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      decoration: const InputDecoration(
+                        isDense: true,
+                        counterText: '',
+                        hintText: '2024',
+                      ),
+                      onChanged: (_) => setState(() {}),
+                    ),
+                  ),
+                  if (options == null)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  else ...[
+                    if (options.genres.isNotEmpty)
+                      _pickerTile(
+                        title: context.t('library:genres'),
+                        options: [
+                          for (final g in options.genres)
+                            (slug: g, name: genreLabel(context, g)),
+                        ],
+                        values: _genres,
+                        onDone: (v) => _genres = v,
+                      ),
+                    if (isGame && options.availablePlatforms.isNotEmpty)
+                      _pickerTile(
+                        title: context.t('library:availablePlatforms'),
+                        options: options.availablePlatforms,
+                        values: _available,
+                        onDone: (v) => _available = v,
+                      ),
+                    if (showCompletion && options.selectedPlatforms.isNotEmpty)
+                      _pickerTile(
+                        title: context.t('library:selectedPlatforms'),
+                        options: options.selectedPlatforms,
+                        values: _selected,
+                        onDone: (v) => _selected = v,
+                      ),
+                  ],
                 ],
               ),
-            ],
-          ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+            child: SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: _apply,
+                child: Text(
+                  _count == 0
+                      ? context.t('user:filterApply')
+                      : context.t('user:filterApplyCount', {
+                          'count': _count,
+                          'formattedCount': _count.humanizedCount(),
+                        }),
+                ),
+              ),
+            ),
+          ),
         ],
+      ),
+    );
+  }
+}
+
+class _MultiSelectSheet extends StatefulWidget {
+  const _MultiSelectSheet({
+    required this.title,
+    required this.options,
+    required this.initial,
+  });
+
+  final String title;
+  final List<_Option> options;
+  final List<String> initial;
+
+  @override
+  State<_MultiSelectSheet> createState() => _MultiSelectSheetState();
+}
+
+class _MultiSelectSheetState extends State<_MultiSelectSheet> {
+  late final _selected = <String>{...widget.initial};
+  final _query = TextEditingController();
+
+  @override
+  void dispose() {
+    _query.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final q = _query.text.trim().toLowerCase();
+    final shown = [
+      for (final o in widget.options)
+        if (q.isEmpty || o.name.toLowerCase().contains(q)) o,
+    ];
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: SizedBox(
+        height: MediaQuery.sizeOf(context).height * 0.8,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 8, 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      widget.title,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: _selected.isEmpty
+                        ? null
+                        : () => setState(_selected.clear),
+                    child: Text(context.t('common:clear')),
+                  ),
+                ],
+              ),
+            ),
+            if (widget.options.length > 8)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                child: TextField(
+                  controller: _query,
+                  onChanged: (_) => setState(() {}),
+                  decoration: InputDecoration(
+                    hintText: context.t('common:search'),
+                    isDense: true,
+                    prefixIcon: const Padding(
+                      padding: EdgeInsets.only(left: 12, right: 8),
+                      child: HugeIcon(
+                        icon: HugeIcons.strokeRoundedSearch01,
+                        size: 18,
+                      ),
+                    ),
+                    prefixIconConstraints: const BoxConstraints(),
+                  ),
+                ),
+              ),
+            Expanded(
+              child: shown.isEmpty
+                  ? Center(child: Text(context.t('common:noResults')))
+                  : ListView.builder(
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      itemCount: shown.length,
+                      itemBuilder: (context, i) {
+                        final o = shown[i];
+                        return CheckboxListTile(
+                          dense: true,
+                          controlAffinity: ListTileControlAffinity.trailing,
+                          title: Text(o.name),
+                          value: _selected.contains(o.slug),
+                          onChanged: (v) => setState(() {
+                            v == true
+                                ? _selected.add(o.slug)
+                                : _selected.remove(o.slug);
+                          }),
+                        );
+                      },
+                    ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+              child: SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: () => Navigator.of(context).pop([
+                    for (final o in widget.options)
+                      if (_selected.contains(o.slug)) o.slug,
+                  ]),
+                  child: Text(
+                    _selected.isEmpty
+                        ? context.t('user:filterConfirm')
+                        : context.t('user:filterConfirmCount', {
+                            'count': _selected.length,
+                            'formattedCount': _selected.length.humanizedCount(),
+                          }),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -910,7 +1251,7 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(bottom: 6),
+    padding: const EdgeInsets.only(bottom: 8),
     child: Text(text, style: Theme.of(context).textTheme.labelLarge),
   );
 }

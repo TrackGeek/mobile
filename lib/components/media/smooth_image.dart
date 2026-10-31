@@ -11,6 +11,7 @@ class SmoothImage extends StatelessWidget {
     this.height,
     this.alignment,
     this.error,
+    this.transparent = false,
   });
 
   final String url;
@@ -19,6 +20,7 @@ class SmoothImage extends StatelessWidget {
   final double? height;
   final Alignment? alignment;
   final Widget? error;
+  final bool transparent;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +35,9 @@ class SmoothImage extends StatelessWidget {
       placeholder: Container(
         width: width,
         height: height,
-        color: theme.colorScheme.surfaceContainerHighest,
+        color: transparent
+            ? Colors.transparent
+            : theme.colorScheme.surfaceContainerHighest,
       ),
       errorBuilder: (context, _) =>
           error ??

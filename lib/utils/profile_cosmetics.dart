@@ -78,8 +78,9 @@ abstract final class BannerEffects {
       ),
       'vignette_glow' => const BoxDecoration(
         gradient: RadialGradient(
-          colors: [Colors.transparent, Color(0x8C000000)],
-          stops: [0.45, 1.0],
+          radius: 1.4,
+          colors: [Colors.transparent, Color(0x59000000)],
+          stops: [0.6, 1.0],
         ),
       ),
       'scanlines' => const BoxDecoration(),
@@ -159,5 +160,80 @@ BoxDecoration profileColorDecoration(String? value, {double radius = 10}) {
   return BoxDecoration(
     borderRadius: BorderRadius.circular(radius),
     color: parseHexColor(value),
+  );
+}
+
+Color? profileAccentColor(String? value) {
+  if (isGradientColor(value)) {
+    return profileGradients[gradientKeyFromValue(value!)]?.first;
+  }
+  return parseHexColor(value);
+}
+
+ThemeData profileTheme(ThemeData base, String? value) {
+  final accent = profileAccentColor(value);
+  if (accent == null) return base;
+  final hsl = HSLColor.fromColor(accent);
+  final primary = hsl
+      .withLightness(hsl.lightness.clamp(0.62, 0.8))
+      .withSaturation(hsl.saturation.clamp(0.0, 0.9))
+      .toColor();
+  final onPrimary = primary.computeLuminance() > 0.4
+      ? const Color(0xFF101417)
+      : Colors.white;
+  Color tint(Color c, double t) =>
+      Color.alphaBlend(accent.withValues(alpha: t), c);
+  final scheme = base.colorScheme;
+  final background = tint(scheme.surface, 0.06);
+  final card = tint(scheme.surfaceContainerLow, 0.08);
+  final raised = tint(scheme.surfaceContainerHigh, 0.1);
+  final overlay = tint(scheme.surfaceContainerHighest, 0.12);
+  final container = tint(scheme.surface, 0.28);
+  final onContainer = hsl.withLightness(0.88).toColor();
+  final themed = scheme.copyWith(
+    primary: primary,
+    onPrimary: onPrimary,
+    primaryContainer: container,
+    onPrimaryContainer: onContainer,
+    secondaryContainer: container,
+    onSecondaryContainer: onContainer,
+    tertiary: primary,
+    surface: background,
+    surfaceContainerLowest: background,
+    surfaceContainerLow: card,
+    surfaceContainer: card,
+    surfaceContainerHigh: raised,
+    surfaceContainerHighest: overlay,
+  );
+  return base.copyWith(
+    colorScheme: themed,
+    scaffoldBackgroundColor: background,
+    appBarTheme: base.appBarTheme.copyWith(backgroundColor: background),
+    cardTheme: base.cardTheme.copyWith(color: card),
+    chipTheme: base.chipTheme.copyWith(
+      backgroundColor: raised,
+      selectedColor: container,
+    ),
+    inputDecorationTheme: base.inputDecorationTheme.copyWith(
+      fillColor: raised,
+      focusedBorder:
+          (base.inputDecorationTheme.focusedBorder as OutlineInputBorder?)
+              ?.copyWith(borderSide: BorderSide(color: primary, width: 1.5)),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: base.textButtonTheme.style?.copyWith(
+        foregroundColor: WidgetStatePropertyAll(primary),
+      ),
+    ),
+    progressIndicatorTheme: base.progressIndicatorTheme.copyWith(
+      color: primary,
+      linearTrackColor: raised,
+      circularTrackColor: raised,
+    ),
+    popupMenuTheme: base.popupMenuTheme.copyWith(color: overlay),
+    textSelectionTheme: base.textSelectionTheme.copyWith(
+      cursorColor: primary,
+      selectionHandleColor: primary,
+    ),
   );
 }

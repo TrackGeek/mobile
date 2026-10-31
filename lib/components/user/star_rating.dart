@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hugeicons/hugeicons.dart';
 
 class StarRating extends StatelessWidget {
   const StarRating({super.key, required this.value, this.size = 16});
@@ -41,11 +40,7 @@ class _Star extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Stack(
     children: [
-      HugeIcon(
-        icon: HugeIcons.strokeRoundedStar,
-        size: size,
-        color: emptyColor,
-      ),
+      Icon(Icons.star_rounded, size: size, color: emptyColor),
       ClipRect(
         clipper: _FillClipper(fill),
         child: Icon(Icons.star_rounded, size: size, color: color),

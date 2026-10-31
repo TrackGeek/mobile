@@ -44,7 +44,7 @@ class _UserMissionsTabState extends State<UserMissionsTab>
     try {
       _summary = await widget.users.missions(
         widget.userId,
-        language: L10nScope.of(context).language,
+        language: L10nScope.read(context).language,
       );
     } catch (e) {
       _error = e;
@@ -223,7 +223,7 @@ class _MissionTile extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                '${mission.percentage}%',
+                '${mission.percentage.round()}%',
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),

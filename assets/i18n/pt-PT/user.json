@@ -117,5 +117,7 @@
   "followed": "Seguido com sucesso",
   "unfollowed": "Parado de seguir com sucesso",
   "followedError": "Ocorreu um erro ao tentar seguir este utilizador.",
-  "unfollowedError": "Ocorreu um erro ao tentar deixar de seguir este utilizador."
+  "unfollowedError": "Ocorreu um erro ao tentar deixar de seguir este utilizador.",
+  "screenshotCount_one": "{{formattedCount}} captura de ecrã",
+  "screenshotCount_other": "{{formattedCount}} capturas de ecrã"
 }

@@ -34,6 +34,8 @@
   "activityNoCount": "No",
   "noProgress": "No progress yet.",
   "noProgressDescription": "Titles this user is tracking will show up here.",
+  "screenshotCount_one": "{{formattedCount}} screenshot",
+  "screenshotCount_other": "{{formattedCount}} screenshots",
   "noScreenshots": "No screenshots yet.",
   "noScreenshotsDescription": "Screenshots this user uploads will show up here.",
   "copyProfileUsernameSuccess": "Username copied to clipboard!",
@@ -117,5 +119,12 @@
   "followed": "Followed with success",
   "unfollowed": "Unfollowed with success",
   "followedError": "An error occurred while trying to follow this user.",
-  "unfollowedError": "An error occurred while trying to unfollow this user."
+  "unfollowedError": "An error occurred while trying to unfollow this user.",
+  "filterAny": "Any",
+  "filterApply": "Show results",
+  "filterApplyCount_one": "Show results ({{formattedCount}} filter)",
+  "filterApplyCount_other": "Show results ({{formattedCount}} filters)",
+  "filterConfirm": "Done",
+  "filterConfirmCount_one": "Done ({{formattedCount}} selected)",
+  "filterConfirmCount_other": "Done ({{formattedCount}} selected)"
 }

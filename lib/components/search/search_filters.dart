@@ -4,6 +4,7 @@ import 'package:hugeicons/hugeicons.dart';
 import '../../l10n/l10n_context.dart';
 import '../../models/media_type.dart';
 import '../../services/genre_service.dart';
+import '../../styles/tg_theme.dart';
 import '../../utils/genres.dart';
 
 class _Option {
@@ -235,6 +236,8 @@ class SearchFilters extends StatefulWidget {
 }
 
 class _SearchFiltersState extends State<SearchFilters> {
+  static const _gap = 20.0;
+
   final _year = TextEditingController();
 
   @override
@@ -263,165 +266,282 @@ class _SearchFiltersState extends State<SearchFilters> {
     return raw.split(',');
   }
 
-  Widget _title(String text) => Padding(
-    padding: const EdgeInsets.only(bottom: 6),
-    child: Text(text, style: Theme.of(context).textTheme.titleSmall),
+  Widget _labeled(String title, Widget child) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [_FieldLabel(title), child],
   );
 
-  Widget _select(
-    String title,
-    String key,
-    List<_Option> options, {
-    required String? current,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _title(title),
-        DropdownMenu<String>(
-          width: double.infinity,
-          initialSelection: current,
-          hintText: context.t('common:all'),
-          dropdownMenuEntries: [
-            DropdownMenuEntry(value: '', label: context.t('common:all')),
-            for (final option in options)
-              DropdownMenuEntry(
-                value: option.value,
-                label: option.resolve(context),
+  Widget _select(String title, String key, List<_Option> options) {
+    final current = widget.values[key];
+    final selected = options.where((o) => o.value == current).firstOrNull;
+    return _labeled(
+      title,
+      _MenuField(
+        display: selected?.resolve(context) ?? context.t('common:all'),
+        active: selected != null,
+        itemsBuilder: (close) => [
+          for (final option in [
+            _Option('', label: context.t('common:all')),
+            ...options,
+          ])
+            MenuItemButton(
+              leadingIcon: SizedBox(
+                width: 16,
+                child: option.value == (current ?? '')
+                    ? HugeIcon(
+                        icon: HugeIcons.strokeRoundedTick02,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.primary,
+                      )
+                    : null,
               ),
-          ],
-          onSelected: (value) => widget.onChanged(
-            key,
-            value == null || value.isEmpty ? null : value,
-          ),
-        ),
-      ],
+              onPressed: () => widget.onChanged(
+                key,
+                option.value.isEmpty ? null : option.value,
+              ),
+              child: Text(option.resolve(context)),
+            ),
+        ],
+      ),
     );
   }
 
+  Widget _row(List<Widget> children) => children.length == 1
+      ? children.first
+      : Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 12,
+          children: [for (final child in children) Expanded(child: child)],
+        );
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final activeCount = widget.values.values.where((v) => v.isNotEmpty).length;
     final rating = double.tryParse(widget.values['minTgScore'] ?? '') ?? 0;
     final yearRange = _yearRange(widget.type);
     final typeOptions = _typeOptions[widget.type];
     final statusOptions = _statusOptions[widget.type];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            const HugeIcon(icon: HugeIcons.strokeRoundedPreferenceHorizontal),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                context.t('user:filter'),
-                style: Theme.of(context).textTheme.titleMedium,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 4, 8, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  context.t('user:filter'),
+                  style: theme.textTheme.titleMedium,
+                ),
               ),
-            ),
-            if (activeCount > 0) ...[
-              Badge.count(count: activeCount),
-              const SizedBox(width: 8),
-              TextButton.icon(
-                onPressed: widget.onClear,
-                icon: const HugeIcon(icon: HugeIcons.strokeRoundedCancel01),
-                label: Text(context.t('common:clear')),
+              if (activeCount > 0) ...[
+                Badge.count(count: activeCount),
+                const SizedBox(width: 8),
+                TextButton(
+                  onPressed: widget.onClear,
+                  child: Text(context.t('common:clear')),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: _gap),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _FieldLabel(context.t('common:rating')),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Text(
+                  rating > 0
+                      ? '≥ ${rating.toStringAsFixed(1)}'
+                      : context.t('common:all'),
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: rating > 0
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
               ),
             ],
-          ],
-        ),
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              context.t('common:rating'),
-              style: Theme.of(context).textTheme.titleSmall,
+          ),
+          Slider(
+            min: 0,
+            max: 5,
+            divisions: 10,
+            value: rating,
+            label: rating.toStringAsFixed(1),
+            onChanged: (v) => widget.onChanged(
+              'minTgScore',
+              v <= 0 ? null : v.toStringAsFixed(1),
             ),
-            Text(
-              rating > 0
-                  ? '≥ ${rating.toStringAsFixed(1)}'
-                  : context.t('common:all'),
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
+          ),
+          const SizedBox(height: _gap - 8),
+          if (typeOptions != null || statusOptions != null) ...[
+            _row([
+              if (typeOptions != null)
+                _select(context.t('library:type'), 'type', typeOptions),
+              if (statusOptions != null)
+                _select(context.t('common:status'), 'status', statusOptions),
+            ]),
+            const SizedBox(height: _gap),
           ],
-        ),
-        Slider(
-          min: 0,
-          max: 5,
-          divisions: 10,
-          value: rating,
-          label: rating.toStringAsFixed(1),
-          onChanged: (v) => widget.onChanged(
-            'minTgScore',
-            v <= 0 ? null : v.toStringAsFixed(1),
-          ),
-        ),
-        const SizedBox(height: 8),
-        if (typeOptions != null) ...[
-          _select(
-            context.t('library:type'),
-            'type',
-            typeOptions,
-            current: widget.values['type'],
-          ),
-          const SizedBox(height: 16),
-        ],
-        if (statusOptions != null) ...[
-          _select(
-            context.t('common:status'),
-            'status',
-            statusOptions,
-            current: widget.values['status'],
-          ),
-          const SizedBox(height: 16),
-        ],
-        _GenreFilter(
-          type: widget.type,
-          service: widget.genreService,
-          selected: _listValue('genres'),
-          onChanged: (v) =>
-              widget.onChanged('genres', v.isEmpty ? null : v.join(',')),
-        ),
-        const SizedBox(height: 16),
-        _title(context.t('library:year')),
-        TextField(
-          controller: _year,
-          keyboardType: const TextInputType.numberWithOptions(signed: true),
-          decoration: InputDecoration(
-            hintText: context.t('library:year'),
-            helperText: '${yearRange.min} – ${yearRange.max}',
-          ),
-          onChanged: (v) => widget.onChanged('year', v.isEmpty ? null : v),
-        ),
-        if (widget.type == MediaType.game) ...[
-          const SizedBox(height: 16),
-          _MultiSelect(
-            title: context.t('library:platforms'),
-            options: _platforms,
-            selected: _listValue('platforms'),
-            labelOf: (v) => v,
+          _GenreFilter(
+            type: widget.type,
+            service: widget.genreService,
+            selected: _listValue('genres'),
             onChanged: (v) =>
-                widget.onChanged('platforms', v.isEmpty ? null : v.join(',')),
+                widget.onChanged('genres', v.isEmpty ? null : v.join(',')),
           ),
-          const SizedBox(height: 16),
-          _select(
-            context.t('library:gameModes'),
-            'gameMode',
-            _gameModeOptions,
-            current: widget.values['gameMode'],
-          ),
+          const SizedBox(height: _gap),
+          if (widget.type == MediaType.game) ...[
+            _MultiSelect(
+              title: context.t('library:platforms'),
+              options: _platforms,
+              selected: _listValue('platforms'),
+              labelOf: (v) => v,
+              onChanged: (v) =>
+                  widget.onChanged('platforms', v.isEmpty ? null : v.join(',')),
+            ),
+            const SizedBox(height: _gap),
+            _select(
+              context.t('library:gameModes'),
+              'gameMode',
+              _gameModeOptions,
+            ),
+            const SizedBox(height: _gap),
+          ],
+          _row([
+            _labeled(
+              context.t('library:year'),
+              TextField(
+                controller: _year,
+                keyboardType: const TextInputType.numberWithOptions(
+                  signed: true,
+                ),
+                decoration: InputDecoration(
+                  hintText: '${yearRange.min} – ${yearRange.max}',
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 14,
+                  ),
+                ),
+                onChanged: (v) =>
+                    widget.onChanged('year', v.isEmpty ? null : v),
+              ),
+            ),
+            _select(
+              context.t('user:sort.placeholder'),
+              'orderBy',
+              _sortOptions[widget.type]!,
+            ),
+          ]),
         ],
-        const SizedBox(height: 16),
-        _select(
-          context.t('user:sort.placeholder'),
-          'orderBy',
-          _sortOptions[widget.type]!,
-          current: widget.values['orderBy'],
-        ),
-        const SizedBox(height: 8),
-      ],
+      ),
+    );
+  }
+}
+
+class _FieldLabel extends StatelessWidget {
+  const _FieldLabel(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(bottom: 6),
+    child: Text(
+      text,
+      style: Theme.of(context).textTheme.labelMedium
+          ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+    ),
+  );
+}
+
+class _MenuField extends StatelessWidget {
+  const _MenuField({
+    required this.display,
+    required this.itemsBuilder,
+    this.active = false,
+    this.enabled = true,
+  });
+
+  final String display;
+  final bool active;
+  final bool enabled;
+  final List<Widget> Function(VoidCallback close) itemsBuilder;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        return MenuAnchor(
+          style: MenuStyle(
+            backgroundColor: const WidgetStatePropertyAll(TgColors.overlay),
+            surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+            minimumSize: WidgetStatePropertyAll(Size(width, 0)),
+            maximumSize: WidgetStatePropertyAll(Size(width, 320)),
+            shape: WidgetStatePropertyAll(
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+          menuChildren: itemsBuilder(() {}),
+          builder: (context, controller, _) => Material(
+            color: theme.colorScheme.surfaceContainerLow,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(
+                color: active
+                    ? theme.colorScheme.primary.withValues(alpha: 0.6)
+                    : theme.colorScheme.outlineVariant,
+              ),
+            ),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: enabled
+                  ? () {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      controller.isOpen
+                          ? controller.close()
+                          : controller.open();
+                    }
+                  : null,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 14,
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        display,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: active || !enabled
+                              ? null
+                              : theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    HugeIcon(
+                      icon: HugeIcons.strokeRoundedArrowDown01,
+                      size: 16,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -490,7 +610,7 @@ class _GenreFilterState extends State<_GenreFilter> {
   }
 }
 
-class _MultiSelect extends StatefulWidget {
+class _MultiSelect extends StatelessWidget {
   const _MultiSelect({
     required this.title,
     required this.options,
@@ -507,112 +627,63 @@ class _MultiSelect extends StatefulWidget {
   final ValueChanged<List<String>> onChanged;
   final bool enabled;
 
-  @override
-  State<_MultiSelect> createState() => _MultiSelectState();
-}
-
-class _MultiSelectState extends State<_MultiSelect> {
-  String _search = '';
-
   void _toggle(String option) {
-    final next = {...widget.selected};
+    final next = {...selected};
     if (!next.remove(option)) next.add(option);
-    widget.onChanged(next.toList());
+    onChanged(options.where(next.contains).toList());
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final query = _search.toLowerCase();
-    final filtered = widget.options
-        .where((o) => o.toLowerCase().contains(query))
-        .toList();
+    final String display;
+    if (!enabled) {
+      display = context.t('common:loading');
+    } else if (selected.isEmpty) {
+      display = context.t('common:all');
+    } else {
+      display = selected.length == 1
+          ? labelOf(selected.first)
+          : '${labelOf(selected.first)} +${selected.length - 1}';
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 6),
-          child: Text(widget.title, style: theme.textTheme.titleSmall),
+        _FieldLabel(title),
+        _MenuField(
+          display: display,
+          active: selected.isNotEmpty,
+          enabled: enabled,
+          itemsBuilder: (_) => [
+            for (final option in options)
+              CheckboxMenuButton(
+                closeOnActivate: false,
+                value: selected.contains(option),
+                onChanged: (_) => _toggle(option),
+                child: Text(labelOf(option)),
+              ),
+          ],
         ),
-        if (widget.selected.isNotEmpty)
+        if (selected.isNotEmpty)
           Padding(
-            padding: const EdgeInsets.only(bottom: 6),
+            padding: const EdgeInsets.only(top: 8),
             child: Wrap(
               spacing: 6,
               runSpacing: 6,
               children: [
-                for (final value in widget.selected)
+                for (final value in selected)
                   InputChip(
-                    label: Text(widget.labelOf(value)),
+                    label: Text(labelOf(value)),
+                    visualDensity: VisualDensity.compact,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    deleteIcon: const HugeIcon(
+                      icon: HugeIcons.strokeRoundedCancel01,
+                      size: 14,
+                    ),
                     onDeleted: () => _toggle(value),
                   ),
               ],
             ),
           ),
-        TextField(
-          enabled: widget.enabled,
-          decoration: InputDecoration(
-            hintText: widget.enabled
-                ? widget.title
-                : context.t('common:loading'),
-            isDense: true,
-            prefixIcon: const HugeIcon(
-              icon: HugeIcons.strokeRoundedSearch01,
-              size: 18,
-            ),
-            suffixIcon: _search.isEmpty
-                ? null
-                : IconButton(
-                    icon: const HugeIcon(
-                      icon: HugeIcons.strokeRoundedCancel01,
-                      size: 16,
-                    ),
-                    onPressed: () => setState(() => _search = ''),
-                  ),
-          ),
-          onChanged: (v) => setState(() => _search = v),
-        ),
-        const SizedBox(height: 4),
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxHeight: 200),
-          child: ListView.builder(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            shrinkWrap: true,
-            itemCount: filtered.length,
-            itemBuilder: (context, index) {
-              final option = filtered[index];
-              final selected = widget.selected.contains(option);
-              return InkWell(
-                onTap: widget.enabled ? () => _toggle(option) : null,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 4,
-                    vertical: 8,
-                  ),
-                  child: Row(
-                    children: [
-                      HugeIcon(
-                        icon: selected
-                            ? HugeIcons.strokeRoundedCheckmarkSquare02
-                            : HugeIcons.strokeRoundedSquare,
-                        size: 20,
-                        color: selected ? theme.colorScheme.primary : null,
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          widget.labelOf(option),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
       ],
     );
   }

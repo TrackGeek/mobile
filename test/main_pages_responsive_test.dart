@@ -177,8 +177,8 @@ void main() {
               ),
               ProfileTabs(
                 tabs: const [
-                  ('overview', 'Overview'),
-                  ('activity', 'Activity with a long name'),
+                  ('overview', 'Overview', null),
+                  ('activity', 'Activity with a long name', '12'),
                 ],
                 active: 'overview',
                 onSelect: (_) {},

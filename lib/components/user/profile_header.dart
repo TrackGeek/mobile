@@ -8,7 +8,9 @@ import '../../models/user_profile.dart';
 import '../../utils/profile_cosmetics.dart';
 import 'user_widgets.dart';
 import '../media/smooth_image.dart';
+import '../../styles/tg_theme.dart';
 import '../../utils/numbers.dart';
+import '../../utils/strings.dart';
 
 class ProfileHeader extends StatelessWidget {
   const ProfileHeader({
@@ -36,32 +38,69 @@ class ProfileHeader extends StatelessWidget {
   final VoidCallback? onOpenFollowers;
   final VoidCallback? onOpenFollowing;
 
+  static const _bannerHeight = 120.0;
+  static const _avatarSize = 84.0;
+
+  String? _titleLabel(BuildContext context) {
+    final title = user.profile.title;
+    if (!title.isUsable || title == 'none') return null;
+    final key = 'cosmetics:titles.$title';
+    final label = context.t(key);
+    return label == key ? title : label;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final locale = L10nScope.of(context).language;
     final color = user.profile.color;
     final createdAt = user.createdAt;
     final bannerUrl = user.profile.bannerUrl;
     final effectKey = user.profile.bannerEffect ?? 'none';
+    final titleLabel = _titleLabel(context);
+    final tier = user.tier;
+    final hasTier = tier != null && tier.isNotEmpty;
+    final action = isOwner
+        ? FilledButton.tonalIcon(
+            onPressed: onEdit,
+            icon: const HugeIcon(
+              icon: HugeIcons.strokeRoundedPencilEdit01,
+              size: 18,
+            ),
+            label: Text(context.t('user:editProfile')),
+          )
+        : isAuthenticated
+        ? (isFollowing
+              ? FilledButton.tonalIcon(
+                  onPressed: followBusy ? null : onFollow,
+                  icon: _followIcon(HugeIcons.strokeRoundedUserRemove01),
+                  label: Text(context.t('user:unfollow')),
+                )
+              : FilledButton.icon(
+                  onPressed: followBusy ? null : onFollow,
+                  icon: _followIcon(HugeIcons.strokeRoundedUserAdd01),
+                  label: Text(context.t('user:follow')),
+                ))
+        : null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          height: 132,
+          height: _bannerHeight + _avatarSize / 2,
           child: Stack(
             children: [
               Positioned(
                 top: 0,
                 left: 0,
                 right: 0,
-                height: 112,
+                height: _bannerHeight,
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    if (bannerUrl != null && bannerUrl.isNotEmpty)
+                    if (bannerUrl.isUsable)
                       SmoothImage(
-                        url: bannerUrl,
+                        url: bannerUrl!,
                         error: Container(
                           decoration: profileColorDecoration(color, radius: 0),
                         ),
@@ -73,14 +112,15 @@ class ProfileHeader extends StatelessWidget {
                     Container(decoration: BannerEffects.decoration(effectKey)),
                     if (BannerEffects.painter(effectKey) != null)
                       CustomPaint(painter: BannerEffects.painter(effectKey)),
-                    Container(
+                    DecoratedBox(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
+                          stops: const [0.55, 1],
                           colors: [
                             Colors.transparent,
-                            theme.colorScheme.surface,
+                            scheme.surface.withValues(alpha: 0.9),
                           ],
                         ),
                       ),
@@ -92,92 +132,43 @@ class ProfileHeader extends StatelessWidget {
                 left: 16,
                 bottom: 0,
                 child: Container(
+                  padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: theme.colorScheme.surface,
-                      width: 4,
-                    ),
+                    color: scheme.surface,
                   ),
                   child: UserAvatar(
                     name: user.name,
                     avatarUrl: user.profile.avatarUrl,
                     frame: user.profile.avatarFrame,
-                    size: 72,
+                    size: _avatarSize - 8,
                   ),
                 ),
               ),
+              if (action != null)
+                Positioned(right: 16, bottom: 4, child: action),
             ],
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Flexible(
-                    child: Text(
-                      user.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Flexible(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      decoration: profileColorDecoration(color, radius: 6),
-                      child: Text(
-                        context.t('xp:levelShort', {'level': user.xp.level}),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              if (user.profile.title != null && user.profile.title!.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
-                        color: theme.colorScheme.outlineVariant,
-                      ),
-                    ),
-                    child: Text(
-                      user.profile.title!,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
+              Text(
+                user.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
                 ),
-              const SizedBox(height: 4),
+              ),
+              const SizedBox(height: 2),
               Row(
                 children: [
                   Flexible(
                     child: InkWell(
+                      borderRadius: BorderRadius.circular(6),
                       onTap: () async {
                         await Clipboard.setData(
                           ClipboardData(text: '@${user.username}'),
@@ -196,27 +187,26 @@ class ProfileHeader extends StatelessWidget {
                         '@${user.username}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: scheme.onSurfaceVariant,
                         ),
                       ),
                     ),
                   ),
                   if (followsYou) ...[
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 1,
+                        horizontal: 8,
+                        vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(4),
+                        color: scheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         context.t('user:followsYou'),
-                        style: const TextStyle(
-                          fontSize: 12,
+                        style: theme.textTheme.labelSmall?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -224,51 +214,85 @@ class ProfileHeader extends StatelessWidget {
                   ],
                 ],
               ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: profileColorDecoration(color, radius: 20),
+                    child: Text(
+                      context.t('xp:levelShort', {'level': user.xp.level}),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        shadows: [Shadow(color: Colors.black38, blurRadius: 4)],
+                      ),
+                    ),
+                  ),
+                  if (titleLabel != null)
+                    _Badge(
+                      icon: HugeIcons.strokeRoundedAward01,
+                      text: titleLabel,
+                      color: scheme.primary,
+                    ),
+                  if (hasTier)
+                    _Badge(
+                      icon: HugeIcons.strokeRoundedCrown,
+                      text: context.t('common:tiers.$tier'),
+                      color: scheme.primary,
+                    ),
+                ],
+              ),
+              if (createdAt != null) ...[
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    HugeIcon(
+                      icon: HugeIcons.strokeRoundedCalendar01,
+                      size: 16,
+                      color: scheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text(
+                        '${context.t('common:joinedAt')} ${DateFormat.yMd(locale).format(createdAt)}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ],
           ),
         ),
-        if (createdAt != null || (user.tier != null && user.tier!.isNotEmpty))
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-            child: Wrap(
-              spacing: 12,
-              runSpacing: 4,
-              children: [
-                if (createdAt != null)
-                  _MetaItem(
-                    icon: HugeIcons.strokeRoundedCalendar01,
-                    text:
-                        '${context.t('common:joinedAt')} ${DateFormat.yMd(locale).format(createdAt)}',
-                  ),
-                if (user.tier != null && user.tier!.isNotEmpty)
-                  _MetaItem(
-                    icon: HugeIcons.strokeRoundedCrown,
-                    text: user.tierStartedAt == null
-                        ? context.t('common:tiers.${user.tier}')
-                        : '${context.t('common:tierStartedAt')} ${DateFormat.yMd(locale).format(DateTime.tryParse(user.tierStartedAt!) ?? createdAt ?? DateTime.now())}, ${context.t('common:tiers.${user.tier}')}',
-                  ),
-              ],
-            ),
-          ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
           child: Row(
             children: [
-              _StatPill(
+              _Stat(
                 icon: HugeIcons.strokeRoundedAward01,
                 label: context.t('user:medals'),
                 count: user.userMedals.length,
               ),
-              const SizedBox(width: 8),
-              _StatPill(
+              const SizedBox(width: 10),
+              _Stat(
                 icon: HugeIcons.strokeRoundedUserGroup,
                 label: context.t('user:follower', {'count': user.followers}),
                 count: user.followers,
                 onTap: onOpenFollowers,
               ),
-              const SizedBox(width: 8),
-              _StatPill(
-                icon: HugeIcons.strokeRoundedUserGroup,
+              const SizedBox(width: 10),
+              _Stat(
+                icon: HugeIcons.strokeRoundedUserCheck01,
                 label: context.t('common:following'),
                 count: user.following,
                 onTap: onOpenFollowing,
@@ -276,81 +300,59 @@ class ProfileHeader extends StatelessWidget {
             ],
           ),
         ),
-
-        if (isOwner || isAuthenticated)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
-            child: SizedBox(
-              width: double.infinity,
-              child: isOwner
-                  ? FilledButton.tonalIcon(
-                      onPressed: onEdit,
-                      icon: const HugeIcon(
-                        icon: HugeIcons.strokeRoundedPencilEdit01,
-                        size: 16,
-                      ),
-                      label: Text(context.t('user:editProfile')),
-                    )
-                  : FilledButton.tonalIcon(
-                      onPressed: followBusy ? null : onFollow,
-                      icon: followBusy
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : HugeIcon(
-                              icon: isFollowing
-                                  ? HugeIcons.strokeRoundedUserRemove01
-                                  : HugeIcons.strokeRoundedUserAdd01,
-                              size: 16,
-                            ),
-                      label: Text(
-                        context.t(
-                          isFollowing ? 'user:unfollow' : 'user:follow',
-                        ),
-                      ),
-                    ),
-            ),
-          ),
       ],
     );
   }
+
+  Widget _followIcon(List<List<dynamic>> icon) => followBusy
+      ? const SizedBox(
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        )
+      : HugeIcon(icon: icon, size: 18);
 }
 
-class _MetaItem extends StatelessWidget {
-  const _MetaItem({required this.icon, required this.text});
+class _Badge extends StatelessWidget {
+  const _Badge({required this.icon, required this.text, required this.color});
 
   final List<List<dynamic>> icon;
   final String text;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        HugeIcon(
-          icon: icon,
-          size: 14,
-          color: theme.colorScheme.onSurfaceVariant,
-        ),
-        const SizedBox(width: 4),
-        Flexible(
-          child: Text(
-            text,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          HugeIcon(icon: icon, size: 16, color: color),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: color,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
 
-class _StatPill extends StatelessWidget {
-  const _StatPill({
+class _Stat extends StatelessWidget {
+  const _Stat({
     required this.icon,
     required this.label,
     required this.count,
@@ -365,48 +367,50 @@ class _StatPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceContainerHigh,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            children: [
-              Text(
-                count.humanizedCount(),
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  HugeIcon(
-                    icon: icon,
-                    size: 13,
-                    color: theme.colorScheme.onSurfaceVariant,
+      child: Material(
+        color: scheme.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(TgRadii.lg),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+            child: Column(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: scheme.primary.withValues(alpha: 0.16),
                   ),
-                  const SizedBox(width: 4),
-                  Flexible(
-                    child: Text(
-                      label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
+                  child: Center(
+                    child: HugeIcon(
+                      icon: icon,
+                      size: 24,
+                      color: scheme.primary,
                     ),
                   ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  count.humanizedCount(),
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -74,7 +74,7 @@ class _PresenceCardsState extends State<PresenceCards> {
     try {
       final presence = await widget.users.discordPresence(
         widget.userId,
-        language: L10nScope.of(context).language,
+        language: L10nScope.read(context).language,
       );
       if (mounted) {
         setState(() {

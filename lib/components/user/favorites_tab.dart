@@ -76,7 +76,7 @@ class _UserFavoritesTabState extends State<UserFavoritesTab>
     super.dispose();
   }
 
-  String get _language => L10nScope.of(context).language;
+  String get _language => L10nScope.read(context).language;
 
   Future<void> _load() async {
     if (_loading) return;
@@ -193,10 +193,14 @@ class _UserFavoritesTabState extends State<UserFavoritesTab>
                     onChanged: (_) => _onSearchChanged(),
                     decoration: InputDecoration(
                       hintText: context.t('common:search'),
-                      prefixIcon: const HugeIcon(
-                        icon: HugeIcons.strokeRoundedSearch01,
-                        size: 18,
+                      prefixIcon: const Padding(
+                        padding: EdgeInsets.only(left: 12, right: 8),
+                        child: HugeIcon(
+                          icon: HugeIcons.strokeRoundedSearch01,
+                          size: 18,
+                        ),
                       ),
+                      prefixIconConstraints: const BoxConstraints(),
                       border: const OutlineInputBorder(),
                       isDense: true,
                     ),
@@ -242,19 +246,23 @@ class _UserFavoritesTabState extends State<UserFavoritesTab>
                       ),
                       if (isOwner)
                         Positioned(
-                          top: 4,
-                          right: 4,
+                          top: 8,
+                          right: 8,
                           child: IconButton.filled(
                             icon: const HugeIcon(
                               icon: HugeIcons.strokeRoundedDelete02,
-                              size: 14,
+                              size: 20,
                             ),
-                            iconSize: 14,
-                            visualDensity: VisualDensity.compact,
+                            tooltip: context.t('common:delete'),
                             style: IconButton.styleFrom(
                               backgroundColor: TgColors.scrim,
                               foregroundColor: Colors.white,
-                              minimumSize: const Size(28, 28),
+                              fixedSize: const Size(40, 40),
+                              minimumSize: const Size(40, 40),
+                              padding: const EdgeInsets.all(10),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(TgRadii.lg),
+                              ),
                             ),
                             onPressed: () => _remove(item),
                           ),
