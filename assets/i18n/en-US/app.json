@@ -26,5 +26,9 @@
     "apply": "Apply",
     "direction": "Direction"
   },
+  "changelog": {
+    "title": "What's new",
+    "close": "Got it"
+  },
   "library": "Library"
 }

@@ -17,6 +17,7 @@ import '../pages/settings_page.dart';
 import '../pages/shop_page.dart';
 import '../services/activity_service.dart';
 import '../services/api_client.dart';
+import '../services/changelog_service.dart';
 import '../services/comment_service.dart';
 import '../services/favorite_service.dart';
 import '../services/game_service.dart';
@@ -94,7 +95,59 @@ class _TrackGeekShellState extends State<TrackGeekShell>
     _poll = Timer.periodic(NotificationAlerts.checkInterval, (_) {
       _refreshUnread();
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) => _refreshUnread());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _refreshUnread();
+      _showChangelog();
+    });
+  }
+
+  Future<void> _showChangelog() async {
+    final service = ChangelogService();
+    final changes = await service.pendingChanges(
+      language: L10nScope.of(context).language,
+    );
+    if (changes == null || !mounted) return;
+    unawaited(service.markSeen());
+    FocusManager.instance.primaryFocus?.unfocus();
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(context.t('app:changelog.title')),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (final change in changes)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Icon(
+                          Icons.circle,
+                          size: 6,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text(change)),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(context.t('app:changelog.close')),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
