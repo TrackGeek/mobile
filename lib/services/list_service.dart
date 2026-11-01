@@ -32,7 +32,7 @@ class ListService {
     required MediaType type,
     int page = 1,
     int itemsPerPage = 50,
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -79,7 +79,7 @@ class ListService {
     required String mediaId,
     int page = 1,
     int itemsPerPage = 20,
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -138,7 +138,7 @@ class ListService {
     String query = '',
     int page = 1,
     int itemsPerPage = 10,
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -169,7 +169,7 @@ class ListService {
     String listId, {
     int page = 1,
     int itemsPerPage = 10,
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(

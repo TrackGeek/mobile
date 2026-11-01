@@ -16,7 +16,7 @@ class ReviewService {
     String query = '',
     int page = 1,
     int itemsPerPage = 20,
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final config = reviewContent[type]!;
@@ -50,7 +50,7 @@ class ReviewService {
     String? userId,
     int page = 1,
     int itemsPerPage = 20,
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final config = reviewContent[type]!;

@@ -30,7 +30,7 @@ class CommentService {
     CommentTarget target, {
     int page = 1,
     int itemsPerPage = 10,
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(

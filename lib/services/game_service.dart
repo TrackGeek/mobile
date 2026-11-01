@@ -11,7 +11,7 @@ class GameService {
 
   Future<GameDetail> detail(
     int igdbId, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -33,7 +33,7 @@ class GameService {
 
   Future<GameFranchise> franchise(
     String slug, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -158,7 +158,7 @@ class GameService {
     String? gameId,
     int page = 1,
     int itemsPerPage = 18,
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -189,7 +189,7 @@ class GameService {
     List<int> bytes, {
     required String filename,
     String? mimeType,
-    String language = 'en-US',
+    String? language,
   }) async {
     final res = await _api.sendMultipart(
       'POST',

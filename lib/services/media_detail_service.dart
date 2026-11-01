@@ -11,7 +11,7 @@ class MediaDetailService {
   Future<MediaDetail> detail(
     MediaType type,
     String id, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     if (id.isEmpty) throw ArgumentError.value(id, 'id');

@@ -11,7 +11,7 @@ class NotificationService {
   Future<PaginatedPage<AppNotification>> notifications({
     int page = 1,
     int itemsPerPage = 20,
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -33,7 +33,7 @@ class NotificationService {
     }
   }
 
-  Future<int> unreadCount({String language = 'en-US'}) async {
+  Future<int> unreadCount({String? language}) async {
     final res = await _api.requestJson(
       'GET',
       'notifications/unread/count',

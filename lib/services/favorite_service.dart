@@ -38,7 +38,7 @@ class FavoriteService {
   Future<bool> status(
     FavoriteTarget target,
     String id, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -60,7 +60,7 @@ class FavoriteService {
     int page = 1,
     int itemsPerPage = 20,
     String query = '',
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -86,22 +86,19 @@ class FavoriteService {
     }
   }
 
-  Future<void> remove(
-    FavoriteTarget target,
-    String id, {
-    String language = 'en-US',
-  }) => _api.requestJson(
-    'DELETE',
-    'favorite',
-    body: _request(target, id),
-    language: language,
-  );
+  Future<void> remove(FavoriteTarget target, String id, {String? language}) =>
+      _api.requestJson(
+        'DELETE',
+        'favorite',
+        body: _request(target, id),
+        language: language,
+      );
 
   Future<void> toggle(
     FavoriteTarget target,
     String id,
     bool isFavorited, {
-    String language = 'en-US',
+    String? language,
   }) async {
     await _api.requestJson(
       isFavorited ? 'DELETE' : 'POST',

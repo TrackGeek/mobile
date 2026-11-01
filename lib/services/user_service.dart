@@ -13,7 +13,7 @@ class UserService {
 
   Future<UserProfile> userByUsername(
     String username, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -31,7 +31,7 @@ class UserService {
 
   Future<bool> followStatus(
     String username, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async => (await followStatusDetails(
     username,
@@ -41,7 +41,7 @@ class UserService {
 
   Future<FollowStatus> followStatusDetails(
     String username, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -60,17 +60,17 @@ class UserService {
     );
   }
 
-  Future<void> follow(String userId, {String language = 'en-US'}) =>
+  Future<void> follow(String userId, {String? language}) =>
       _api.requestJson('POST', 'user/follow/$userId', language: language);
 
-  Future<void> unfollow(String userId, {String language = 'en-US'}) =>
+  Future<void> unfollow(String userId, {String? language}) =>
       _api.requestJson('POST', 'user/unfollow/$userId', language: language);
 
   Future<PaginatedPage<FollowEntry>> followers(
     String userId, {
     int page = 1,
     int itemsPerPage = 10,
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) => _follows(
     'user/follower',
@@ -86,7 +86,7 @@ class UserService {
     String userId, {
     int page = 1,
     int itemsPerPage = 10,
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) => _follows(
     'user/following',
@@ -104,7 +104,7 @@ class UserService {
     String userId, {
     required int page,
     required int itemsPerPage,
-    required String language,
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -132,7 +132,7 @@ class UserService {
 
   Future<UserMissionsSummary> missions(
     String userId, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -150,7 +150,7 @@ class UserService {
 
   Future<ActivityCalendar> activityCalendar(
     String userId, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -240,7 +240,7 @@ class UserService {
 
   Future<DiscordPresence> discordPresence(
     String userId, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(

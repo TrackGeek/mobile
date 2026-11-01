@@ -10,7 +10,7 @@ class AnimeService {
 
   Future<AnimeDetail> detail(
     String malId, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -34,7 +34,7 @@ class AnimeService {
     String malId, {
     int page = 1,
     int itemsPerPage = 24,
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -58,7 +58,7 @@ class AnimeService {
 
   Future<List<AnimeRelation>> relations(
     String malId, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(

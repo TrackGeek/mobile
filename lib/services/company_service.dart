@@ -18,7 +18,7 @@ class CompanyService {
   Future<Company> company(
     MediaType type,
     String id, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final endpoint = companyEndpoints[type];

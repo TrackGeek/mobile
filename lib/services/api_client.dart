@@ -43,6 +43,8 @@ class ApiClient {
 
   String? bearerToken;
 
+  String language = 'en-US';
+
   void setBaseUrl(String baseUrl, {bool allowInsecure = false}) {
     _config = ApiConfig(baseUrl: baseUrl, allowInsecure: allowInsecure);
   }
@@ -54,7 +56,7 @@ class ApiClient {
     String path, {
     Map<String, String> query = const {},
     Map<String, dynamic>? body,
-    String language = 'en-US',
+    String? language,
     Map<String, String> headers = const {},
     Future<void>? cancelWhen,
   }) async {
@@ -76,7 +78,7 @@ class ApiClient {
           ..headers.addAll({
             'Accept': 'application/json',
             'X-TrackGeek-Version': '1.0.0',
-            'X-TrackGeek-Language': language,
+            'X-TrackGeek-Language': language ?? this.language,
             if (bearerToken != null) 'Authorization': 'Bearer $bearerToken',
             ...headers,
           });
@@ -123,7 +125,7 @@ class ApiClient {
   Future<Map<String, dynamic>> getJson(
     String path, {
     Map<String, String> query = const {},
-    String language = 'pt-PT',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final abort = Completer<void>();
@@ -144,7 +146,7 @@ class ApiClient {
           ..headers.addAll({
             'Accept': 'application/json',
             'X-TrackGeek-Version': '1.0.0',
-            'X-TrackGeek-Language': language,
+            'X-TrackGeek-Language': language ?? this.language,
           });
 
     try {
@@ -181,7 +183,7 @@ class ApiClient {
     required List<int> bytes,
     required String filename,
     String field = 'file',
-    String language = 'en-US',
+    String? language,
     String? mimeType,
   }) async {
     final request =
@@ -190,7 +192,7 @@ class ApiClient {
           ..headers.addAll({
             'Accept': 'application/json',
             'X-TrackGeek-Version': '1.0.0',
-            'X-TrackGeek-Language': language,
+            'X-TrackGeek-Language': language ?? this.language,
             if (bearerToken != null) 'Authorization': 'Bearer $bearerToken',
           })
           ..files.add(

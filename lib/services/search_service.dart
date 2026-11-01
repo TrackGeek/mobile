@@ -79,7 +79,7 @@ class SearchService implements SearchGateway {
     SearchKind kind, {
     String query = '',
     int page = 1,
-    String language = 'en-US',
+    String? language,
     Map<String, String> filters = const {},
     Future<void>? cancelWhen,
   }) async {

@@ -9,13 +9,13 @@ class PersonService {
 
   Future<Person> person(
     String slug, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) => _fetch('person/$slug', language: language, cancelWhen: cancelWhen);
 
   Future<Person> mangaCast(
     String anilistId, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) => _fetch(
     'manga/cast/$anilistId',
@@ -25,7 +25,7 @@ class PersonService {
 
   Future<Person> _fetch(
     String path, {
-    required String language,
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final json = await _api.getJson(

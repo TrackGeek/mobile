@@ -9,7 +9,7 @@ class MovieService {
 
   Future<MovieDetail> detail(
     int tmdbId, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -31,7 +31,7 @@ class MovieService {
 
   Future<MovieFranchise> franchise(
     String slug, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -94,7 +94,7 @@ class MovieService {
   Future<WatchProviders> watchProviders(
     int tmdbId, {
     String? region,
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -116,7 +116,7 @@ class MovieService {
   }
 
   Future<List<WatchProviderRegion>> watchProviderRegions({
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(

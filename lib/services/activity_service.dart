@@ -43,7 +43,7 @@ class ActivityService {
   Future<ActivityPage> feed(
     FeedKind kind, {
     int page = 1,
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) => _activities(
     _paths[kind]!,
@@ -55,7 +55,7 @@ class ActivityService {
   Future<ActivityPage> userActivities(
     String userId, {
     int page = 1,
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) => _activities(
     'activities/user/$userId',
@@ -67,7 +67,7 @@ class ActivityService {
   Future<ActivityPage> _activities(
     String path, {
     required int page,
-    required String language,
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final response = await _api.requestJson(

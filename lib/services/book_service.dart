@@ -9,7 +9,7 @@ class BookService {
 
   Future<BookDetail> detail(
     String hardcoverId, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -31,7 +31,7 @@ class BookService {
 
   Future<BookFranchise> franchise(
     String slug, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(

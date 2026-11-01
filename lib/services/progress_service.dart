@@ -84,7 +84,7 @@ class ProgressService extends ChangeNotifier {
     required String userId,
     required List<String> statuses,
     int limit = 6,
-    String language = 'en-US',
+    String? language,
   }) async {
     final pages = await Future.wait(
       statuses.map(
@@ -121,7 +121,7 @@ class ProgressService extends ChangeNotifier {
     String search = '',
     int page = 1,
     int itemsPerPage = 20,
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     if (userId.isEmpty) throw ArgumentError.value(userId, 'userId');
@@ -177,7 +177,7 @@ class ProgressService extends ChangeNotifier {
   Future<ProgressFilterOptions> progressFilters(
     MediaType type, {
     required String userId,
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -217,7 +217,7 @@ class ProgressService extends ChangeNotifier {
     String? status,
     int page = 1,
     int itemsPerPage = 20,
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     if (userId.isEmpty) throw ArgumentError.value(userId, 'userId');

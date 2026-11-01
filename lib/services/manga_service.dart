@@ -9,7 +9,7 @@ class MangaService {
 
   Future<MangaDetail> detail(
     int anilistId, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(

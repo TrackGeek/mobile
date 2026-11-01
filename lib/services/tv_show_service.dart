@@ -9,7 +9,7 @@ class TvShowService {
 
   Future<TvShowDetail> detail(
     int tmdbId, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -31,7 +31,7 @@ class TvShowService {
 
   Future<List<TvSeason>> seasons(
     int tmdbId, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -57,7 +57,7 @@ class TvShowService {
   Future<List<TvSeasonEpisode>> seasonEpisodes(
     int tmdbId,
     int seasonNumber, {
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -196,7 +196,7 @@ class TvShowService {
   Future<WatchProviders> watchProviders(
     int tmdbId, {
     String? region,
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(
@@ -218,7 +218,7 @@ class TvShowService {
   }
 
   Future<List<WatchProviderRegion>> watchProviderRegions({
-    String language = 'en-US',
+    String? language,
     Future<void>? cancelWhen,
   }) async {
     final res = await _api.requestJson(

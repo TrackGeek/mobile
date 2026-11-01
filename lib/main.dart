@@ -47,6 +47,8 @@ Future<void> main() async {
       ),
     ),
   );
+  api.language = l10n.language;
+  l10n.addListener(() => api.language = l10n.language);
   final server = ServerConfig(api);
   await server.restore();
   const googleClientId = String.fromEnvironment('TRACKGEEK_GOOGLE_CLIENT_ID');
