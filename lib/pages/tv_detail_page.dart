@@ -514,6 +514,7 @@ class _TvDetailPageState extends State<TvDetailPage> {
       await _load();
     } catch (_) {
       _toast('api:INTERNAL_SERVER_ERROR');
+    } finally {
       if (mounted) setState(() => _refreshing = false);
     }
   }

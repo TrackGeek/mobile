@@ -12,7 +12,9 @@ import '../../l10n/l10n_context.dart';
 import '../../models/favorite.dart';
 import '../../services/favorite_service.dart';
 import '../../utils/content_types.dart';
+import '../../models/media_type.dart';
 import 'media_card.dart';
+import 'progress_tab.dart' show TgMenuField, TgMenuEntry, progressTypeIcons;
 import 'user_widgets.dart';
 import '../layout/tg_refresh_indicator.dart';
 import '../layout/bottom_padding.dart';
@@ -162,25 +164,24 @@ class _UserFavoritesTabState extends State<UserFavoritesTab>
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
               child: Column(
                 children: [
-                  DropdownButtonFormField<String>(
-                    initialValue: _type,
-                    isExpanded: true,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      isDense: true,
+                  TgMenuField<String>(
+                    icon: _iconFor(_type),
+                    label: context.t(
+                      _favoriteTypes.firstWhere((t) => t.$1 == _type).$2,
                     ),
+                    value: _type,
                     items: [
                       for (final (type, labelKey) in _favoriteTypes)
-                        DropdownMenuItem(
-                          value: type,
-                          enabled:
-                              type == 'Person' ||
-                              visible.any((t) => t.name == _slugFor(type)),
-                          child: Text(context.t(labelKey)),
-                        ),
+                        if (type == 'Person' ||
+                            visible.any((t) => t.name == _slugFor(type)))
+                          TgMenuEntry(
+                            value: type,
+                            icon: _iconFor(type),
+                            label: context.t(labelKey),
+                          ),
                     ],
-                    onChanged: (value) {
-                      if (value == null || value == _type) return;
+                    onSelected: (value) {
+                      if (value == _type) return;
                       setState(() {
                         _type = value;
                         _search.clear();
@@ -240,6 +241,7 @@ class _UserFavoritesTabState extends State<UserFavoritesTab>
                 BottomPadding.of(context, minimum: 24),
               ),
               sliver: SliverPosterGrid(
+                textHeight: 40,
                 delegate: SliverChildBuilderDelegate((context, index) {
                   final item = items[index];
                   return Stack(
@@ -283,6 +285,12 @@ class _UserFavoritesTabState extends State<UserFavoritesTab>
       ),
     );
   }
+
+  List<List<dynamic>> _iconFor(String type) => type == 'Person'
+      ? HugeIcons.strokeRoundedUser
+      : progressTypeIcons[MediaType.values.firstWhere(
+          (t) => t.name == _slugFor(type),
+        )]!;
 
   String _slugFor(String type) => switch (type) {
     'TVShow' => 'tv',

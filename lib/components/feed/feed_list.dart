@@ -131,7 +131,8 @@ class _FeedListState extends State<FeedList> {
                   leading +
                   controller.entries.length +
                   (controller.isLoadingMore ? 1 : 0),
-              separatorBuilder: (_, _) => const SizedBox(height: 12),
+              separatorBuilder: (_, index) =>
+                  SizedBox(height: index < leading ? 4 : 12),
               itemBuilder: (context, index) {
                 if (index == 0 && header != null) return header;
                 index -= leading;

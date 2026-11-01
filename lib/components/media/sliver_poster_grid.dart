@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 
 class SliverPosterGrid extends StatelessWidget {
-  const SliverPosterGrid({super.key, required this.delegate});
+  const SliverPosterGrid({
+    super.key,
+    required this.delegate,
+    this.textHeight = 56,
+  });
 
   final SliverChildDelegate delegate;
+  final double textHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -19,9 +24,9 @@ class SliverPosterGrid extends StatelessWidget {
         return SliverGrid(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: columns,
-            mainAxisSpacing: 16,
+            mainAxisSpacing: 12,
             crossAxisSpacing: 12,
-            mainAxisExtent: width * 1.5 + 68 + extraTextHeight * 3,
+            mainAxisExtent: width * 1.5 + textHeight + extraTextHeight * 3,
           ),
           delegate: delegate,
         );

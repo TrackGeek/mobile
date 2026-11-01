@@ -11,7 +11,7 @@
         android:scaleType="centerCrop"
         android:src="@drawable/widget_cover_placeholder" />
 
-    <View
+    <FrameLayout
         android:id="@+id/item_scrim"
         android:layout_width="match_parent"
         android:layout_height="72dp"

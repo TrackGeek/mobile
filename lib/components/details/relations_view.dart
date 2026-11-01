@@ -135,7 +135,8 @@ class RelationsView extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             SizedBox(
-              height: 126 + MediaQuery.textScalerOf(context).scale(11) * 3,
+              height:
+                  120 + (MediaQuery.textScalerOf(context).scale(11) - 11) * 3,
               child: Edgy(
                 axis: .horizontal,
                 child: ListView.separated(

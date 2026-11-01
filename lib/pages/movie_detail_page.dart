@@ -325,6 +325,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
       await _load();
     } catch (_) {
       _toast('api:INTERNAL_SERVER_ERROR');
+    } finally {
       if (mounted) setState(() => _refreshing = false);
     }
   }
@@ -395,9 +396,10 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
     );
   }
 
-  void _writeReview() {
+  Future<void> _writeReview() async {
     if (_progress?.status != 'Completed') {
-      _setStatus('Completed');
+      await _setStatus('Completed');
+      if (!mounted) return;
     }
     _openMoreOptions();
   }

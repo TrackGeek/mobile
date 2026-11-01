@@ -171,7 +171,20 @@ object TrackingApi {
         } finally {
             conn.disconnect()
         }
-        bitmap?.let { roundCorners(it, cornersDp * density) }
+        bitmap?.let {
+            val maxW = 100f * density
+            val maxH = 150f * density
+            val scale = minOf(1f, maxW / it.width, maxH / it.height)
+            val scaled = if (scale < 1f) {
+                Bitmap.createScaledBitmap(
+                    it,
+                    (it.width * scale).toInt().coerceAtLeast(1),
+                    (it.height * scale).toInt().coerceAtLeast(1),
+                    true,
+                )
+            } else it
+            roundCorners(scaled, cornersDp * density)
+        }
     } catch (_: Exception) {
         null
     }

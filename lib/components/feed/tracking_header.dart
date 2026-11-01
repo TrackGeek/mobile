@@ -144,7 +144,7 @@ class _TrackingSection extends StatelessWidget {
               }
               return SizedBox(
                 height:
-                    222 + (MediaQuery.textScalerOf(context).scale(14) - 14) * 3,
+                    204 + (MediaQuery.textScalerOf(context).scale(14) - 14) * 3,
                 child: Edgy(
                   axis: .horizontal,
                   child: ListView.separated(

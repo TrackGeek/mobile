@@ -320,6 +320,7 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
       await _load();
     } catch (_) {
       _toast('api:INTERNAL_SERVER_ERROR');
+    } finally {
       if (mounted) setState(() => _refreshing = false);
     }
   }
