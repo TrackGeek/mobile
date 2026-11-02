@@ -1,4 +1,4 @@
-package com.example.trackgeek.widget
+package net.trackgeek.mobile.widget
 
 import android.app.Activity
 import android.appwidget.AppWidgetManager
@@ -8,7 +8,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.Switch
-import com.example.trackgeek.R
+import net.trackgeek.mobile.R
 
 class TrackingWidgetConfigActivity : Activity() {
 

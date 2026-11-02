@@ -1,4 +1,4 @@
-package com.example.trackgeek.widget
+package net.trackgeek.mobile.widget
 
 import android.content.Context
 

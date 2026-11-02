@@ -1,4 +1,4 @@
-package com.example.trackgeek.widget
+package net.trackgeek.mobile.widget
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
@@ -9,8 +9,8 @@ import android.content.Intent
 import android.net.Uri
 import android.view.View
 import android.widget.RemoteViews
-import com.example.trackgeek.MainActivity
-import com.example.trackgeek.R
+import net.trackgeek.mobile.MainActivity
+import net.trackgeek.mobile.R
 
 class TrackingWidgetProvider : AppWidgetProvider() {
 
@@ -40,7 +40,7 @@ class TrackingWidgetProvider : AppWidgetProvider() {
     }
 
     companion object {
-        const val ACTION_REFRESH = "com.example.trackgeek.widget.REFRESH"
+        const val ACTION_REFRESH = "net.trackgeek.mobile.widget.REFRESH"
         const val EXTRA_OPEN_APP = "trackgeek.openApp"
 
         fun refreshAll(context: Context) {

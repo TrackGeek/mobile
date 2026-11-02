@@ -1,6 +1,6 @@
-package com.example.trackgeek
+package net.trackgeek.mobile
 
-import com.example.trackgeek.widget.TrackingWidgetProvider
+import net.trackgeek.mobile.widget.TrackingWidgetProvider
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel

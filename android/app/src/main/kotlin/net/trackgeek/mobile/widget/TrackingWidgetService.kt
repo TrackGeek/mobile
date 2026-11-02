@@ -1,4 +1,4 @@
-package com.example.trackgeek.widget
+package net.trackgeek.mobile.widget
 
 import android.appwidget.AppWidgetManager
 import android.content.Context
@@ -6,7 +6,7 @@ import android.content.Intent
 import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import com.example.trackgeek.R
+import net.trackgeek.mobile.R
 
 class TrackingWidgetService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
