@@ -1,5 +1,6 @@
 import '../models/cosmetic.dart';
 import '../models/oauth_app.dart';
+import '../models/psn.dart';
 import '../models/watch_link.dart';
 import 'api_client.dart';
 
@@ -155,4 +156,17 @@ class SettingsService {
     'DELETE',
     'integrations/apps/${Uri.encodeComponent(clientId)}',
   );
+
+  Future<PsnAccount?> psnAccount() async {
+    final res = await _api.requestJson('GET', 'psn/account');
+    final account = res.json?['account'];
+    return account is Map<String, dynamic>
+        ? PsnAccount.fromJson(account)
+        : null;
+  }
+
+  Future<void> linkPsnAccount(String npsso) =>
+      _api.requestJson('PUT', 'psn/account', body: {'npsso': npsso});
+
+  Future<void> unlinkPsnAccount() => _api.requestJson('DELETE', 'psn/account');
 }

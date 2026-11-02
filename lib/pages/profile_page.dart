@@ -547,6 +547,7 @@ class _ProfilePageState extends State<ProfilePage> implements ScrollableTab {
           },
           onOpenMedia: _openMedia,
           onOpenUser: _openUser,
+          onOpenSettings: widget.onOpenSettings,
           onChanged: _load,
         );
     }

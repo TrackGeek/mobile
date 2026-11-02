@@ -3,6 +3,7 @@ import '../models/discord_presence.dart';
 import '../models/follow.dart';
 import '../models/mission.dart';
 import '../models/paginated_page.dart';
+import '../models/psn.dart';
 import '../models/user_profile.dart';
 import 'api_client.dart';
 
@@ -254,6 +255,33 @@ class UserService {
       throw const ApiException(ApiFailure.invalidResponse);
     }
     return DiscordPresence.fromJson(presence);
+  }
+
+  Future<PsnTrophies> psnTrophies(
+    String userId, {
+    String? language,
+    Future<void>? cancelWhen,
+  }) async {
+    final res = await _api.requestJson(
+      'GET',
+      'psn/trophies/$userId',
+      language: language,
+      cancelWhen: cancelWhen,
+    );
+    return _readPsnTrophies(res);
+  }
+
+  Future<PsnTrophies> refreshPsnTrophies() async {
+    final res = await _api.requestJson('POST', 'psn/trophies/refresh');
+    return _readPsnTrophies(res);
+  }
+
+  PsnTrophies _readPsnTrophies(ApiResponse res) {
+    final trophies = res.json?['trophies'];
+    if (trophies is! Map<String, dynamic>) {
+      throw const ApiException(ApiFailure.invalidResponse);
+    }
+    return PsnTrophies.fromJson(trophies);
   }
 }
 

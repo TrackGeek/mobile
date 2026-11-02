@@ -7,6 +7,7 @@ import '../../models/oauth_app.dart';
 import '../../services/auth_service.dart';
 import '../../services/settings_service.dart';
 import '../../utils/oauth_scopes.dart';
+import 'psn_connection_card.dart';
 import 'settings_card.dart';
 
 class ConnectionsSection extends StatelessWidget {
@@ -24,6 +25,8 @@ class ConnectionsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        PsnConnectionCard(settings: settings),
+        const SizedBox(height: 16),
         AuthorizedAppsCard(settings: settings),
         const SizedBox(height: 16),
         DeveloperAppsCard(auth: auth),

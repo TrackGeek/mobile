@@ -21,6 +21,7 @@ import 'comments_card.dart';
 import 'links_card.dart';
 import 'media_card.dart';
 import 'presence_cards.dart';
+import 'psn_trophies_card.dart';
 import 'setup_card.dart';
 import 'user_widgets.dart';
 import '../media/smooth_image.dart';
@@ -41,6 +42,7 @@ class UserOverviewTab extends StatefulWidget {
     this.onSeeProgress,
     this.onOpenMedia,
     this.onOpenUser,
+    this.onOpenSettings,
     this.onChanged,
   });
 
@@ -54,6 +56,7 @@ class UserOverviewTab extends StatefulWidget {
   final void Function(MediaType type)? onSeeProgress;
   final void Function(MediaType type, String slug)? onOpenMedia;
   final void Function(String username)? onOpenUser;
+  final VoidCallback? onOpenSettings;
   final VoidCallback? onChanged;
 
   @override
@@ -99,6 +102,12 @@ class _UserOverviewTabState extends State<UserOverviewTab>
         ),
         const SizedBox(height: 16),
         PresenceCards(userId: user.id, users: widget.users),
+        PsnTrophiesCard(
+          userId: user.id,
+          isOwner: isOwner,
+          users: widget.users,
+          onOpenSettings: widget.onOpenSettings,
+        ),
         _FavoritesPreview(
           userId: user.id,
           session: widget.session,

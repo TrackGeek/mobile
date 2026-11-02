@@ -32,6 +32,14 @@ abstract final class TgStatus {
   static const danger = Color(0xFFE5484D);
 }
 
+abstract final class TgPsn {
+  static const brand = Color(0xFF3B82F6);
+  static const platinum = Color(0xFF7DD3FC);
+  static const gold = Color(0xFFFACC15);
+  static const silver = Color(0xFFD4D4D8);
+  static const bronze = Color(0xFFD97706);
+}
+
 abstract final class TgRadii {
   static const xs = 6.0;
   static const sm = 10.0;
