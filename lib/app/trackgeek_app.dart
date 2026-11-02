@@ -70,6 +70,7 @@ class TrackGeekApp extends StatelessWidget {
     return MaterialApp(
       title: 'TrackGeek',
       theme: trackGeekTheme(),
+      debugShowCheckedModeBanner: false,
       scrollBehavior: const AlwaysScrollbarBehavior(),
       home: ListenableBuilder(
         listenable: session,
