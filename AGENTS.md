@@ -14,7 +14,7 @@
 | Run | `flutter run --dart-define=TRACKGEEK_API_URL=https://api.trackgeek.net` |
 
 ## Build Defines
-- `TRACKGEEK_API_URL`: API base (default `ServerConfig.defaultUrl` in `lib/app/server_config.dart`); must be HTTPS (`lib/app/api_config.dart`).
+- `TRACKGEEK_API_URL`: API base (default `ServerConfig.defaultUrl` in `lib/app/server_config.dart`); must be HTTPS in release; HTTP accepted in debug (`lib/app/api_config.dart`).
 - `TRACKGEEK_GOOGLE_CLIENT_ID`: Google sign-in; empty disables it.
 
 ## Layout

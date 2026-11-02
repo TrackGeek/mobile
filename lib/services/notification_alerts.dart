@@ -103,7 +103,7 @@ class NotificationAlerts {
     final l10n = await _loadLocalizations();
 
     final api = ApiClient(
-      config: ApiConfig(baseUrl: baseUrl),
+      config: ApiConfig(baseUrl: baseUrl, allowInsecure: true),
       client: http.Client(),
     )..bearerToken = token;
     try {

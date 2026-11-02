@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:app_links/app_links.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -45,6 +46,7 @@ Future<void> main() async {
         'TRACKGEEK_API_URL',
         defaultValue: ServerConfig.defaultUrl,
       ),
+      allowInsecure: kDebugMode,
     ),
   );
   api.language = l10n.language;
