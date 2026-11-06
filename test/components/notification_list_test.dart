@@ -50,11 +50,7 @@ void main() {
                           ? '2026-11-06T10:01:00Z'
                           : null,
                       'createdAt': '2026-11-06T10:00:00Z',
-                      'actor': {
-                        'id': 'u1',
-                        'name': 'Ana',
-                        'username': 'ana',
-                      },
+                      'actor': {'id': 'u1', 'name': 'Ana', 'username': 'ana'},
                     },
                 ],
                 'total': 3,
