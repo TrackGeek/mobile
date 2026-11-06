@@ -883,26 +883,28 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
             ],
           ),
         ),
-        const SizedBox(height: 8),
-        WatchProvidersSection(
-          providers: _movies.watchProviders,
-          regions: _movies.watchProviderRegions,
-          api: widget.env.api,
-          session: widget.env.session,
-          tmdbId: movie.tmdbId,
-        ),
-        if (_watchLinks.isNotEmpty || widget.env.onOpenSettings != null) ...[
-          const SizedBox(height: 12),
-          CustomWatchLinks(
-            links: _watchLinks,
-            linkContext: WatchLinkContext(
-              mediaType: MediaType.movie,
-              imdbId: movie.imdbId,
-              tmdbId: movie.tmdbId,
-              title: movie.title,
-            ),
-            onManage: widget.env.onOpenSettings,
+        if (!_unreleased) ...[
+          const SizedBox(height: 8),
+          WatchProvidersSection(
+            providers: _movies.watchProviders,
+            regions: _movies.watchProviderRegions,
+            api: widget.env.api,
+            session: widget.env.session,
+            tmdbId: movie.tmdbId,
           ),
+          if (_watchLinks.isNotEmpty || widget.env.onOpenSettings != null) ...[
+            const SizedBox(height: 12),
+            CustomWatchLinks(
+              links: _watchLinks,
+              linkContext: WatchLinkContext(
+                mediaType: MediaType.movie,
+                imdbId: movie.imdbId,
+                tmdbId: movie.tmdbId,
+                title: movie.title,
+              ),
+              onManage: widget.env.onOpenSettings,
+            ),
+          ],
         ],
         if (stats != null) ...[
           const SizedBox(height: 8),
