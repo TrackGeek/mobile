@@ -436,6 +436,7 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
   void _openCastPerson(int anilistId) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/person'),
         builder: (_) => PersonPage(
           request: MangaCastRequest('$anilistId'),
           people: widget.env.people,
@@ -453,6 +454,7 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
   void _openMedia(MediaType type, String id) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: RouteSettings(name: '/${type.slug}'),
         builder: (_) => mediaDetailPage(
           type: type,
           id: id,

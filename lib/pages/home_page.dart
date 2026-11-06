@@ -123,6 +123,7 @@ class _HomePageState extends State<HomePage> implements ScrollableTab {
     if (media.person) {
       Navigator.of(context).push(
         MaterialPageRoute(
+          settings: const RouteSettings(name: '/person'),
           builder: (_) => PersonPage(
             request: PersonSlugRequest(media.slug),
             people: widget.people,
@@ -142,6 +143,7 @@ class _HomePageState extends State<HomePage> implements ScrollableTab {
     if (type == null) return;
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: RouteSettings(name: '/${type.slug}'),
         builder: (_) => mediaDetailPage(
           type: type,
           id: media.slug,
@@ -183,6 +185,7 @@ class _HomePageState extends State<HomePage> implements ScrollableTab {
     final published = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
         fullscreenDialog: true,
+        settings: const RouteSettings(name: '/compose'),
         builder: (_) => FeedComposerPage(
           api: widget.api,
           activities: widget.activities,

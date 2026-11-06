@@ -76,6 +76,7 @@ class _BookFranchisePageState extends State<BookFranchisePage> {
   void _openBook(FranchiseBook book) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/book'),
         builder: (_) => mediaDetailPage(
           type: MediaType.book,
           id: '${book.hardcoverId}',

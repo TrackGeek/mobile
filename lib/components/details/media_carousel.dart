@@ -133,6 +133,7 @@ class _MediaCarouselState extends State<MediaCarousel> {
   void _openBackdrop(String url) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/gallery'),
         builder: (_) => MediaGalleryPage(
           title: widget.title,
           items: widget.backdrops.map((url) => GalleryItem(url: url)).toList(),

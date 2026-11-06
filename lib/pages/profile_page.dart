@@ -230,6 +230,7 @@ class _ProfilePageState extends State<ProfilePage> implements ScrollableTab {
   void _openMedia(MediaType type, String slug) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: RouteSettings(name: '/${type.slug}'),
         builder: (_) => mediaDetailPage(
           type: type,
           id: slug,
@@ -256,6 +257,7 @@ class _ProfilePageState extends State<ProfilePage> implements ScrollableTab {
     if (username == _username) return;
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/user'),
         builder: (_) => ProfilePage(
           session: widget.session,
           users: widget.users,
@@ -280,6 +282,7 @@ class _ProfilePageState extends State<ProfilePage> implements ScrollableTab {
     if (media.person) {
       Navigator.of(context).push(
         MaterialPageRoute(
+          settings: const RouteSettings(name: '/person'),
           builder: (_) => PersonPage(
             request: PersonSlugRequest(media.slug),
             people: widget.people,
@@ -557,6 +560,7 @@ class _ProfilePageState extends State<ProfilePage> implements ScrollableTab {
     if (item.target == FavoriteTarget.person) {
       Navigator.of(context).push(
         MaterialPageRoute(
+          settings: const RouteSettings(name: '/person'),
           builder: (_) => PersonPage(
             request: PersonSlugRequest(item.slug),
             people: widget.people,

@@ -1,3 +1,4 @@
+import '../app/dataxamas.dart';
 import '../models/anime_detail.dart';
 import '../models/api_exception.dart';
 import '../models/paginated_page.dart';
@@ -110,17 +111,24 @@ class AnimeService {
     int? watchCount,
     String? startedAt,
     String? completedAt,
-  }) => _api.requestJson(
-    'POST',
-    'anime/progress',
-    body: {
-      'animeId': animeId,
+  }) async {
+    await _api.requestJson(
+      'POST',
+      'anime/progress',
+      body: {
+        'animeId': animeId,
+        'status': status,
+        'watchCount': ?watchCount,
+        'startedAt': ?startedAt,
+        'completedAt': ?completedAt,
+      },
+    );
+    dataxamas.track('progress_save', {
+      'type': 'anime',
+      'id': animeId,
       'status': status,
-      'watchCount': ?watchCount,
-      'startedAt': ?startedAt,
-      'completedAt': ?completedAt,
-    },
-  );
+    });
+  }
 
   Future<void> deleteProgress(String animeProgressId) =>
       _api.requestJson('DELETE', 'anime/progress/$animeProgressId');
@@ -151,18 +159,24 @@ class AnimeService {
     }
   }
 
-  Future<void> watchEpisodes(String animeId, List<int> episodes) =>
-      _api.requestJson(
-        'POST',
-        'anime/episode/watch',
-        body: {
-          'animeId': animeId,
-          'episodes': [
-            for (final episode in episodes)
-              {'episode': episode, 'status': 'Completed'},
-          ],
-        },
-      );
+  Future<void> watchEpisodes(String animeId, List<int> episodes) async {
+    await _api.requestJson(
+      'POST',
+      'anime/episode/watch',
+      body: {
+        'animeId': animeId,
+        'episodes': [
+          for (final episode in episodes)
+            {'episode': episode, 'status': 'Completed'},
+        ],
+      },
+    );
+    dataxamas.track('episodes_watch', {
+      'type': 'anime',
+      'id': animeId,
+      'count': episodes.length,
+    });
+  }
 
   Future<void> unwatchEpisode(String animeId, int episode) => _api.requestJson(
     'DELETE',

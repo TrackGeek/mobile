@@ -1,3 +1,4 @@
+import '../app/dataxamas.dart';
 import '../models/api_exception.dart';
 import '../models/movie_detail.dart';
 import 'api_client.dart';
@@ -79,11 +80,18 @@ class MovieService {
     String movieId, {
     required String status,
     int? watchCount,
-  }) => _api.requestJson(
-    'POST',
-    'movie/progress',
-    body: {'movieId': movieId, 'status': status, 'watchCount': ?watchCount},
-  );
+  }) async {
+    await _api.requestJson(
+      'POST',
+      'movie/progress',
+      body: {'movieId': movieId, 'status': status, 'watchCount': ?watchCount},
+    );
+    dataxamas.track('progress_save', {
+      'type': 'movie',
+      'id': movieId,
+      'status': status,
+    });
+  }
 
   Future<void> deleteProgress(String progressId) =>
       _api.requestJson('DELETE', 'movie/progress/$progressId');

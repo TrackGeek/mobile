@@ -1,3 +1,4 @@
+import '../app/dataxamas.dart';
 import '../models/api_exception.dart';
 import '../models/tv_detail.dart';
 import 'api_client.dart';
@@ -111,18 +112,25 @@ class TvShowService {
     String? startedAt,
     String? completedAt,
     String? notes,
-  }) => _api.requestJson(
-    'POST',
-    'tv/progress',
-    body: {
-      'tvShowId': tvShowId,
+  }) async {
+    await _api.requestJson(
+      'POST',
+      'tv/progress',
+      body: {
+        'tvShowId': tvShowId,
+        'status': status,
+        'watchCount': ?watchCount,
+        'startedAt': ?startedAt,
+        'completedAt': ?completedAt,
+        'notes': ?notes,
+      },
+    );
+    dataxamas.track('progress_save', {
+      'type': 'tv',
+      'id': tvShowId,
       'status': status,
-      'watchCount': ?watchCount,
-      'startedAt': ?startedAt,
-      'completedAt': ?completedAt,
-      'notes': ?notes,
-    },
-  );
+    });
+  }
 
   Future<void> deleteProgress(String progressId) =>
       _api.requestJson('DELETE', 'tv/progress/$progressId');
@@ -162,17 +170,24 @@ class TvShowService {
   Future<void> watchEpisodes(
     String tvShowId,
     List<({int season, int episode})> episodes,
-  ) => _api.requestJson(
-    'POST',
-    'tv/episode/watch',
-    body: {
-      'tvShowId': tvShowId,
-      'episodes': [
-        for (final e in episodes)
-          {'season': e.season, 'episode': e.episode, 'status': 'Completed'},
-      ],
-    },
-  );
+  ) async {
+    await _api.requestJson(
+      'POST',
+      'tv/episode/watch',
+      body: {
+        'tvShowId': tvShowId,
+        'episodes': [
+          for (final e in episodes)
+            {'season': e.season, 'episode': e.episode, 'status': 'Completed'},
+        ],
+      },
+    );
+    dataxamas.track('episodes_watch', {
+      'type': 'tv',
+      'id': tvShowId,
+      'count': episodes.length,
+    });
+  }
 
   Future<void> unwatchEpisode(String tvShowId, int season, int episode) =>
       _api.requestJson(
@@ -181,11 +196,18 @@ class TvShowService {
         body: {'tvShowId': tvShowId, 'season': season, 'episode': episode},
       );
 
-  Future<void> watchAll(String tvShowId) => _api.requestJson(
-    'POST',
-    'tv/episode/watch/all',
-    body: {'tvShowId': tvShowId},
-  );
+  Future<void> watchAll(String tvShowId) async {
+    await _api.requestJson(
+      'POST',
+      'tv/episode/watch/all',
+      body: {'tvShowId': tvShowId},
+    );
+    dataxamas.track('episodes_watch', {
+      'type': 'tv',
+      'id': tvShowId,
+      'all': true,
+    });
+  }
 
   Future<void> unwatchAll(String tvShowId) => _api.requestJson(
     'DELETE',

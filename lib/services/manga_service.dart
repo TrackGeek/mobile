@@ -1,3 +1,4 @@
+import '../app/dataxamas.dart';
 import '../models/api_exception.dart';
 import '../models/manga_detail.dart';
 import 'api_client.dart';
@@ -56,18 +57,25 @@ class MangaService {
     int? readCount,
     String? startedAt,
     String? completedAt,
-  }) => _api.requestJson(
-    'POST',
-    'manga/progress',
-    body: {
-      'mangaId': mangaId,
+  }) async {
+    await _api.requestJson(
+      'POST',
+      'manga/progress',
+      body: {
+        'mangaId': mangaId,
+        'status': status,
+        'chaptersRead': ?chaptersRead,
+        'readCount': ?readCount,
+        'startedAt': ?startedAt,
+        'completedAt': ?completedAt,
+      },
+    );
+    dataxamas.track('progress_save', {
+      'type': 'manga',
+      'id': mangaId,
       'status': status,
-      'chaptersRead': ?chaptersRead,
-      'readCount': ?readCount,
-      'startedAt': ?startedAt,
-      'completedAt': ?completedAt,
-    },
-  );
+    });
+  }
 
   Future<void> deleteProgress(String mangaProgressId) =>
       _api.requestJson('DELETE', 'manga/progress/$mangaProgressId');

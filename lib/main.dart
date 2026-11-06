@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'app/dataxamas.dart';
 import 'app/api_config.dart';
 import 'app/server_config.dart';
 import 'app/trackgeek_app.dart';
@@ -34,6 +35,7 @@ import 'services/user_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dataxamas.start();
   ErrorWidget.builder = (details) => FriendlyErrorView(details: details);
   final l10n = await TrackGeekLocalizations.load(
     WidgetsBinding.instance.platformDispatcher.locale,
@@ -62,38 +64,45 @@ Future<void> main() async {
     passkeys: PlatformPasskeySource(),
   );
   await session.restore();
+  dataxamas.identify(session.user?.id);
+  session.addListener(() => dataxamas.identify(session.user?.id));
   if (session.loggedIn) unawaited(NotificationAlerts.enable());
   final appLinks = AppLinks();
-  appLinks.uriLinkStream.listen(
-    (uri) => unawaited(session.handleAuthDeepLink(uri)),
-  );
+  appLinks.uriLinkStream.listen((uri) {
+    dataxamas.openedFromLink(uri);
+    unawaited(session.handleAuthDeepLink(uri));
+  });
   unawaited(
     appLinks.getInitialLink().then((uri) {
-      if (uri != null) unawaited(session.handleAuthDeepLink(uri));
+      if (uri == null) return;
+      dataxamas.openedFromLink(uri);
+      unawaited(session.handleAuthDeepLink(uri));
     }),
   );
   runApp(
-    L10nScope(
-      localizations: l10n,
-      child: TrackGeekApp(
-        search: SearchService(api),
-        details: MediaDetailService(api),
-        people: PersonService(api),
-        favorites: FavoriteService(api),
-        progress: ProgressService(api),
-        activities: ActivityService(api),
-        api: api,
-        session: session,
-        server: server,
-        settings: SettingsService(api),
-        users: UserService(api),
-        reviews: ReviewService(api),
-        lists: ListService(api),
-        comments: CommentService(api),
-        games: GameService(api),
-        genres: GenreService(client: client),
-        shop: ShopService(api),
-        notifications: NotificationService(api),
+    dataxamas.wrap(
+      L10nScope(
+        localizations: l10n,
+        child: TrackGeekApp(
+          search: SearchService(api),
+          details: MediaDetailService(api),
+          people: PersonService(api),
+          favorites: FavoriteService(api),
+          progress: ProgressService(api),
+          activities: ActivityService(api),
+          api: api,
+          session: session,
+          server: server,
+          settings: SettingsService(api),
+          users: UserService(api),
+          reviews: ReviewService(api),
+          lists: ListService(api),
+          comments: CommentService(api),
+          games: GameService(api),
+          genres: GenreService(client: client),
+          shop: ShopService(api),
+          notifications: NotificationService(api),
+        ),
       ),
     ),
   );

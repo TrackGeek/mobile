@@ -222,6 +222,7 @@ class _PersonPageState extends State<PersonPage> {
   void _openCredit(PersonCredit credit) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: RouteSettings(name: '/${credit.mediaType.slug}'),
         builder: (_) => mediaDetailPage(
           type: credit.mediaType,
           id: '${credit.id}',
@@ -239,6 +240,7 @@ class _PersonPageState extends State<PersonPage> {
       if (internal.startsWith('/manga/cast/')) {
         Navigator.of(context).push(
           MaterialPageRoute(
+            settings: const RouteSettings(name: '/person'),
             builder: (_) => PersonPage(
               request: MangaCastRequest(id),
               people: widget.people,
@@ -255,6 +257,7 @@ class _PersonPageState extends State<PersonPage> {
       } else {
         Navigator.of(context).push(
           MaterialPageRoute(
+            settings: const RouteSettings(name: '/manga'),
             builder: (_) => mediaDetailPage(
               type: MediaType.manga,
               id: id,

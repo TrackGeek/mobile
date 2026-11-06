@@ -1,3 +1,4 @@
+import '../app/dataxamas.dart';
 import '../models/api_exception.dart';
 import '../models/favorite.dart';
 import '../models/paginated_page.dart';
@@ -86,13 +87,19 @@ class FavoriteService {
     }
   }
 
-  Future<void> remove(FavoriteTarget target, String id, {String? language}) =>
-      _api.requestJson(
-        'DELETE',
-        'favorite',
-        body: _request(target, id),
-        language: language,
-      );
+  Future<void> remove(
+    FavoriteTarget target,
+    String id, {
+    String? language,
+  }) async {
+    await _api.requestJson(
+      'DELETE',
+      'favorite',
+      body: _request(target, id),
+      language: language,
+    );
+    dataxamas.track('favorite_remove', {'target': target.name, 'id': id});
+  }
 
   Future<void> toggle(
     FavoriteTarget target,
@@ -106,5 +113,9 @@ class FavoriteService {
       body: _request(target, id),
       language: language,
     );
+    dataxamas.track(isFavorited ? 'favorite_remove' : 'favorite_add', {
+      'target': target.name,
+      'id': id,
+    });
   }
 }
