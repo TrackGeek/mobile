@@ -7,12 +7,8 @@
 Messages must be matched by the following regex:
 
 ```js
-/^(revert: )?(feat|fix|style|refactor|perf|test|workflow|ci|chore|types|wip)(\(.+\))?: .{1,72}/;
+/^(revert: )?(feat|fix|docs|style|refactor|perf|test|build|ci|chore|wip)(\(.+\))?: .{1,72}/;
 ```
-
-### Known issues
-
-husky hooks are currently not compatible with GitHub Desktop's commit tool on Node 16+. There is an [open issue](https://github.com/desktop/desktop/issues/12562) about this on their repo, therefore there is nothing we can do about this. We recommend either committing through the command line, or using VSCode's source control.
 
 ### Examples
 
@@ -41,7 +37,7 @@ BREAKING CHANGE: Pagination parameters were changed.
 The following commit and commit `667ecc1` do not appear in the changelog if they are under the same release. If not, the revert commit appears under the "Reverts" header.
 
 ```
-revert: feat: Discussions (#4662)
+revert: feat(Movies): add rewatched status
 
 This reverts commit c8cb81ec50aae940efa35ad3d69ee69c2db89125.
 ```
@@ -68,11 +64,11 @@ If the commit reverts a previous commit, it should begin with `revert:`, followe
 
 If the prefix is `feat`, `fix` or `perf`, it will appear in the changelog. However, if there is any [BREAKING CHANGE](#footer), the commit will always appear in the changelog.
 
-Other prefixes are up to your discretion. Suggested prefixes are `chore`, `style`, `refactor`, and `test` for non-changelog related tasks.
+Other prefixes are up to your discretion. Suggested prefixes are `docs`, `chore`, `style`, `refactor`, `test`, `build` and `ci` for non-changelog related tasks.
 
 ### Scope
 
-The scope could be anything specifying the place of the commit change, usually the name of the tab. For example `Auth`, `Games`, `API` (Application Programming Interface), `Tracker` etc...
+The scope could be anything specifying the place of the commit change, usually the name of the tab. For example `Auth`, `Games`, `API` (Application Programming Interface), `Tracking`, `Profile`, `i18n` etc...
 
 ### Subject
 

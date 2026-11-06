@@ -1092,28 +1092,30 @@ class _TvDetailPageState extends State<TvDetailPage> {
             onToggleAll: _toggleAll,
           ),
         ],
-        const SizedBox(height: 8),
-        WatchProvidersSection(
-          providers: _tv.watchProviders,
-          regions: _tv.watchProviderRegions,
-          api: widget.env.api,
-          session: widget.env.session,
-          tmdbId: show.tmdbId,
-        ),
-        if (_watchLinks.isNotEmpty || widget.env.onOpenSettings != null) ...[
-          const SizedBox(height: 12),
-          CustomWatchLinks(
-            links: _watchLinks,
-            linkContext: WatchLinkContext(
-              mediaType: MediaType.tv,
-              imdbId: show.imdbId,
-              tmdbId: show.tmdbId,
-              title: show.name,
-              season: _nextWatch.season,
-              episode: _nextWatch.episode,
-            ),
-            onManage: widget.env.onOpenSettings,
+        if (!_unreleased) ...[
+          const SizedBox(height: 8),
+          WatchProvidersSection(
+            providers: _tv.watchProviders,
+            regions: _tv.watchProviderRegions,
+            api: widget.env.api,
+            session: widget.env.session,
+            tmdbId: show.tmdbId,
           ),
+          if (_watchLinks.isNotEmpty || widget.env.onOpenSettings != null) ...[
+            const SizedBox(height: 12),
+            CustomWatchLinks(
+              links: _watchLinks,
+              linkContext: WatchLinkContext(
+                mediaType: MediaType.tv,
+                imdbId: show.imdbId,
+                tmdbId: show.tmdbId,
+                title: show.name,
+                season: _nextWatch.season,
+                episode: _nextWatch.episode,
+              ),
+              onManage: widget.env.onOpenSettings,
+            ),
+          ],
         ],
         if (stats != null) ...[
           const SizedBox(height: 8),

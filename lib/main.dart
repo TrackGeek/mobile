@@ -58,6 +58,7 @@ Future<void> main() async {
   const googleClientId = String.fromEnvironment('TRACKGEEK_GOOGLE_CLIENT_ID');
   final session = SessionController(
     AuthService(api),
+    localizations: l10n,
     google: googleClientId.isEmpty
         ? null
         : GoogleSignInSource(serverClientId: googleClientId),

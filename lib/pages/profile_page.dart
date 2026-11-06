@@ -221,6 +221,12 @@ class _ProfilePageState extends State<ProfilePage> implements ScrollableTab {
       }
       await _load();
     } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.t('user:followedError'))),
+        );
+      }
+    } finally {
       if (mounted) setState(() => _followBusy = false);
     }
   }

@@ -4,11 +4,17 @@
 
 <!-- A clear and detailed description of the changes, referencing issues if applicable -->
 
+## Related issue
+
+<!-- e.g. Closes #123 -->
+
 ## Acknowledgements
 
-- [ ] I read the [PR Guidelines](https://github.com/TrackGeek/mobile-android/blob/main/.github/CONTRIBUTING.md)
-- [ ] I linted and formatted the code by running `npm run check`
-- [ ] The PR title follows the repo's [commit conventions](https://github.com/TrackGeek/mobile-android/blob/main/.github/COMMIT_CONVENTION.md)
+- [ ] I read the [PR Guidelines](https://github.com/TrackGeek/mobile/blob/main/.github/CONTRIBUTING.md)
+- [ ] I formatted the code with `dart format lib test`
+- [ ] `flutter analyze` reports no new issues
+- [ ] `flutter test -j 1` passes
+- [ ] The PR title follows the repo's [commit conventions](https://github.com/TrackGeek/mobile/blob/main/.github/COMMIT_CONVENTION.md)
 
 ## Screenshots
 

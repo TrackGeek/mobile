@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../l10n/trackgeek_localizations.dart';
 import '../app/dataxamas.dart';
 import '../services/auth_service.dart';
 import '../services/external_sign_in.dart';
@@ -10,7 +11,12 @@ import '../services/notification_alerts.dart';
 import '../services/widget_sync.dart';
 
 class SessionController extends ChangeNotifier {
-  SessionController(this._auth, {this._google, this._passkeys});
+  SessionController(
+    this._auth, {
+    this._google,
+    this._passkeys,
+    this.localizations,
+  });
 
   static const tokenKey = 'trackgeek.session.token';
   static const _userIdKey = 'trackgeek.session.userId';
@@ -18,6 +24,7 @@ class SessionController extends ChangeNotifier {
   final AuthService _auth;
   final IdTokenSource? _google;
   final PasskeyAssertionSource? _passkeys;
+  final TrackGeekLocalizations? localizations;
 
   SessionUser? _user;
   bool _loading = true;
@@ -39,6 +46,7 @@ class SessionController extends ChangeNotifier {
       _auth.restoreToken(token);
       try {
         _user = await _auth.session();
+        await _applyAccountLanguage();
         final userId = _user?.id;
         if (userId != null) {
           await prefs.setString(_userIdKey, userId);
@@ -118,6 +126,7 @@ class SessionController extends ChangeNotifier {
   Future<void> refresh() async {
     final user = await _auth.session();
     _user = user;
+    await _applyAccountLanguage();
     notifyListeners();
   }
 
@@ -232,12 +241,20 @@ class SessionController extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(tokenKey);
     await prefs.remove(_userIdKey);
+    await _applyAccountLanguage();
     unawaited(WidgetSync.refresh());
     unawaited(NotificationAlerts.disable());
     notifyListeners();
   }
 
+  Future<void> _applyAccountLanguage() async {
+    try {
+      await localizations?.setAccountLanguage(_user?.language);
+    } catch (_) {}
+  }
+
   Future<void> _persist() async {
+    await _applyAccountLanguage();
     final token = _auth.token;
     if (token == null) return;
     final prefs = await SharedPreferences.getInstance();

@@ -218,6 +218,7 @@ class _NotificationsPageState extends State<NotificationsPage>
             scrollController: _notifScroll,
             notifications: widget.notifications,
             onChanged: (total) => setState(() => _total = total ?? 0),
+            onUnreadChanged: _refreshUnread,
             onOpenUser: widget.onOpenUser,
             onOpenMedia: widget.onOpenMedia,
             onOpenLink: _openLink,

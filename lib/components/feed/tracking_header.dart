@@ -83,91 +83,94 @@ class _TrackingSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
-          child: Row(
+    return ListenableBuilder(
+      listenable: progress,
+      builder: (context, _) => FutureBuilder<List<ProgressItem>>(
+        future:
+            Future.wait(
+              types.map(
+                (type) => progress.activeProgress(
+                  type,
+                  userId: userId,
+                  statuses: statuses,
+                ),
+              ),
+            ).then(
+              (groups) =>
+                  [for (final group in groups) ...group].take(6).toList(),
+            ),
+        builder: (context, snapshot) {
+          final items = snapshot.data ?? const <ProgressItem>[];
+          if (snapshot.connectionState == ConnectionState.done &&
+              !snapshot.hasError &&
+              items.isEmpty) {
+            return const SizedBox.shrink();
+          }
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              HugeIcon(
-                icon: icon,
-                size: 18,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ),
-              TextButton(
-                onPressed: onViewAll,
-                child: Text(context.t('common:viewAll')),
-              ),
-            ],
-          ),
-        ),
-        ListenableBuilder(
-          listenable: progress,
-          builder: (context, _) => FutureBuilder<List<ProgressItem>>(
-            future:
-                Future.wait(
-                  types.map(
-                    (type) => progress.activeProgress(
-                      type,
-                      userId: userId,
-                      statuses: statuses,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
+                child: Row(
+                  children: [
+                    HugeIcon(
+                      icon: icon,
+                      size: 18,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
-                  ),
-                ).then(
-                  (groups) =>
-                      [for (final group in groups) ...group].take(6).toList(),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: onViewAll,
+                      child: Text(context.t('common:viewAll')),
+                    ),
+                  ],
                 ),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState != ConnectionState.done) {
-                return const SizedBox(
+              ),
+              if (snapshot.connectionState != ConnectionState.done)
+                const SizedBox(
                   height: 210,
                   child: Center(child: CircularProgressIndicator()),
-                );
-              }
-              if (snapshot.hasError) {
-                return Padding(
+                )
+              else if (snapshot.hasError)
+                Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text(context.t('api:INTERNAL_SERVER_ERROR')),
-                );
-              }
-              final items = snapshot.data ?? const <ProgressItem>[];
-              if (items.isEmpty) {
-                return const SizedBox.shrink();
-              }
-              return SizedBox(
-                height:
-                    204 + (MediaQuery.textScalerOf(context).scale(14) - 14) * 3,
-                child: Edgy(
-                  axis: .horizontal,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: items.length,
-                    separatorBuilder: (_, _) => const SizedBox(width: 12),
-                    itemBuilder: (context, i) => SizedBox(
-                      width: 116,
-                      child: ProgressCard(
-                        key: ValueKey('${items[i].type}:${items[i].mediaId}'),
-                        item: items[i],
-                        progress: progress,
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            settings: RouteSettings(
-                              name: '/${items[i].type.slug}',
-                            ),
-                            builder: (_) => mediaDetailPage(
-                              type: items[i].type,
-                              id: items[i].detailId,
-                              details: details,
-                              env: env,
+                )
+              else if (items.isNotEmpty)
+                SizedBox(
+                  height:
+                      204 +
+                      (MediaQuery.textScalerOf(context).scale(14) - 14) * 3,
+                  child: Edgy(
+                    axis: .horizontal,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: items.length,
+                      separatorBuilder: (_, _) => const SizedBox(width: 12),
+                      itemBuilder: (context, i) => SizedBox(
+                        width: 116,
+                        child: ProgressCard(
+                          key: ValueKey('${items[i].type}:${items[i].mediaId}'),
+                          item: items[i],
+                          progress: progress,
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              settings: RouteSettings(
+                                name: '/${items[i].type.slug}',
+                              ),
+                              builder: (_) => mediaDetailPage(
+                                type: items[i].type,
+                                id: items[i].detailId,
+                                details: details,
+                                env: env,
+                              ),
                             ),
                           ),
                         ),
@@ -175,11 +178,10 @@ class _TrackingSection extends StatelessWidget {
                     ),
                   ),
                 ),
-              );
-            },
-          ),
-        ),
-      ],
+            ],
+          );
+        },
+      ),
     );
   }
 }

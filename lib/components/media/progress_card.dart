@@ -7,6 +7,7 @@ import '../../l10n/l10n_context.dart';
 import '../../models/media_type.dart';
 import '../../models/progress_item.dart';
 import '../../services/progress_service.dart';
+import 'game_progress_badges.dart';
 import 'smooth_image.dart';
 import '../../utils/haptics.dart';
 import '../../utils/numbers.dart';
@@ -17,11 +18,13 @@ class ProgressCard extends StatefulWidget {
     required this.item,
     required this.progress,
     required this.onTap,
+    this.onIncrement,
   });
 
   final ProgressItem item;
   final ProgressService progress;
   final VoidCallback onTap;
+  final VoidCallback? onIncrement;
 
   @override
   State<ProgressCard> createState() => _ProgressCardState();
@@ -35,6 +38,7 @@ class _ProgressCardState extends State<ProgressCard> {
     setState(() => _busy = true);
     try {
       await widget.progress.increment(widget.item);
+      if (mounted) widget.onIncrement?.call();
     } catch (_) {
       if (mounted) {
         HapticsHelper.error();
@@ -111,6 +115,13 @@ class _ProgressCardState extends State<ProgressCard> {
                           child: Text('${item.year}'),
                         ),
                       ),
+                    ),
+                  if (item.completion != null || (item.hoursPlayed ?? 0) > 0)
+                    Positioned(
+                      left: 4,
+                      right: 4,
+                      bottom: item.current != null ? 36 : 4,
+                      child: GameProgressBadges(item: item),
                     ),
                   if (item.current != null)
                     Positioned(

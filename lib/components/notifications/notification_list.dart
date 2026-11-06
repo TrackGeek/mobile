@@ -15,6 +15,7 @@ class NotificationList extends StatefulWidget {
     super.key,
     required this.notifications,
     required this.onChanged,
+    this.onUnreadChanged,
     this.onOpenUser,
     this.onOpenMedia,
     this.onOpenLink,
@@ -23,6 +24,7 @@ class NotificationList extends StatefulWidget {
 
   final NotificationService notifications;
   final void Function(int? total) onChanged;
+  final Future<void> Function()? onUnreadChanged;
   final ValueChanged<String>? onOpenUser;
   final void Function(MediaType type, String id)? onOpenMedia;
   final ValueChanged<String>? onOpenLink;
@@ -123,6 +125,7 @@ class NotificationListState extends State<NotificationList> {
     setState(() => _busy = true);
     try {
       await action();
+      await widget.onUnreadChanged?.call();
       await load();
     } catch (_) {
       if (mounted) {

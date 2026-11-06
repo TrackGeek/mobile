@@ -87,7 +87,7 @@ class RelationsView extends StatelessWidget {
     }
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 14),
+      padding: const EdgeInsets.only(bottom: 14),
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHigh,
@@ -97,30 +97,6 @@ class RelationsView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            child: Row(
-              children: [
-                _Cover(url: malImage(rootImageUrl), size: 44),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        rootTitle,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
           for (final group in groups.entries) ...[
             const SizedBox(height: 14),
             Padding(
@@ -136,7 +112,7 @@ class RelationsView extends StatelessWidget {
             const SizedBox(height: 8),
             SizedBox(
               height:
-                  120 + (MediaQuery.textScalerOf(context).scale(11) - 11) * 3,
+                  152 + (MediaQuery.textScalerOf(context).scale(12) - 12) * 3,
               child: Edgy(
                 axis: .horizontal,
                 child: ListView.separated(
