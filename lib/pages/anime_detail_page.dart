@@ -1011,7 +1011,7 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
             ),
           ),
         ],
-        if (!_unreleased &&
+        if ((!_unreleased || anime.status == null) &&
             (_watchLinks.isNotEmpty || widget.env.onOpenSettings != null)) ...[
           const SizedBox(height: 16),
           CustomWatchLinks(

@@ -86,8 +86,8 @@ class _NotificationsPageState extends State<NotificationsPage>
     setState(() => _pending = true);
     try {
       await action();
-      await _refreshUnread();
       await _listKey.currentState?.load();
+      await _refreshUnread();
     } catch (_) {
       if (mounted) {
         HapticsHelper.error();
