@@ -140,25 +140,45 @@ class NotificationAlerts {
       title: content.title,
       body: content.body,
       notificationDetails: NotificationDetails(
-        android: AndroidNotificationDetails(
-          _channelId,
-          'Notifications',
-          importance: Importance.high,
-          priority: Priority.high,
-          groupKey: _channelId,
-          largeIcon: imagePath == null
-              ? null
-              : FilePathAndroidBitmap(imagePath),
-          styleInformation: content.body == null
-              ? null
-              : BigTextStyleInformation(content.body!),
-        ),
+        android: _androidDetails(content, imagePath),
         iOS: DarwinNotificationDetails(
           attachments: imagePath == null
               ? null
               : [DarwinNotificationAttachment(imagePath)],
         ),
       ),
+    );
+  }
+
+  @visibleForTesting
+  static AndroidNotificationDetails androidDetailsForTesting(
+    AppNotification n,
+    TrackGeekLocalizations l10n,
+    String? imagePath,
+  ) => _androidDetails(_content(n, l10n), imagePath);
+
+  static AndroidNotificationDetails _androidDetails(
+    ({String title, String? body}) content,
+    String? imagePath,
+  ) {
+    final bitmap = imagePath == null ? null : FilePathAndroidBitmap(imagePath);
+    final expandedText = content.body ?? content.title;
+    return AndroidNotificationDetails(
+      _channelId,
+      'Notifications',
+      importance: Importance.high,
+      priority: Priority.high,
+      groupKey: _channelId,
+      largeIcon: bitmap,
+      styleInformation: bitmap == null
+          ? BigTextStyleInformation(expandedText, contentTitle: content.title)
+          : BigPictureStyleInformation(
+              bitmap,
+              contentTitle: content.title,
+              summaryText: expandedText,
+              hideExpandedLargeIcon: true,
+              showBigPictureWhenCollapsed: true,
+            ),
     );
   }
 
@@ -227,8 +247,10 @@ class NotificationAlerts {
       };
       final unitTitle = event.unitTitle;
       return (
-        title: headline,
-        body: unitTitle != null && unitTitle.isNotEmpty ? unitTitle : null,
+        title: title,
+        body: unitTitle == null || unitTitle.isEmpty
+            ? headline
+            : '$headline\n$unitTitle',
       );
     }
     if (n.isSystem || n.actor == null) {

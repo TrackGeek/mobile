@@ -221,6 +221,7 @@ class _ProfilePageState extends State<ProfilePage> implements ScrollableTab {
       }
       await _load();
     } catch (_) {
+    } finally {
       if (mounted) setState(() => _followBusy = false);
     }
   }

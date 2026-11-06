@@ -63,7 +63,18 @@ Future<String> _read(String path) async {
   }
   if (path.endsWith('notifications.json')) {
     return '''
-    {"preferences": {"description": "Choose what you are notified about."}}
+    {
+      "preferences": {"description": "Choose what you are notified about."},
+      "release": {
+        "episode": "Episode {{number}} of {{title}} has released",
+        "seasonEpisode": "Season {{season}}, episode {{number}} of {{title}} has released",
+        "episodeUnknown": "A new episode of {{title}} has released",
+        "chapter": "Chapter {{number}} of {{title}} has released",
+        "chapterUnknown": "A new chapter of {{title}} has released",
+        "game": "{{title}} has released",
+        "sequel": "{{title}} has been added as a sequel"
+      }
+    }
     ''';
   }
   if (path.endsWith('auth.json')) {

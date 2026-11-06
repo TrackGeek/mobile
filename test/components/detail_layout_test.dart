@@ -4,6 +4,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:trackgeek/components/details/community_stats.dart';
 import 'package:trackgeek/components/details/detail_overview.dart';
 import 'package:trackgeek/components/details/people_cards.dart';
+import 'package:trackgeek/components/details/relations_view.dart';
 import 'package:trackgeek/components/details/tracking.dart';
 import 'package:trackgeek/components/layout/adaptive_grid_delegate.dart';
 import 'package:trackgeek/components/layout/content_frame.dart';
@@ -137,4 +138,38 @@ void main() {
       expect(taps, 1);
     },
   );
+
+  for (final scale in [1.0, 2.0]) {
+    testWidgets('Relation titles do not overlap groups at text scale $scale', (
+      tester,
+    ) async {
+      const longTitle = 'A relation with a title long enough to use two lines';
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: trackGeekTheme(),
+          home: MediaQuery(
+            data: MediaQueryData(textScaler: TextScaler.linear(scale)),
+            child: const Scaffold(
+              body: SingleChildScrollView(
+                child: RelationsView(
+                  rootTitle: 'Root title',
+                  nodes: [
+                    RelationNode(id: 1, title: longTitle, label: 'Parent'),
+                    RelationNode(id: 2, title: 'Sequel title', label: 'Sequel'),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+      expect(
+        tester.getBottomLeft(find.text(longTitle)).dy,
+        lessThanOrEqualTo(tester.getTopLeft(find.text('Sequel')).dy),
+      );
+    });
+  }
 }
