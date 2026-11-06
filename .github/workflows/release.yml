@@ -22,7 +22,11 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - run: flutter build apk --release --dart-define=TRACKGEEK_API_URL=${{ vars.TRACKGEEK_API_URL || 'https://api.trackgeek.net' }} --dart-define=TRACKGEEK_GOOGLE_CLIENT_ID=${{ vars.TRACKGEEK_GOOGLE_CLIENT_ID }}
+      - run: |
+          flutter build apk --release \
+            --dart-define=TRACKGEEK_API_URL=${{ vars.TRACKGEEK_API_URL || 'https://api.trackgeek.net' }} \
+            --dart-define=TRACKGEEK_GOOGLE_CLIENT_ID=${{ vars.TRACKGEEK_GOOGLE_CLIENT_ID }} \
+            --dart-define=DATAXAMAS_API_KEY=${{ vars.DATAXAMAS_API_KEY }}
       - run: mv build/app/outputs/flutter-apk/app-release.apk trackgeek-${{ github.ref_name }}.apk
       - uses: softprops/action-gh-release@v3
         if: startsWith(github.ref, 'refs/tags/')

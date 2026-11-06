@@ -84,6 +84,7 @@ class _UserScreenshotsTabState extends State<UserScreenshotsTab>
     final theme = Theme.of(context);
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/screenshots'),
         builder: (_) => Theme(
           data: theme,
           child: GameScreenshotsPage(
@@ -253,6 +254,7 @@ class _GameScreenshotsPageState extends State<GameScreenshotsPage> {
   void _openGallery(int index) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/gallery'),
         builder: (_) => MediaGalleryPage(
           title: '',
           initialIndex: index,

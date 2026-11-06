@@ -1,3 +1,4 @@
+import 'package:dataxamas/dataxamas.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -698,14 +699,16 @@ class _TwoFactorCardState extends State<TwoFactorCard> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Container(
-                  width: 184,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
+                DataxamasMask(
+                  child: Container(
+                    width: 184,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: QrImageView(data: _totpUri!, size: 160),
                   ),
-                  child: QrImageView(data: _totpUri!, size: 160),
                 ),
                 if (_totpSecret != null) ...[
                   const SizedBox(height: 8),
@@ -865,19 +868,21 @@ class _BackupCodes extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Wrap(
-            spacing: 24,
-            runSpacing: 8,
-            children: [
-              for (final code in codes)
-                SizedBox(
-                  width: 140,
-                  child: Text(
-                    code,
-                    style: const TextStyle(fontFamily: 'monospace'),
+          DataxamasMask(
+            child: Wrap(
+              spacing: 24,
+              runSpacing: 8,
+              children: [
+                for (final code in codes)
+                  SizedBox(
+                    width: 140,
+                    child: Text(
+                      code,
+                      style: const TextStyle(fontFamily: 'monospace'),
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 12),
           Wrap(

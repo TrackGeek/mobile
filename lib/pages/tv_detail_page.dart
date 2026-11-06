@@ -624,6 +624,7 @@ class _TvDetailPageState extends State<TvDetailPage> {
     if (slug == null || slug.isEmpty) return;
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/person'),
         builder: (_) => PersonPage(
           request: PersonSlugRequest(slug),
           people: widget.env.people,
@@ -642,6 +643,7 @@ class _TvDetailPageState extends State<TvDetailPage> {
   void _openCompany(int companyId) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/company'),
         builder: (_) =>
             CompanyPage(type: MediaType.tv, id: '$companyId', env: widget.env),
       ),
@@ -651,6 +653,7 @@ class _TvDetailPageState extends State<TvDetailPage> {
   void _openMedia(MediaType type, String id) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: RouteSettings(name: '/${type.slug}'),
         builder: (_) => mediaDetailPage(
           type: type,
           id: id,

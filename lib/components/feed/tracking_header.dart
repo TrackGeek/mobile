@@ -141,33 +141,35 @@ class _TrackingSection extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text(context.t('api:INTERNAL_SERVER_ERROR')),
-                )
-              else
-                SizedBox(
-                  height:
-                      204 +
-                      (MediaQuery.textScalerOf(context).scale(14) - 14) * 3,
-                  child: Edgy(
-                    axis: .horizontal,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: items.length,
-                      separatorBuilder: (_, _) => const SizedBox(width: 12),
-                      itemBuilder: (context, i) => SizedBox(
-                        width: 116,
-                        child: ProgressCard(
-                          key: ValueKey('${items[i].type}:${items[i].mediaId}'),
-                          item: items[i],
-                          progress: progress,
-                          onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => mediaDetailPage(
-                                type: items[i].type,
-                                id: items[i].detailId,
-                                details: details,
-                                env: env,
-                              ),
+                );
+              }
+              final items = snapshot.data ?? const <ProgressItem>[];
+              if (items.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              return SizedBox(
+                height:
+                    204 + (MediaQuery.textScalerOf(context).scale(14) - 14) * 3,
+                child: Edgy(
+                  axis: .horizontal,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: items.length,
+                    separatorBuilder: (_, _) => const SizedBox(width: 12),
+                    itemBuilder: (context, i) => SizedBox(
+                      width: 116,
+                      child: ProgressCard(
+                        key: ValueKey('${items[i].type}:${items[i].mediaId}'),
+                        item: items[i],
+                        progress: progress,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => mediaDetailPage(
+                              type: items[i].type,
+                              id: items[i].detailId,
+                              details: details,
+                              env: env,
                             ),
                           ),
                         ),
@@ -175,10 +177,11 @@ class _TrackingSection extends StatelessWidget {
                     ),
                   ),
                 ),
-            ],
-          );
-        },
-      ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

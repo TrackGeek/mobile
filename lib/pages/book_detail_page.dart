@@ -414,6 +414,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
   void _openFranchise(BookSeriesEntry entry) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/book/franchise'),
         builder: (_) => BookFranchisePage(
           slug: franchiseSlug(entry.series.id, entry.series.name),
           env: widget.env,
@@ -425,6 +426,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
   void _openMedia(MediaType type, String id) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: RouteSettings(name: '/${type.slug}'),
         builder: (_) => mediaDetailPage(
           type: type,
           id: id,

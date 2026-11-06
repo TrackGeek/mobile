@@ -1,3 +1,4 @@
+import '../app/dataxamas.dart';
 import '../models/api_exception.dart';
 import '../models/feed_entry.dart';
 import '../models/media_type.dart';
@@ -105,6 +106,7 @@ class ReviewService {
       config.endpoint,
       body: {config.mediaIdField: mediaId, ...fields},
     );
+    dataxamas.track('review_create', {'type': type.slug, 'id': mediaId});
   }
 
   Future<void> deleteReview(UserReview review) async {

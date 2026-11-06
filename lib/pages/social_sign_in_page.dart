@@ -30,6 +30,7 @@ class SocialSignInPage extends StatefulWidget {
   }) {
     return Navigator.of(context).push<SocialSignInResult>(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/auth/social'),
         builder: (_) => SocialSignInPage(start: start, apiUrl: apiUrl),
       ),
     );

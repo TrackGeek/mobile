@@ -184,6 +184,7 @@ class _ScreenshotCardState extends State<ScreenshotCard> {
   void _openGallery(int index) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/gallery'),
         builder: (_) => MediaGalleryPage(
           items: widget.entry.screenshots.map((shot) {
             final video = shot.type == 'Video' ? parseVideoUrl(shot.url) : null;

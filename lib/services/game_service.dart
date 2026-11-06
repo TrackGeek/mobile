@@ -1,3 +1,4 @@
+import '../app/dataxamas.dart';
 import '../models/api_exception.dart';
 import '../models/game_detail.dart';
 import '../models/game_screenshot.dart';
@@ -83,21 +84,28 @@ class GameService {
     String? notes,
     String? startedAt,
     String? completedAt,
-  }) => _api.requestJson(
-    'POST',
-    'game/progress',
-    body: {
-      'gameId': gameId,
+  }) async {
+    await _api.requestJson(
+      'POST',
+      'game/progress',
+      body: {
+        'gameId': gameId,
+        'status': status,
+        'playCount': ?playCount,
+        'completion': ?completion,
+        'platforms': ?platforms,
+        'hoursPlayed': ?hoursPlayed,
+        'notes': ?notes,
+        'startedAt': ?startedAt,
+        'completedAt': ?completedAt,
+      },
+    );
+    dataxamas.track('progress_save', {
+      'type': 'game',
+      'id': gameId,
       'status': status,
-      'playCount': ?playCount,
-      'completion': ?completion,
-      'platforms': ?platforms,
-      'hoursPlayed': ?hoursPlayed,
-      'notes': ?notes,
-      'startedAt': ?startedAt,
-      'completedAt': ?completedAt,
-    },
-  );
+    });
+  }
 
   Future<void> deleteProgress(String gameProgressId) =>
       _api.requestJson('DELETE', 'game/progress/$gameProgressId');

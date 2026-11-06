@@ -1,3 +1,4 @@
+import '../app/dataxamas.dart';
 import '../models/api_exception.dart';
 import '../models/cosmetic.dart';
 import '../models/wallet.dart';
@@ -50,6 +51,7 @@ class ShopService {
     if (wallet is! Map<String, dynamic> || cosmetic is! Map<String, dynamic>) {
       throw const ApiException(ApiFailure.invalidResponse);
     }
+    dataxamas.track('cosmetic_purchase', {'kind': kind.apiName, 'key': key});
     return ShopPurchase(
       wallet: Wallet.fromJson(wallet),
       cosmetic: Cosmetic.fromJson(cosmetic),
