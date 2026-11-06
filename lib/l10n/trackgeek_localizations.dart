@@ -4,10 +4,16 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
+import '../utils/dates.dart';
 import '../utils/numbers.dart';
 
 class TrackGeekLocalizations extends ChangeNotifier {
-  TrackGeekLocalizations._(this._resources, this._language) {
+  TrackGeekLocalizations._(
+    this._resources,
+    this._language,
+    this._deviceLanguage,
+    this._read,
+  ) {
     setNumberLocale(_language);
   }
 
@@ -66,9 +72,16 @@ class TrackGeekLocalizations extends ChangeNotifier {
   ];
 
   final Map<String, Map<String, String>> _resources;
+  final String _deviceLanguage;
+  final Future<String> Function(String path) _read;
   String _language;
 
   String get language => _language;
+
+  Locale get locale {
+    final parts = _language.split('-');
+    return Locale(parts.first, parts.length > 1 ? parts[1] : null);
+  }
 
   static String resolveLanguage(Locale locale) {
     final tag = '${locale.languageCode}-${locale.countryCode}'.replaceAll(
@@ -102,7 +115,8 @@ class TrackGeekLocalizations extends ChangeNotifier {
     if (language != fallbackLanguage) {
       resources[language] = await _loadLanguage(language, loader);
     }
-    return TrackGeekLocalizations._(resources, language);
+    await ensureDateLocale(language);
+    return TrackGeekLocalizations._(resources, language, language, loader);
   }
 
   static Future<Map<String, String>> _loadLanguage(
@@ -138,12 +152,19 @@ class TrackGeekLocalizations extends ChangeNotifier {
     });
   }
 
+  Future<void> setAccountLanguage(String? language) => setLanguage(
+    supportedLanguages.contains(language) ? language! : _deviceLanguage,
+  );
+
   Future<void> setLanguage(
-    String language,
-    Future<String> Function(String path) read,
-  ) async {
+    String language, [
+    Future<String> Function(String path)? read,
+  ]) async {
     if (!supportedLanguages.contains(language) || language == _language) return;
-    _resources[language] ??= await _loadLanguage(language, read);
+    final resources =
+        _resources[language] ?? await _loadLanguage(language, read ?? _read);
+    await ensureDateLocale(language);
+    _resources[language] = resources;
     _language = language;
     setNumberLocale(language);
     notifyListeners();

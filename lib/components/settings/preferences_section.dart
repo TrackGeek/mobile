@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:hugeicons/hugeicons.dart';
 
@@ -87,7 +86,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
     } catch (_) {}
   }
 
-  Future<void> _patch(Map<String, Object?> fields) async {
+  Future<bool> _patch(Map<String, Object?> fields) async {
     setState(() => _pending = true);
     try {
       await widget.settings.updateProfile(fields);
@@ -95,6 +94,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
       if (mounted) {
         showSettingsToast(context, context.t('settings:save.success'));
       }
+      return true;
     } catch (e) {
       if (mounted) {
         showSettingsToast(
@@ -103,17 +103,22 @@ class _PreferencesSectionState extends State<PreferencesSection> {
           error: true,
         );
       }
+      return false;
     } finally {
       if (mounted) setState(() => _pending = false);
     }
   }
 
   Future<void> _setLanguage(String language) async {
+    final previous = _language;
     setState(() => _language = language);
-    await _patch({'language': language});
+    final saved = await _patch({'language': language});
     if (!mounted) return;
-    final l10n = L10nScope.of(context);
-    await l10n.setLanguage(language, rootBundle.loadString);
+    if (!saved) {
+      setState(() => _language = previous);
+      return;
+    }
+    await L10nScope.read(context).setAccountLanguage(language);
   }
 
   Future<void> _toggleType(MediaType type, bool enabled) async {

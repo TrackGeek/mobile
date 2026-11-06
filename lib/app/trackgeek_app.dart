@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../controllers/session_controller.dart';
+import '../l10n/l10n_context.dart';
 import '../pages/auth_gate_page.dart';
 import '../services/activity_service.dart';
 import '../services/api_client.dart';
@@ -67,8 +68,10 @@ class TrackGeekApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = L10nScope.of(context);
     return MaterialApp(
       title: 'TrackGeek',
+      locale: l10n.locale,
       theme: trackGeekTheme(),
       debugShowCheckedModeBanner: false,
       scrollBehavior: const AlwaysScrollbarBehavior(),
