@@ -165,6 +165,9 @@ class _TrackingSection extends StatelessWidget {
                         progress: progress,
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(
+                            settings: RouteSettings(
+                              name: '/${items[i].type.slug}',
+                            ),
                             builder: (_) => mediaDetailPage(
                               type: items[i].type,
                               id: items[i].detailId,
