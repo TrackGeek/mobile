@@ -2,17 +2,24 @@ name: Release APK
 
 on:
   push:
+    branches: [main]
     tags: ["v*"]
   workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: release-apk
+  cancel-in-progress: false
+
 jobs:
   apk:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: actions/setup-java@v7
         with:
           distribution: temurin
@@ -21,20 +28,55 @@ jobs:
         with:
           channel: stable
           cache: true
+      - id: version
+        shell: bash
+        env:
+          REF_NAME: ${{ github.ref_name }}
+          REF_TYPE: ${{ github.ref_type }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          VERSION="$(awk '/^version: / { print $2; exit }' pubspec.yaml)"
+          VERSION_NAME="${VERSION%%+*}"
+          BASE_BUILD_NUMBER="${VERSION#*+}"
+          BUILD_NUMBER=$((BASE_BUILD_NUMBER + RUN_NUMBER))
+          if [[ "$REF_TYPE" == "tag" ]]; then
+            TAG="$REF_NAME"
+          else
+            TAG="v${VERSION_NAME}-build.${BUILD_NUMBER}"
+          fi
+          {
+            echo "name=$VERSION_NAME"
+            echo "number=$BUILD_NUMBER"
+            echo "tag=$TAG"
+            echo "apk=trackgeek-$TAG.apk"
+          } >> "$GITHUB_OUTPUT"
       - run: flutter pub get
       - run: |
           flutter build apk --release \
+            --build-name=${{ steps.version.outputs.name }} \
+            --build-number=${{ steps.version.outputs.number }} \
             --dart-define=TRACKGEEK_API_URL=${{ vars.TRACKGEEK_API_URL || 'https://api.trackgeek.net' }} \
             --dart-define=TRACKGEEK_GOOGLE_CLIENT_ID=${{ vars.TRACKGEEK_GOOGLE_CLIENT_ID }} \
             --dart-define=DATAXAMAS_API_KEY=${{ vars.DATAXAMAS_API_KEY }}
-      - run: mv build/app/outputs/flutter-apk/app-release.apk trackgeek-${{ github.ref_name }}.apk
+      - name: Generate release notes
+        shell: bash
+        run: |
+          PREVIOUS_TAG="$(git describe --tags --abbrev=0 "${GITHUB_SHA}^" 2>/dev/null || true)"
+          ARGS=(--to "$GITHUB_SHA" --output release-notes.md)
+          if [[ -n "$PREVIOUS_TAG" ]]; then
+            ARGS+=(--from "$PREVIOUS_TAG")
+          fi
+          python3 .github/scripts/generate-release-notes.py "${ARGS[@]}"
+      - run: mv build/app/outputs/flutter-apk/app-release.apk "${{ steps.version.outputs.apk }}"
       - uses: softprops/action-gh-release@v3
-        if: startsWith(github.ref, 'refs/tags/')
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
         with:
-          files: trackgeek-${{ github.ref_name }}.apk
-          generate_release_notes: true
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: TrackGeek ${{ steps.version.outputs.tag }}
+          body_path: release-notes.md
+          files: ${{ steps.version.outputs.apk }}
       - uses: actions/upload-artifact@v7
-        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        if: github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/')
         with:
           name: apk
           path: trackgeek-*.apk
