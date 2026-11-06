@@ -5,10 +5,12 @@ class SliverPosterGrid extends StatelessWidget {
     super.key,
     required this.delegate,
     this.textHeight = 56,
-  });
+    this.posterAspectRatio = 2 / 3,
+  }) : assert(posterAspectRatio > 0);
 
   final SliverChildDelegate delegate;
   final double textHeight;
+  final double posterAspectRatio;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +28,8 @@ class SliverPosterGrid extends StatelessWidget {
             crossAxisCount: columns,
             mainAxisSpacing: 12,
             crossAxisSpacing: 12,
-            mainAxisExtent: width * 1.5 + textHeight + extraTextHeight * 3,
+            mainAxisExtent:
+                width / posterAspectRatio + textHeight + extraTextHeight * 3,
           ),
           delegate: delegate,
         );

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../media/progress_card.dart';
 import '../media/sliver_poster_grid.dart';
 
 import 'package:hugeicons/hugeicons.dart';
@@ -16,7 +17,6 @@ import '../../models/progress_item.dart';
 import '../../services/progress_service.dart';
 import '../../utils/content_types.dart';
 import '../../utils/genres.dart';
-import 'media_card.dart';
 import 'user_widgets.dart';
 import '../layout/tg_refresh_indicator.dart';
 import '../../utils/adaptive_sheet_route.dart';
@@ -707,6 +707,7 @@ class _UserProgressTabState extends State<UserProgressTab>
                   BottomPadding.of(context, minimum: 24),
                 ),
                 sliver: SliverPosterGrid(
+                  posterAspectRatio: 3 / 4,
                   delegate: SliverChildBuilderDelegate((context, index) {
                     if (index >= _items.length) {
                       return const Center(
@@ -714,11 +715,13 @@ class _UserProgressTabState extends State<UserProgressTab>
                       );
                     }
                     final item = _items[index];
-                    return MediaCard(
-                      title: item.title,
-                      image: item.imageUrl ?? '',
-                      year: item.year,
+                    return ProgressCard(
+                      key: ValueKey(
+                        '${item.type}:${item.mediaId ?? item.detailId}',
+                      ),
                       item: item,
+                      progress: widget.progress,
+                      onIncrement: _load,
                       onTap: () =>
                           widget.onOpenMedia?.call(item.type, item.detailId),
                     );
