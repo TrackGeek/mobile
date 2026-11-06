@@ -84,6 +84,7 @@ class _GameMediaCarouselState extends State<GameMediaCarousel> {
                   return InkWell(
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute<void>(
+                        settings: const RouteSettings(name: '/gallery'),
                         builder: (_) => MediaGalleryPage(
                           title: widget.game.name,
                           initialIndex: index - widget.game.videos.length,

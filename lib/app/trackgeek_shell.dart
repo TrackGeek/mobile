@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 import '../controllers/session_controller.dart';
+import 'dataxamas.dart';
 import 'scrollable_tab.dart';
 import '../components/layout/adaptive_navigation.dart';
 import '../l10n/l10n_context.dart';
@@ -82,6 +83,7 @@ class TrackGeekShell extends StatefulWidget {
 class _TrackGeekShellState extends State<TrackGeekShell>
     with WidgetsBindingObserver {
   static const _profileTab = 3;
+  static const _tabScreens = ['/home', '/search', '/notifications', '/profile'];
 
   int _tab = 0;
   final List<GlobalKey> _pageKeys = List.generate(4, (_) => GlobalKey());
@@ -92,6 +94,7 @@ class _TrackGeekShellState extends State<TrackGeekShell>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    dataxamas.root(_tabScreens[_tab]);
     _poll = Timer.periodic(NotificationAlerts.checkInterval, (_) {
       _refreshUnread();
     });
@@ -175,9 +178,19 @@ class _TrackGeekShellState extends State<TrackGeekShell>
     }
   }
 
+  void _selectTab(int index) {
+    setState(() => _tab = index);
+    // Opening your own profile from a pushed page switches the tab underneath.
+    dataxamas.root(
+      _tabScreens[index],
+      visible: ModalRoute.isCurrentOf(context) ?? true,
+    );
+  }
+
   void _openShop() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
+        settings: const RouteSettings(name: '/shop'),
         builder: (_) => ShopPage(
           shop: widget.shop,
           session: widget.session,
@@ -190,6 +203,7 @@ class _TrackGeekShellState extends State<TrackGeekShell>
   void _openSettings() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
+        settings: const RouteSettings(name: '/settings'),
         builder: (_) => SettingsPage(
           session: widget.session,
           settings: widget.settings,
@@ -202,11 +216,12 @@ class _TrackGeekShellState extends State<TrackGeekShell>
 
   void _openUser(String username) {
     if (username == widget.session.user?.username) {
-      setState(() => _tab = _profileTab);
+      _selectTab(_profileTab);
       return;
     }
     Navigator.of(context).push(
       MaterialPageRoute<void>(
+        settings: const RouteSettings(name: '/user'),
         builder: (_) => ProfilePage(
           session: widget.session,
           users: widget.users,
@@ -230,6 +245,7 @@ class _TrackGeekShellState extends State<TrackGeekShell>
   void _openMedia(MediaType type, String id) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
+        settings: RouteSettings(name: '/${type.slug}'),
         builder: (_) => mediaDetailPage(
           type: type,
           id: id,
@@ -253,6 +269,7 @@ class _TrackGeekShellState extends State<TrackGeekShell>
   void _openGenre(MediaType type, String genre) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
+        settings: const RouteSettings(name: '/genre'),
         builder: (_) => SearchPage(
           search: widget.search,
           details: widget.details,
@@ -280,7 +297,7 @@ class _TrackGeekShellState extends State<TrackGeekShell>
           (_pageKeys[index].currentState as ScrollableTab?)?.scrollToTop();
           return;
         }
-        setState(() => _tab = index);
+        _selectTab(index);
       },
       body: IndexedStack(
         index: _tab,
@@ -294,7 +311,7 @@ class _TrackGeekShellState extends State<TrackGeekShell>
             activities: widget.activities,
             api: widget.api,
             session: widget.session,
-            onOpenProfile: () => setState(() => _tab = _profileTab),
+            onOpenProfile: () => _selectTab(_profileTab),
             onOpenUserProfile: _openUser,
             onOpenGenre: _openGenre,
             onOpenSettings: _openSettings,

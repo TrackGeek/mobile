@@ -478,6 +478,7 @@ class _GameDetailPageState extends State<GameDetailPage> {
   void _openCompany(int companyId) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/company'),
         builder: (_) => CompanyPage(
           type: MediaType.game,
           id: '$companyId',
@@ -492,6 +493,7 @@ class _GameDetailPageState extends State<GameDetailPage> {
     if (slug == null || slug.isEmpty) return;
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/game/franchise'),
         builder: (_) => GameFranchisePage(slug: slug, env: widget.env),
       ),
     );
@@ -500,6 +502,7 @@ class _GameDetailPageState extends State<GameDetailPage> {
   void _openMedia(MediaType type, String id) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: RouteSettings(name: '/${type.slug}'),
         builder: (_) => mediaDetailPage(
           type: type,
           id: id,
@@ -1226,6 +1229,7 @@ class _GameDetailPageState extends State<GameDetailPage> {
   void _openGallery(List<GameScreenshot> shots, int index) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/gallery'),
         builder: (_) => MediaGalleryPage(
           title: _game?.name ?? '',
           initialIndex: index,

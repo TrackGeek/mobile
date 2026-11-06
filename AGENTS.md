@@ -16,6 +16,8 @@
 ## Build Defines
 - `TRACKGEEK_API_URL`: API base (default `ServerConfig.defaultUrl` in `lib/app/server_config.dart`); must be HTTPS in release; HTTP accepted in debug (`lib/app/api_config.dart`).
 - `TRACKGEEK_GOOGLE_CLIENT_ID`: Google sign-in; empty disables it.
+- `DATAXAMAS_API_KEY`: Dataxamas ingest key (analytics, errors, replay); empty disables it. Wrapped by `dataxamas` in `lib/app/dataxamas.dart`.
+- `DATAXAMAS_BASE_URL`: optional Dataxamas server (default `https://dataxamas.com`), e.g. a local instance for testing.
 
 ## Layout
 | Path | Purpose |
@@ -49,6 +51,7 @@
 - Format: `type(Scope): subject` per `.github/COMMIT_CONVENTION.md`.
 
 ## UI Conventions
+- Pushed pages: every `MaterialPageRoute` takes `settings: RouteSettings(name: '/screen')` so Dataxamas records the screen; no IDs in the name (`'/${type.slug}'`, not `'/movie/550'`). Root tabs report through `dataxamas.root`. Hide sensitive non-field areas from session replay with `DataxamasMask`.
 - Network images: use `SmoothImage` (`lib/components/media/smooth_image.dart`, wraps `image_fade`); never `Image.network`/`NetworkImage`. Exception: `zoomable_image.dart`. Avatars: `CircleAvatar` + `ClipOval(SmoothImage)`, no `backgroundImage`.
 - Scrollbars: app-wide via `AlwaysScrollbarBehavior` in `MaterialApp.scrollBehavior`; do not add manual `Scrollbar` widgets (double-bar clash).
 - Small non-scrolling modal sheets: `showSpringBottomSheet` (`lib/components/layout/spring_sheet.dart`). Scrollable/`isScrollControlled` sheets stay on `showModalBottomSheet`; never put a scrollable inside the spring sheet.

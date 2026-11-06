@@ -408,6 +408,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
     if (slug == null || slug.isEmpty) return;
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/person'),
         builder: (_) => PersonPage(
           request: PersonSlugRequest(slug),
           people: widget.env.people,
@@ -426,6 +427,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
   void _openCompany(int companyId) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/company'),
         builder: (_) => CompanyPage(
           type: MediaType.movie,
           id: '$companyId',
@@ -438,6 +440,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
   void _openFranchise(MovieCollectionRef collection) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/movie/franchise'),
         builder: (_) => MovieFranchisePage(
           slug: franchiseSlug(collection.id, collection.name),
           env: widget.env,
@@ -449,6 +452,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
   void _openMedia(MediaType type, String id) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: RouteSettings(name: '/${type.slug}'),
         builder: (_) => mediaDetailPage(
           type: type,
           id: id,

@@ -20,6 +20,7 @@ import '../services/shop_service.dart';
 import '../services/user_service.dart';
 import '../styles/tg_theme.dart';
 import 'always_scrollbar_behavior.dart';
+import 'dataxamas.dart';
 import 'server_config.dart';
 import 'trackgeek_shell.dart';
 
@@ -72,6 +73,7 @@ class TrackGeekApp extends StatelessWidget {
       theme: trackGeekTheme(),
       debugShowCheckedModeBanner: false,
       scrollBehavior: const AlwaysScrollbarBehavior(),
+      navigatorObservers: [?dataxamas.observer],
       home: ListenableBuilder(
         listenable: session,
         builder: (context, _) {

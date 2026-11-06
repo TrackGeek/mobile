@@ -1,3 +1,4 @@
+import '../app/dataxamas.dart';
 import '../models/api_exception.dart';
 import '../models/media_type.dart';
 import '../models/paginated_page.dart';
@@ -110,11 +111,14 @@ class ListService {
     String userId, {
     required String name,
     required MediaType type,
-  }) => _api.requestJson(
-    'POST',
-    'list',
-    body: {'name': name, 'userId': userId, 'type': listApiType[type]!},
-  );
+  }) async {
+    await _api.requestJson(
+      'POST',
+      'list',
+      body: {'name': name, 'userId': userId, 'type': listApiType[type]!},
+    );
+    dataxamas.track('list_create', {'type': type.slug});
+  }
 
   Future<void> toggleListItem(
     String listId, {

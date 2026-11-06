@@ -204,6 +204,7 @@ class _MovieFranchisePageState extends State<MovieFranchisePage> {
   void _openPart(MovieFranchisePart part) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/movie'),
         builder: (_) => mediaDetailPage(
           type: MediaType.movie,
           id: '${part.tmdbId}',

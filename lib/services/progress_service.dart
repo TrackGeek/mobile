@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../app/dataxamas.dart';
 import '../models/api_exception.dart';
 import '../models/media_type.dart';
 import '../models/paginated_page.dart';
@@ -63,6 +64,10 @@ class ProgressService extends ChangeNotifier {
                 'chaptersRead': item.current! + 1,
               },
       );
+      dataxamas.track('progress_increment', {
+        'type': item.type.slug,
+        'id': item.mediaId,
+      });
       notifyListeners();
       unawaited(WidgetSync.refresh());
     } finally {

@@ -1,3 +1,4 @@
+import '../app/dataxamas.dart';
 import '../models/api_exception.dart';
 import '../models/book_detail.dart';
 import 'api_client.dart';
@@ -79,19 +80,26 @@ class BookService {
     int? readCount,
     String? startedAt,
     String? completedAt,
-  }) => _api.requestJson(
-    'POST',
-    'book/progress',
-    body: {
-      'bookId': bookId,
+  }) async {
+    await _api.requestJson(
+      'POST',
+      'book/progress',
+      body: {
+        'bookId': bookId,
+        'status': status,
+        'chaptersRead': ?pagesRead,
+        'totalPages': ?totalPages,
+        'readCount': ?readCount,
+        'startedAt': ?startedAt,
+        'completedAt': ?completedAt,
+      },
+    );
+    dataxamas.track('progress_save', {
+      'type': 'book',
+      'id': bookId,
       'status': status,
-      'chaptersRead': ?pagesRead,
-      'totalPages': ?totalPages,
-      'readCount': ?readCount,
-      'startedAt': ?startedAt,
-      'completedAt': ?completedAt,
-    },
-  );
+    });
+  }
 
   Future<void> deleteProgress(String bookProgressId) =>
       _api.requestJson('DELETE', 'book/progress/$bookProgressId');

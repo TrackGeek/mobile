@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../app/dataxamas.dart';
 import '../app/server_config.dart';
 import '../controllers/session_controller.dart';
 import '../l10n/l10n_context.dart';
@@ -43,6 +44,12 @@ class _AuthGatePageState extends State<AuthGatePage> {
   bool _customServer = false;
   bool _magicLinkSent = false;
   _Method _method = _Method.password;
+
+  @override
+  void initState() {
+    super.initState();
+    dataxamas.root('/auth');
+  }
 
   @override
   void dispose() {

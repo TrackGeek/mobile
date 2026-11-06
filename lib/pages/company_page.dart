@@ -106,6 +106,9 @@ class _CompanyPageState extends State<CompanyPage> {
   void _openWork(CompanyWork work) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: RouteSettings(
+          name: '/${(work.mediaType ?? widget.type).slug}',
+        ),
         builder: (_) => mediaDetailPage(
           type: work.mediaType ?? widget.type,
           id: '${work.id}',

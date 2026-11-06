@@ -159,6 +159,7 @@ class _SearchPageState extends State<SearchPage> implements ScrollableTab {
   void _openGenreSearch(MediaType type, String genre) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/genre'),
         builder: (_) => SearchPage(
           search: widget.search,
           details: widget.details,
@@ -496,6 +497,7 @@ class _SearchPageState extends State<SearchPage> implements ScrollableTab {
             SearchTarget.media when item.mediaType != null =>
               () => Navigator.of(context).push(
                 MaterialPageRoute(
+                  settings: RouteSettings(name: '/${item.mediaType!.slug}'),
                   builder: (_) => mediaDetailPage(
                     type: item.mediaType!,
                     id: item.id,
@@ -506,6 +508,7 @@ class _SearchPageState extends State<SearchPage> implements ScrollableTab {
               ),
             SearchTarget.person => () => Navigator.of(context).push(
               MaterialPageRoute(
+                settings: const RouteSettings(name: '/person'),
                 builder: (_) => PersonPage(
                   request: PersonSlugRequest(item.id),
                   people: widget.people,

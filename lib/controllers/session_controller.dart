@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../app/dataxamas.dart';
 import '../services/auth_service.dart';
 import '../services/external_sign_in.dart';
 import '../services/notification_alerts.dart';
@@ -63,6 +64,7 @@ class SessionController extends ChangeNotifier {
       _user = result.user;
       await _persist();
       notifyListeners();
+      dataxamas.track('sign_in', {'method': 'email'});
       return true;
     } catch (e) {
       _error = e;
@@ -87,6 +89,7 @@ class SessionController extends ChangeNotifier {
       _user = result.user;
       await _persist();
       notifyListeners();
+      dataxamas.track('sign_up', {'method': 'email'});
       return true;
     } catch (e) {
       _error = e;
@@ -103,6 +106,7 @@ class SessionController extends ChangeNotifier {
       _twoFactorPending = false;
       await _persist();
       notifyListeners();
+      dataxamas.track('sign_in', {'method': 'two_factor'});
       return true;
     } catch (e) {
       _error = e;
@@ -131,6 +135,7 @@ class SessionController extends ChangeNotifier {
       _user = result.user;
       await _persist();
       notifyListeners();
+      dataxamas.track('sign_in', {'method': 'social'});
       return true;
     } catch (e) {
       _error = e;
@@ -154,6 +159,7 @@ class SessionController extends ChangeNotifier {
       _user = result.user;
       await _persist();
       notifyListeners();
+      dataxamas.track('sign_in', {'method': 'google'});
       return true;
     } catch (e) {
       _error = e;
@@ -189,6 +195,7 @@ class SessionController extends ChangeNotifier {
       _user = result.user;
       await _persist();
       notifyListeners();
+      dataxamas.track('sign_in', {'method': 'passkey'});
       return true;
     } catch (e) {
       _error = e;
@@ -206,6 +213,7 @@ class SessionController extends ChangeNotifier {
       _twoFactorPending = false;
       await _persist();
       notifyListeners();
+      dataxamas.track('sign_in', {'method': 'magic_link'});
       return true;
     } catch (e) {
       _error = e;
@@ -215,6 +223,7 @@ class SessionController extends ChangeNotifier {
   }
 
   Future<void> signOut() async {
+    dataxamas.track('sign_out');
     try {
       await _auth.signOut();
     } catch (_) {}

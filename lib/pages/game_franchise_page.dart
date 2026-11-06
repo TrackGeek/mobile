@@ -74,6 +74,7 @@ class _GameFranchisePageState extends State<GameFranchisePage> {
   void _openGame(FranchiseGame game) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/game'),
         builder: (_) => mediaDetailPage(
           type: MediaType.game,
           id: '${game.igdbId}',

@@ -556,6 +556,7 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
   void _openCompany(int malId) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/company'),
         builder: (_) =>
             CompanyPage(type: MediaType.anime, id: '$malId', env: widget.env),
       ),
@@ -565,6 +566,7 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
   void _openPerson(String slug) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/person'),
         builder: (_) => PersonPage(
           request: PersonSlugRequest(slug),
           people: widget.env.people,
@@ -581,6 +583,7 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
   void _openMedia(MediaType type, String slug) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: RouteSettings(name: '/${type.slug}'),
         builder: (_) => mediaDetailPage(
           type: type,
           id: slug,
