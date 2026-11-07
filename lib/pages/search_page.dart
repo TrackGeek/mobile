@@ -1,4 +1,5 @@
 import '../app/scrollable_tab.dart';
+import '../app/tour_keys.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -70,6 +71,8 @@ class _SearchPageState extends State<SearchPage> implements ScrollableTab {
   final _scroll = ScrollController();
   final _searchField = TextEditingController();
   final _kindButtonKey = GlobalKey();
+
+  bool get _isRoot => widget.initialFilters.isEmpty;
   static const _barClearance = 96.0;
 
   static const _kinds = [
@@ -230,27 +233,35 @@ class _SearchPageState extends State<SearchPage> implements ScrollableTab {
                   child: Row(
                     spacing: 12,
                     children: [
-                      Expanded(child: _buildSearchBar(context)),
+                      Expanded(
+                        child: KeyedSubtree(
+                          key: _isRoot ? TourKeys.searchBar : null,
+                          child: _buildSearchBar(context),
+                        ),
+                      ),
                       ListenableBuilder(
                         listenable: _controller,
-                        builder: (context, _) => FloatingActionButton(
-                          key: _kindButtonKey,
-                          heroTag: null,
-                          tooltip: _kindLabel(context, _controller.kind),
-                          onPressed: () => _openKindMenu(context, kinds),
-                          child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 180),
-                            transitionBuilder: (child, animation) =>
-                                ScaleTransition(
-                                  scale: animation,
-                                  child: FadeTransition(
-                                    opacity: animation,
-                                    child: child,
+                        builder: (context, _) => KeyedSubtree(
+                          key: _isRoot ? TourKeys.searchKind : null,
+                          child: FloatingActionButton(
+                            key: _kindButtonKey,
+                            heroTag: null,
+                            tooltip: _kindLabel(context, _controller.kind),
+                            onPressed: () => _openKindMenu(context, kinds),
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 180),
+                              transitionBuilder: (child, animation) =>
+                                  ScaleTransition(
+                                    scale: animation,
+                                    child: FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    ),
                                   ),
-                                ),
-                            child: HugeIcon(
-                              key: ValueKey(_controller.kind.path),
-                              icon: _kindIcon(_controller.kind),
+                              child: HugeIcon(
+                                key: ValueKey(_controller.kind.path),
+                                icon: _kindIcon(_controller.kind),
+                              ),
                             ),
                           ),
                         ),

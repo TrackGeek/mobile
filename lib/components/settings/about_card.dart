@@ -3,6 +3,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../l10n/l10n_context.dart';
+import '../../controllers/tour_controller.dart';
 import '../../utils/haptics.dart';
 import 'settings_card.dart';
 
@@ -25,6 +26,22 @@ class AboutCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        SettingsCard(
+          icon: HugeIcons.strokeRoundedHelpCircle,
+          title: context.t('app:tour.menu'),
+          description: context.t('app:tour.menuDescription'),
+          children: [
+            OutlinedButton(
+              onPressed: () {
+                HapticsHelper.light();
+                Navigator.of(context).popUntil((route) => route.isFirst);
+                TourController.instance.start();
+              },
+              child: Text(context.t('app:tour.menu')),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
         SettingsCard(
           icon: HugeIcons.strokeRoundedDatabase,
           title: context.t('settings:about.metadataTitle'),

@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
 
+import '../../app/tour_keys.dart';
+import '../../controllers/tour_controller.dart';
 import '../../l10n/l10n_context.dart';
+import '../onboarding/product_tour.dart';
 
 class StatusButtonConfig {
   const StatusButtonConfig({
@@ -22,14 +25,42 @@ class StatusButtonConfig {
   final bool disabled;
 }
 
-class QuickStatusButtons extends StatelessWidget {
+class QuickStatusButtons extends StatefulWidget {
   const QuickStatusButtons({super.key, required this.buttons});
 
   final List<StatusButtonConfig> buttons;
 
   @override
+  State<QuickStatusButtons> createState() => _QuickStatusButtonsState();
+}
+
+class _QuickStatusButtonsState extends State<QuickStatusButtons> {
+  late final bool _ownsTourKey = TourKeys.statusButtons.currentContext == null;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!_ownsTourKey) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (TourController.instance.stage != TourStage.details) return;
+      await Future<void>.delayed(const Duration(milliseconds: 600));
+      if (!mounted) return;
+      await showTourStage(context, TourStage.details);
+      await TourController.instance.finish();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final buttons = widget.buttons;
     if (buttons.isEmpty) return const SizedBox.shrink();
+    return KeyedSubtree(
+      key: _ownsTourKey ? TourKeys.statusButtons : null,
+      child: _buildGrid(buttons),
+    );
+  }
+
+  Widget _buildGrid(List<StatusButtonConfig> buttons) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final scale = MediaQuery.textScalerOf(context).scale(1);
