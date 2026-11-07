@@ -51,6 +51,12 @@ const settingsSections = [
     icon: HugeIcons.strokeRoundedUserCog,
     descriptionKey: 'settings:deleteAccount.description',
   ),
+  SettingsSection(
+    id: 'about',
+    labelKey: 'settings:about.title',
+    icon: HugeIcons.strokeRoundedInformationCircle,
+    descriptionKey: 'settings:about.description',
+  ),
 ];
 
 final settingsGroups = [
@@ -60,7 +66,12 @@ final settingsGroups = [
   ),
   (
     'settings:navigation.groups.application',
-    [settingsSections[2], settingsSections[3], settingsSections[4]],
+    [
+      settingsSections[2],
+      settingsSections[3],
+      settingsSections[4],
+      settingsSections[8],
+    ],
   ),
   (
     'settings:navigation.groups.account',

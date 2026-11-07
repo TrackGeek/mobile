@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../components/settings/about_card.dart';
 import '../components/settings/appearance_section.dart';
 import '../components/settings/settings_navigation.dart';
 import '../components/layout/content_frame.dart';
@@ -146,6 +147,7 @@ class _SettingsPageState extends State<SettingsPage> {
         session: widget.session,
         auth: widget.auth,
       ),
+      'about' => const AboutCard(),
       _ => const SizedBox.shrink(),
     };
   }

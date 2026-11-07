@@ -144,8 +144,10 @@ class _MediaPickerSheetState extends State<MediaPickerSheet> {
       padding: EdgeInsets.only(
         left: 16,
         right: 16,
+        top: 16,
         bottom:
-            MediaQuery.viewInsetsOf(context).bottom + BottomPadding.of(context),
+            MediaQuery.viewInsetsOf(context).bottom +
+            BottomPadding.of(context, minimum: 16),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

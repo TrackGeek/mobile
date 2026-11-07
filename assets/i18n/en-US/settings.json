@@ -432,6 +432,20 @@
       "data": "Import or export your tracked library."
     }
   },
+  "about": {
+    "title": "About",
+    "description": "Where our data comes from and the app source code.",
+    "metadataTitle": "Metadata sources",
+    "metadataDescription": "All media information shown in TrackGeek comes from these providers.",
+    "games": "Games",
+    "tvAndMovies": "TV Shows, Movies",
+    "animes": "Animes",
+    "mangas": "Mangas",
+    "books": "Books",
+    "sourceTitle": "Source code",
+    "sourceDescription": "TrackGeek is open source.",
+    "sourceAction": "View on GitHub"
+  },
   "oauth": {
     "title": "Authorized applications",
     "description": "Manage access granted to other applications.",
