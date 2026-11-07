@@ -54,6 +54,7 @@ class _ProgressCardState extends State<ProgressCard> {
   @override
   Widget build(BuildContext context) {
     final item = widget.item;
+    final showProgress = item.current != null && item.status != 'Completed';
     final episodes = item.type == MediaType.anime || item.type == MediaType.tv;
     final active = episodes
         ? const ['Watching', 'Rewatching'].contains(item.status)
@@ -149,10 +150,10 @@ class _ProgressCardState extends State<ProgressCard> {
                     Positioned(
                       left: 4,
                       right: 4,
-                      bottom: item.current != null ? 36 : 4,
+                      bottom: showProgress ? 36 : 4,
                       child: GameProgressBadges(item: item),
                     ),
-                  if (item.current != null)
+                  if (showProgress)
                     Positioned(
                       bottom: 4,
                       left: 0,
