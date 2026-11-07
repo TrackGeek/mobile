@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 
+import '../app/tour_keys.dart';
 import '../components/feed/feed_list.dart';
 import '../components/feed/feed_tabs.dart';
 import '../components/feed/tracking_header.dart';
@@ -241,7 +242,11 @@ class _HomePageState extends State<HomePage> implements ScrollableTab {
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-                  child: FeedTabs(active: _tab, onChanged: _setTab),
+                  child: FeedTabs(
+                    key: TourKeys.feedTabs,
+                    active: _tab,
+                    onChanged: _setTab,
+                  ),
                 ),
                 TrackingHeader(
                   userId: userId,
@@ -259,6 +264,7 @@ class _HomePageState extends State<HomePage> implements ScrollableTab {
           ),
         ),
         floatingActionButton: FloatingActionButton(
+          key: TourKeys.feedCompose,
           tooltip: context.t('feed:postPlaceholder'),
           onPressed: _compose,
           child: const HugeIcon(icon: HugeIcons.strokeRoundedPencilEdit01),

@@ -7,6 +7,8 @@ import '../controllers/session_controller.dart';
 import 'dataxamas.dart';
 import 'scrollable_tab.dart';
 import '../components/layout/adaptive_navigation.dart';
+import '../components/onboarding/product_tour.dart';
+import '../controllers/tour_controller.dart';
 import '../l10n/l10n_context.dart';
 import '../models/media_type.dart';
 import '../pages/home_page.dart';
@@ -89,6 +91,7 @@ class _TrackGeekShellState extends State<TrackGeekShell>
   final List<GlobalKey> _pageKeys = List.generate(4, (_) => GlobalKey());
   int _unread = 0;
   Timer? _poll;
+  bool _touring = false;
 
   @override
   void initState() {
@@ -100,8 +103,63 @@ class _TrackGeekShellState extends State<TrackGeekShell>
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _refreshUnread();
-      _showChangelog();
+      _showIntro();
     });
+  }
+
+  Future<void> _showIntro() async {
+    await _showChangelog();
+    if (!mounted) return;
+    await TourController.instance.startIfNew(widget.session.user);
+    TourController.instance.addListener(_onTourChanged);
+    unawaited(_runTour());
+  }
+
+  void _onTourChanged() {
+    WidgetsBinding.instance.addPostFrameCallback((_) => _runTour());
+  }
+
+  Future<void> _runTour() async {
+    final tour = TourController.instance;
+    final stage = tour.stage;
+    if (_touring || !mounted) return;
+    if (stage == null || stage == TourStage.done) return;
+    if (stage == TourStage.details || !widget.session.loggedIn) return;
+    _touring = true;
+    try {
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      switch (stage) {
+        case TourStage.welcome:
+          final start = await showTourWelcome(context);
+          await (start ? tour.go(TourStage.feed) : tour.finish());
+        case TourStage.feed:
+          await _tourStage(stage, tab: 0, next: TourStage.profile);
+        case TourStage.profile:
+          await _tourStage(stage, tab: _profileTab, next: TourStage.search);
+        case TourStage.search:
+          await _tourStage(stage, tab: 1, next: TourStage.details);
+        case TourStage.details:
+        case TourStage.done:
+          break;
+      }
+    } finally {
+      _touring = false;
+    }
+    if (mounted && tour.stage != stage) unawaited(_runTour());
+  }
+
+  Future<void> _tourStage(
+    TourStage stage, {
+    required int tab,
+    required TourStage next,
+  }) async {
+    if (_tab != tab) _selectTab(tab);
+    await Future<void>.delayed(const Duration(milliseconds: 700));
+    if (!mounted) return;
+    final finished = await showTourStage(context, stage);
+    await (finished
+        ? TourController.instance.go(next)
+        : TourController.instance.finish());
   }
 
   Future<void> _showChangelog() async {
@@ -156,6 +214,7 @@ class _TrackGeekShellState extends State<TrackGeekShell>
   @override
   void dispose() {
     _poll?.cancel();
+    TourController.instance.removeListener(_onTourChanged);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }

@@ -21,6 +21,7 @@ class SessionUser {
     this.profileTitle,
     this.bannerEffect,
     this.twoFactorEnabled = false,
+    this.createdAt,
   });
 
   factory SessionUser.fromJson(Map<String, dynamic> json) {
@@ -47,6 +48,7 @@ class SessionUser {
       profileTitle: p['title'] as String?,
       bannerEffect: p['bannerEffect'] as String?,
       twoFactorEnabled: json['twoFactorEnabled'] as bool? ?? false,
+      createdAt: DateTime.tryParse('${json['createdAt'] ?? ''}'),
     );
   }
 
@@ -67,6 +69,7 @@ class SessionUser {
   final String? profileTitle;
   final String? bannerEffect;
   final bool twoFactorEnabled;
+  final DateTime? createdAt;
 }
 
 class AuthAccount {

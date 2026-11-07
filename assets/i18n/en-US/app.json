@@ -30,5 +30,52 @@
     "title": "What's new",
     "close": "Got it"
   },
+  "tour": {
+    "menu": "Product tour",
+    "menuDescription": "Replay the guided tour of the app.",
+    "start": "Start tour",
+    "skip": "Skip",
+    "finish": "Got it",
+    "welcome": {
+      "title": "Welcome to TrackGeek!",
+      "description": "Let's take a quick tour of the feed, your progress, search and how to add things to it. You can skip at any time."
+    },
+    "feed": {
+      "tabs": {
+        "title": "The feed",
+        "description": "Following shows what the people you follow are doing, Global shows everyone, and Trending shows what is getting attention."
+      },
+      "compose": {
+        "title": "Share something",
+        "description": "Write a post, attach a title or a screenshot, and share it with the community."
+      }
+    },
+    "profile": {
+      "header": {
+        "title": "Your profile",
+        "description": "Your avatar, level and followers live here. Tap Edit to change how your profile looks."
+      },
+      "tabs": {
+        "title": "Your progress",
+        "description": "Each tab shows a different side of your account. Once you track something, a Progress tab appears with everything you are watching, reading or playing, organized by status."
+      }
+    },
+    "search": {
+      "bar": {
+        "title": "Search",
+        "description": "Type a name to find movies, TV shows, anime, manga, games, books, cast and other users."
+      },
+      "kind": {
+        "title": "Choose what to look for",
+        "description": "Switch between types of media, cast and users. Open any title to continue the tour and see how to add it to your progress."
+      }
+    },
+    "details": {
+      "status": {
+        "title": "Add it to your progress",
+        "description": "Pick a status to add this title to your progress. After that you can update episodes, chapters or hours, rate it and write a review."
+      }
+    }
+  },
   "library": "Library"
 }

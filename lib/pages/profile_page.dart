@@ -1,4 +1,5 @@
 import '../app/scrollable_tab.dart';
+import '../app/tour_keys.dart';
 
 import 'dart:async';
 
@@ -414,6 +415,7 @@ class _ProfilePageState extends State<ProfilePage> implements ScrollableTab {
                         child: Column(
                           children: [
                             ProfileHeader(
+                              key: isNested ? null : TourKeys.profileHeader,
                               user: user,
                               isOwner: _isOwner,
                               isAuthenticated: widget.session.user != null,
@@ -427,6 +429,7 @@ class _ProfilePageState extends State<ProfilePage> implements ScrollableTab {
                             ),
                             const SizedBox(height: 16),
                             ProfileTabs(
+                              key: isNested ? null : TourKeys.profileTabs,
                               tabs: _tabs(user),
                               active: _tab,
                               onSelect: _setTab,

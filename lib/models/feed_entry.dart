@@ -87,6 +87,29 @@ class FeedScreenshot {
   final bool isSpoiler;
 }
 
+class FeedReviewDetails {
+  const FeedReviewDetails({
+    required this.overall,
+    this.criteria = const [],
+    this.notes,
+    this.story,
+    this.recommended,
+  });
+
+  final double overall;
+  final List<FeedReviewCriterion> criteria;
+  final String? notes;
+  final String? story;
+  final bool? recommended;
+}
+
+class FeedReviewCriterion {
+  const FeedReviewCriterion({required this.labelKey, required this.value});
+
+  final String labelKey;
+  final double value;
+}
+
 class FeedEntry {
   FeedEntry({
     required this.kind,
@@ -108,6 +131,7 @@ class FeedEntry {
     this.isSpoiler = false,
     this.isAdult = false,
     this.screenshots = const [],
+    this.review,
   }) : reactions = reactions ?? [];
 
   final FeedEntryKind kind;
@@ -130,4 +154,5 @@ class FeedEntry {
   final bool isSpoiler;
   final bool isAdult;
   final List<FeedScreenshot> screenshots;
+  final FeedReviewDetails? review;
 }
