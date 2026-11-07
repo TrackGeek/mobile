@@ -7,6 +7,7 @@ import '../../l10n/l10n_context.dart';
 import '../../models/feed_entry.dart';
 import 'feed_item_card.dart';
 import 'post_card.dart';
+import 'review_card.dart';
 import 'screenshot_card.dart';
 import '../layout/tg_refresh_indicator.dart';
 import '../../utils/haptics.dart';
@@ -194,6 +195,17 @@ class _FeedListState extends State<FeedList> {
                       isReacting: isReacting,
                       onUpdate: widget.onUpdatePost,
                       onDelete: widget.onDeletePost,
+                    ),
+                    FeedEntryKind.review => ReviewCard(
+                      entry: entry,
+                      currentUserId: currentUserId,
+                      onMediaTap: mediaLink != null
+                          ? () => widget.onOpenMedia?.call(mediaLink)
+                          : null,
+                      onUserTap: onUserTap,
+                      onTitleLinkTap: onTitleTap,
+                      onReact: onReact,
+                      isReacting: isReacting,
                     ),
                     _ => FeedItemCard(
                       entry: entry,

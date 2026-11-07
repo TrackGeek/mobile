@@ -1,5 +1,6 @@
 import 'feed_entry.dart';
 import 'media_type.dart';
+import 'review.dart';
 
 class _ResolvedMedia {
   const _ResolvedMedia({
@@ -142,6 +143,36 @@ FeedProfile _profileOf(Map<String, dynamic> user) {
   );
 }
 
+String? _nonEmpty(Object? value) =>
+    value is String && value.trim().isNotEmpty ? value : null;
+
+FeedReviewDetails _reviewDetails(Map<String, dynamic> review, MediaType? type) {
+  final config = type == null ? null : reviewContent[type];
+  final storyIsText = config?.hasStory ?? false;
+  final criteria = <FeedReviewCriterion>[];
+  if (config != null) {
+    for (final field in config.criteria) {
+      if (field == 'story' && storyIsText) continue;
+      final raw = review[field];
+      final value = raw is num ? raw.toDouble() : double.tryParse('$raw');
+      if (value == null) continue;
+      criteria.add(
+        FeedReviewCriterion(
+          labelKey: config.criteriaLabels[field] ?? field,
+          value: value,
+        ),
+      );
+    }
+  }
+  return FeedReviewDetails(
+    overall: _toNum(review['overall']).toDouble(),
+    criteria: criteria,
+    notes: _nonEmpty(review['notes']),
+    story: storyIsText ? _nonEmpty(review['story']) : null,
+    recommended: review['recommended'] as bool?,
+  );
+}
+
 FeedTitleLink _mediaLink(_ResolvedMedia media) => FeedMediaTitleLink(
   slug: media.slug,
   type: media.type,
@@ -185,6 +216,7 @@ FeedEntry? normalizeActivityGroup(Map<String, dynamic> group) {
     String? authorId,
     bool isSpoiler = false,
     List<FeedScreenshot> screenshots = const [],
+    FeedReviewDetails? review,
   }) => FeedEntry(
     kind: kind,
     profile: profile,
@@ -211,6 +243,7 @@ FeedEntry? normalizeActivityGroup(Map<String, dynamic> group) {
     isSpoiler: isSpoiler,
     isAdult: media?.isAdult ?? false,
     screenshots: screenshots,
+    review: review,
   );
 
   return switch (type) {
@@ -225,6 +258,7 @@ FeedEntry? normalizeActivityGroup(Map<String, dynamic> group) {
         titleValues: {'content': media.title},
         titleLink: _mediaLink(media),
         content: review['summary'] as String?,
+        review: _reviewDetails(review, media.type),
       );
     }(),
     'Watched' => () {
