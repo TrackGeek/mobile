@@ -15,6 +15,7 @@ class ProgressItem {
     this.updatedAt,
     this.completion,
     this.hoursPlayed,
+    this.rating,
     this.isAdult = false,
   });
 
@@ -31,6 +32,7 @@ class ProgressItem {
   final DateTime? updatedAt;
   final String? completion;
   final double? hoursPlayed;
+  final double? rating;
   final bool isAdult;
 
   bool get canIncrement {
@@ -103,6 +105,7 @@ class ProgressItem {
       updatedAt: DateTime.tryParse('${json['updatedAt']}'),
       completion: json['completion'] as String?,
       hoursPlayed: (json['hoursPlayed'] as num?)?.toDouble(),
+      rating: (json['rating'] as num?)?.toDouble(),
       isAdult: media['isAdult'] as bool? ?? false,
     );
   }

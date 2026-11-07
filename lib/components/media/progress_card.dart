@@ -102,6 +102,35 @@ class _ProgressCardState extends State<ProgressCard> {
                             ),
                           ),
                   ),
+                  if (item.rating != null)
+                    Positioned(
+                      top: 4,
+                      left: 4,
+                      child: _CoverLabel(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const HugeIcon(
+                                icon: HugeIcons.strokeRoundedStar,
+                                size: 12,
+                                color: Colors.amber,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                item.rating!.toStringAsFixed(
+                                  item.rating! % 1 == 0 ? 0 : 1,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   if (item.year != null)
                     Positioned(
                       top: 4,
